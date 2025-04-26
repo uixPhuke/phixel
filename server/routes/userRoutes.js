@@ -1,11 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const { testUserRoute } = require('../controllers/userCtrl'); 
 
-router.get('/test', (req, res) => {
-    console.log('userRoutes.js loaded');
-    res.send('User route is working');
-}
-);
+router.get('/test', testUserRoute);
 
 module.exports = router;
 
