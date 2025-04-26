@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose=require('mongoose')
 
 const userSchema=new mongoose.Schema({
     firstName:{
@@ -25,16 +25,31 @@ const userSchema=new mongoose.Schema({
             message: props=> `${props.value} is not a valid email!`
         }
     },
-   password: {
+    phone:{
+        type:String,
+        required:true,
+        validate: {
+            validator: function (v){
+                return /^\d{10}$/.test(v);
+            },
+            message: props=> `${props.value} is not a valid phone number!`
+        }
+    },
+    dob:{
+        type:Date,
+        required:true,
+        validate: {
+            validator: function (v){
+                return v <= new Date();
+            },
+            message: props=> `${props.value} is not a valid date of birth!`
+        }
+    },
+    password: {
         type: String,
         required: [true, 'Password is required'],
         minlength: [8, 'Password must be at least 8 characters long'],
-        validate: {
-          validator: function (value) {
-            return /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value);
-          },
-          message: 'Password must contain at least 1 uppercase letter, 1 number, 1 special character, and be at least 8 characters long'
-        }
+    
       },
       isAdmin: {
         type: Boolean,
@@ -44,4 +59,5 @@ const userSchema=new mongoose.Schema({
 },{timestamps:true});
 
 const User= mongoose.model("User",userSchema);
-export default User;
+module.exports=User
+
