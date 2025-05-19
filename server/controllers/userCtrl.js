@@ -19,6 +19,7 @@ const registerUser = async (req, res) => {
       message: "Please fill all the fields",
     });
   }
+  //validate the fields (email,phone,password)
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({
       success: false,
@@ -39,7 +40,7 @@ const registerUser = async (req, res) => {
   }
 
   try {
-    // check username
+    // check username if already exists
     const existingUsername = await User.findOne({ username });
     if (existingUsername) {
       return res.status(400).json({
@@ -47,7 +48,7 @@ const registerUser = async (req, res) => {
         message: "Username already exists",
       });
     }
-    // check email
+    // check email if already exists
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return res.status(400).json({
@@ -63,10 +64,10 @@ const registerUser = async (req, res) => {
         message: "Phone number already exists",
       });
     }
-
+  //Hashed the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
+//create a new user
     const newUser = new User({
       firstName,
       lastName,
@@ -75,6 +76,7 @@ const registerUser = async (req, res) => {
       phone,
       dob,
       password: hashedPassword,
+      isAdmin: isAdmin || false
     });
 
     await newUser.save();
