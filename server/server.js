@@ -27,3 +27,4 @@ app.get('/',(req,res)=>{
 )
 //other routes
 app.use('/api/users',userRoutes)
+app.use('/api/address',require('./routes/addressRoutes'))
