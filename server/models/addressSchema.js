@@ -1,7 +1,7 @@
 const mongoose=require('mongoose')
 const { use } = require('../routes/userRoutes')
 
-const addresssSchema= new mongoose.Schema({
+const addressSchema= new mongoose.Schema({
     userId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
@@ -46,5 +46,5 @@ const addresssSchema= new mongoose.Schema({
 },{timestamps:true})
 
 
-const Address=mongoose.model('Address',addresssSchema)
+const Address=mongoose.model('Address',addressSchema)
 module.exports=Address
