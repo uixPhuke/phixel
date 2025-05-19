@@ -8,10 +8,11 @@
 const User = require("../models/userSchema");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const {createToken} = require("../middlewares/auth");
 
 // Register a new user
 const registerUser = async (req, res) => {
-  const { firstName, lastName, username, email, phone, dob, password } = req.body;
+  const { firstName, lastName, username, email, phone, dob, password,isAdmin } = req.body;
 
   if (!firstName || !lastName || !username || !email || !phone || !dob || !password) {
     return res.status(400).json({
@@ -35,7 +36,7 @@ const registerUser = async (req, res) => {
   if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
     return res.status(400).json({
       success: false,
-      message: "m Password must contain at least 1 uppercase letter, 1 number, 1 special character, and be at least 8 characters long",
+      message: "Password must contain at least 1 uppercase letter, 1 number, 1 special character, and be at least 8 characters long",
     });
   }
 
@@ -80,11 +81,12 @@ const registerUser = async (req, res) => {
     });
 
     await newUser.save();
-
-    return res.status(201).json({
+   const token= createToken(newUser._id, newUser.email, res);
+     res.status(201).json({
       success: true,
       message: "User registered successfully",
       user: newUser,
+      token
     });
 
   } catch (error) {
