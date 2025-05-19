@@ -236,4 +236,19 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-module.exports = { registerUser, loginUser, updateUser };
+//get users
+const getUsers = async (req, res,next) => {
+  try {
+    const users = await User.find();
+    res.status(200).json({
+      success: true,
+      message: "Users fetched successfully",
+      users,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+
+module.exports = { registerUser, loginUser, updateUser ,getUsers};
