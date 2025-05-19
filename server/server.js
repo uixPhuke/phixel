@@ -22,7 +22,7 @@ app.listen(PORT,()=>{
 )
 //api routes
 app.get('/',(req,res)=>{
-    res.send('Hello World!')
+    res.send('<h1>Welcome to the server</h1>')
 }
 )
 //other routes

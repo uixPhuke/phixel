@@ -1,10 +1,3 @@
-
-//testing route
-// exports.testUserRoute = (req, res) => {
-//     console.log('Controller: testUserRoute called');
-//     res.send('User Controller is working!');
-//   }; 
-// Import necessary modules
 const User = require("../models/userSchema");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -98,10 +91,55 @@ const registerUser = async (req, res) => {
   }
 };
 
-// simple test route
-const testUserRoute = (req, res) => {
-  console.log("Controller: testUserRoute called");
-  res.send("User Controller is working!");
-};
+//login user
+const loginUser=async(req,res)=>{
+    const {emailOrUsername,password}=req.body;
+    if(!emailOrUsername || !password){
+        return res.status(400).json({
+            success:false,
+            message:"Please fill all the fields"
+        })
+    }
+    // Check if password is at least 6 characters long
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long',
+      });
+    }
+    try{
+        const user=await User.findOne({
+          $or: [
+            { email: emailOrUsername },
+            { username: emailOrUsername },
+          ]});
+        if(!user){
+            return res.status(400).json({
+                success:false,
+                message:"Invalid credentials"
+            })
+        }
+        const isMatch=await bcrypt.compare(password,user.password);
+        if(!isMatch){
+            return res.status(400).json({
+                success:false,
+                message:"Invalid credentials"
+            })
+        }
+        const token=createToken(user._id,user.email,res);
+        res.status(200).json({
+            success:true,
+            message:"User logged in successfully",
+            user,
+            token
+        })
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Internal server error",
+            error:error.message
+        })
+    }
+}
 
-module.exports = { registerUser, testUserRoute };
+module.exports = { registerUser,loginUser };
