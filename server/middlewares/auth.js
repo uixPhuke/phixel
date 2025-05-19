@@ -18,35 +18,34 @@ const createToken = (userID, email, res) => {
 };
 
 //Check is AUTHENTICATED
-const isAuthenticated=async (req, res, next) => {
-    try{
-    const token=req.cookies.token;
-    if(!token){
-        return res.status(401).json({
-            success:false,
-            isLogin:false,
-            message:"Please login to access this resource"
-        })
+const isAuthenticated = async (req, res, next) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        isLogin: false,
+        message: "Please login to access this resource",
+      });
     }
-    const decoded=jwt.verify(token,process.env.JWT_SECRET);
-    const user=await User.findById(decoded.userID).select("-password");
-    if(!user){
-        return res.status(401).json({
-            success:false,
-            isLogin:false,
-            message:"User not found, please login again"
-        })
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userID).select("-password");
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        isLogin: false,
+        message: "User not found, please login again",
+      });
     }
-    req.user=user;
+    req.user = user;
     next();
-}catch(error){
+  } catch (error) {
     return res.status(401).json({
-        success:false,
-        isLogin:false,
-        message:"Invalid token, please login again"
-    })
-}
+      success: false,
+      isLogin: false,
+      message: "Invalid token, please login again",
+    });
+  }
+};
 
-}
-
-module.exports ={ createToken, isAuthenticated };
+module.exports = { createToken, isAuthenticated };
