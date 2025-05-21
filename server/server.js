@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser')
 
 const connectDB = require('./config/db')
 const userRoutes=require('./routes/userRoutes')
+const addressRoutes=require('./routes/addressRoutes')
 const PORT=process.env.PORT
 
 //connect to database
@@ -27,4 +28,4 @@ app.get('/',(req,res)=>{
 )
 //other routes
 app.use('/api/users',userRoutes)
-app.use('/api/address',require('./routes/addressRoutes'))
+app.use('/api/address',addressRoutes)
