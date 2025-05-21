@@ -544,7 +544,7 @@ const getAllProducts = async (req, res, next) => {
   };
 
   //get product 
-  getProduct = async (req, res, next) => {
+  const getProduct = async (req, res, next) => {
     try {
       const { productID } = req.params;
   
@@ -593,7 +593,7 @@ const getAllProducts = async (req, res, next) => {
       return next(err);
     }
   };
-//get all products by category
+//get all products by category 
 const getProductsByCategory = async (req, res, next) => {
     try {
       const { category } = req.params;
@@ -653,3 +653,14 @@ const getProductsByCategory = async (req, res, next) => {
       return next(err);
     }
   };  
+
+  module.exports = {
+    createProduct,
+    editProduct,
+    deleteProduct,
+    getProductsAdmin,
+    getProductAdmin,
+    getAllProducts,
+    getProduct,
+    getProductsByCategory
+  };
