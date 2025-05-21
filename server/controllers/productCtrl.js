@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const xss = require("xss");
 const validator = require("validator");
 
-const createProduct = async (req, res, next) => {
+const createProductAdmin = async (req, res, next) => {
   try {
     const {
       title,
@@ -12,7 +12,7 @@ const createProduct = async (req, res, next) => {
       sellingPrice,
       costPrice,
       category,
-      sizes,
+      sizes,  
       fabricType,
       fitType,
       pattern,
@@ -216,7 +216,7 @@ const createProduct = async (req, res, next) => {
 };
 
 //edit product
-const editProduct = async (req, res,next) => {
+const editProductAdmin = async (req, res,next) => {
     try {
         const {productId} = req.params
 
@@ -321,7 +321,7 @@ const editProduct = async (req, res,next) => {
 }
 
 //delete product
-const deleteProduct = async (req, res) => {
+const deleteProductAdmin = async (req, res) => {
     try {
         const { productId } = req.params;
     
@@ -363,18 +363,21 @@ const getProductsAdmin = async (req, res) => {
         }
         //sort products by createdAt in descending order
         const sortproducts=products.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        // //apply pagination
-        // const page = parseInt(req.query.page) || 1;
-        // const limit = parseInt(req.query.limit) || 10;
-        // const skip = (page - 1) * limit;
-        // const totalProducts = products.length;
-        // const totalPages = Math.ceil(totalProducts / limit);
-        // const paginatedProducts = products.slice(skip, skip + limit);
-        // if (page > totalPages) {
-        //     return res.status(404).json({ success: false, message: "No more products available!" });
-        // }
        
-        // Apply currency conversion if needed
+        /* //apply pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        const totalProducts = products.length;
+        const totalPages = Math.ceil(totalProducts / limit);
+        const paginatedProducts = products.slice(skip, skip + limit);
+        if (page > totalPages) {
+            return res.status(404).json({ success: false, message: "No more products available!" });
+        }
+        */
+
+
+       /* // Apply currency conversion if needed
         const convertedProducts = sortproducts.map((product) => {
             const convertedPrice = product.sellingPrice * req.query.conversionRate; // Assuming conversionRate is passed in the query
             return {
@@ -382,16 +385,15 @@ const getProductsAdmin = async (req, res) => {
                 totalPrice:(product.totalPrice * req.query.conversionRate).toFixed(2),
                 sellingPrice: convertedPrice.toFixed(2),
                 costPrice:(product.costPrice * req.query.conversionRate).toFixed(2),
-                
+              
 
             };})
+             */ 
+
             res.status(200).json({
                 success: true,
                 message: "Products retrieved successfully!",
-                products: convertedProducts,
-                totalProducts,
-                totalPages,
-                currentPage: page,
+                products: sortproducts,
             });
         
     } catch (err) {
@@ -418,17 +420,18 @@ const getProductAdmin = async (req, res) => {
             return res.status(404).json({ success: false, message: "Product not found!" });
         }
 
-        // Convert price to the desired currency if needed
+        /*// Convert price to the desired currency if needed
         const convertedProduct = {
             ...product.toObject(),
             totalPrice: (product.totalPrice * req.query.conversionRate).toFixed(2),
             sellingPrice: (product.sellingPrice * req.query.conversionRate).toFixed(2),
             costPrice: (product.costPrice * req.query.conversionRate).toFixed(2),
         };
+        */
         res.status(200).json({
             success: true,
             message: "Product retrieved successfully!",
-            product: convertedProduct,
+            product: product,
         });
     } catch (err) {
         console.error("Error fetching product:", err);
@@ -509,19 +512,16 @@ const getAllProducts = async (req, res, next) => {
         const uniqueId = `${product.title}${formattedDate}`;
   
         // Overwrite sellingPrice with the converted price
-        const convertedSellingPrice = (product.sellingPrice * req.conversionRate).toFixed(2);
+        //const convertedSellingPrice = (product.sellingPrice * req.conversionRate).toFixed(2);
         
         return {
           ...product,
           uniqueId,
-          totalPrice: convertedSellingPrice,
-          currency: req.currency,
           relatedProducts: relatedProducts.map(rp => ({
             _id: rp._id,
             title: rp.title,
             images: rp.images,
-            totalPrice: (rp.sellingPrice * req.conversionRate).toFixed(2),
-            currency: req.currency,
+            totalPrice: rp.sellingPrice,
           })),
         };
       }));
@@ -539,7 +539,7 @@ const getAllProducts = async (req, res, next) => {
         },
       });
     } catch (err) {
-      return next(err);
+      next(err);
     }
   };
 
@@ -570,21 +570,20 @@ const getAllProducts = async (req, res, next) => {
         _id: { $in: product.relatedProducts || [] },
       });
   
-      const convertedSellingPrice = (product.sellingPrice * req.conversionRate).toFixed(2);
+      //const convertedSellingPrice = (product.sellingPrice * req.conversionRate).toFixed(2);
   
       res.status(200).json({
         success: true,
-        message: 'Product fetched Successfully!',
+        message: 'Product fetched successfully!',
         product: {
           ...product.toObject(),
-          totalPrice: convertedSellingPrice,
-          currency: req.currency,
+          totalPrice: product.sellingPrice, // use sellingPrice directly as totalPrice
           relatedProducts: relatedProducts.map(rp => ({
             _id: rp._id,
             title: rp.title,
             images: rp.images,
             sellingPrice: rp.sellingPrice,
-            totalPrice: (rp.sellingPrice * req.conversionRate).toFixed(2),
+            totalPrice: rp.sellingPrice, // consistent naming
             productCode: rp.productCode,
           })),
         },
@@ -655,9 +654,9 @@ const getProductsByCategory = async (req, res, next) => {
   };  
 
   module.exports = {
-    createProduct,
-    editProduct,
-    deleteProduct,
+    createProductAdmin,
+    editProductAdmin,
+    deleteProductAdmin,
     getProductsAdmin,
     getProductAdmin,
     getAllProducts,

@@ -85,4 +85,4 @@ const isAdmin = async(req, res, next) => {
   }
 }
 
-module.exports = { createToken, isAuthenticated };
+module.exports = { createToken, isAuthenticated ,isAdmin};
