@@ -7,7 +7,15 @@ const productSchema= new mongoose.Schema({
         ref:'Product',
         required:true,
         unique:true,
+        index:true,
     },
+    title: {
+        type: String,
+        required: true,
+        unique: true, // Ensure uniqueness
+        index: true,
+    },
+
     description: {
         type: String,
         required: true,
