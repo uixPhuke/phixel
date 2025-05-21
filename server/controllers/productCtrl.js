@@ -320,3 +320,336 @@ const editProduct = async (req, res,next) => {
     }
 }
 
+//delete product
+const deleteProduct = async (req, res) => {
+    try {
+        const { productId } = req.params;
+    
+        if (!productId) {
+        return res.status(400).json({ success: false, message: "Product ID is required!" });
+        }
+    
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+        return res.status(400).json({ success: false, message: "Invalid Product ID!" });
+        }
+    
+        const product = await Product.findById(productId);
+    
+        if (!product) {
+        return res.status(404).json({ success: false, message: "Product not found!" });
+        }
+    
+        // Delete images from Cloudinary
+        for (const image of product.images) {
+        await cloudinary.uploader.destroy(image.public_id);
+        }
+    
+        // Delete the product from the database
+        await Product.findByIdAndDelete(productId);
+    
+        res.status(200).json({ success: true, message: "Product deleted successfully!" });
+    } catch (err) {
+        console.error("Error deleting product:", err);
+        return res.status(500).json({ success: false, message: "Internal server error", error: err.message });
+    }
+    
+}
+//get all products
+const getProductsAdmin = async (req, res) => {
+    try {
+        const products = await Product.find();
+        if (!products || products.length === 0) {
+            return res.status(404).json({ success: false, message: "No products found!" });
+        }
+        //sort products by createdAt in descending order
+        const sortproducts=products.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        // //apply pagination
+        // const page = parseInt(req.query.page) || 1;
+        // const limit = parseInt(req.query.limit) || 10;
+        // const skip = (page - 1) * limit;
+        // const totalProducts = products.length;
+        // const totalPages = Math.ceil(totalProducts / limit);
+        // const paginatedProducts = products.slice(skip, skip + limit);
+        // if (page > totalPages) {
+        //     return res.status(404).json({ success: false, message: "No more products available!" });
+        // }
+       
+        // Apply currency conversion if needed
+        const convertedProducts = sortproducts.map((product) => {
+            const convertedPrice = product.sellingPrice * req.query.conversionRate; // Assuming conversionRate is passed in the query
+            return {
+                ...product.toObject(),
+                totalPrice:(product.totalPrice * req.query.conversionRate).toFixed(2),
+                sellingPrice: convertedPrice.toFixed(2),
+                costPrice:(product.costPrice * req.query.conversionRate).toFixed(2),
+                
+
+            };})
+            res.status(200).json({
+                success: true,
+                message: "Products retrieved successfully!",
+                products: convertedProducts,
+                totalProducts,
+                totalPages,
+                currentPage: page,
+            });
+        
+    } catch (err) {
+        console.error("Error fetching products:", err);
+        return res.status(500).json({ success: false, message: "Internal server error", error: err.message });
+    }
+}
+//get Product
+const getProductAdmin = async (req, res) => {
+    try {
+        const { productId } = req.params;
+
+        if (!productId) {
+            return res.status(400).json({ success: false, message: "Product ID is required!" });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({ success: false, message: "Invalid Product ID!" });
+        }
+
+        const product = await Product.findById(productId);
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found!" });
+        }
+
+        // Convert price to the desired currency if needed
+        const convertedProduct = {
+            ...product.toObject(),
+            totalPrice: (product.totalPrice * req.query.conversionRate).toFixed(2),
+            sellingPrice: (product.sellingPrice * req.query.conversionRate).toFixed(2),
+            costPrice: (product.costPrice * req.query.conversionRate).toFixed(2),
+        };
+        res.status(200).json({
+            success: true,
+            message: "Product retrieved successfully!",
+            product: convertedProduct,
+        });
+    } catch (err) {
+        console.error("Error fetching product:", err);
+        return res.status(500).json({ success: false, message: "Internal server error", error: err.message });
+    }
+}
+//get all products
+const getAllProducts = async (req, res, next) => {
+    try {
+      const {
+        page = 1, limit = 10, search = '', category, gender, price, sort = 'newest', productCode,
+      } = req.query;
+  
+      const offset = (page - 1) * limit;
+  
+      // Filters
+      const filters = {};
+      const regexOptions = 'i'; // Case-insensitive regex search for text fields
+  
+      if (search) {
+        filters.$or = [
+          { title: new RegExp(search, regexOptions) },
+          { category: new RegExp(search, regexOptions) },
+        ];
+      }
+      if (productCode) {
+        filters.productCode = productCode;
+      }
+      if (price) {
+        const priceRanges = price.split(',');  // Split the multiple price ranges
+        const priceFilters = priceRanges.map(range => {
+          const [minPrice, maxPrice] = range.split('-').map(Number);
+          if (isNaN(minPrice) || (maxPrice && isNaN(maxPrice))) {
+            return null;  // If invalid range, return null
+          }
+          return maxPrice
+            ? { totalPrice: { $gte: minPrice, $lte: maxPrice } }
+            : { totalPrice: { $lte: minPrice } };
+        }).filter(Boolean); // Remove any invalid ranges
+      
+        // Combine the multiple price filters with OR logic
+        if (priceFilters.length > 0) {
+          filters.$or = priceFilters;
+        }
+      }
+      if (category) {
+        filters.category = { $in: category.split(',') };
+      }
+      if (gender) {
+        filters.gender = { $in: gender.split(',') };
+      }
+  
+      // Sorting
+      let sortOptions = { createdAt: -1 }; // Default sort by newest
+      if (sort === 'name') sortOptions = { title: 1 }; // Sort by name A-Z
+      else if (sort === 'price') sortOptions = { sellingPrice: 1 }; // Sort by price from low to high
+      else if (sort === 'oldest') sortOptions = { createdAt: 1 }; // Sort by oldest first
+  
+      // Query products and count total
+      const productsQuery = Product.find(filters)
+        .skip(offset)
+        .limit(parseInt(limit, 10))
+        .sort(sortOptions)
+        .lean();
+  
+      const countQuery = Product.countDocuments(filters);
+  
+      const [products, count] = await Promise.all([productsQuery, countQuery]);
+  
+      // Format Products
+      const formattedProducts = await Promise.all(products.map(async (product) => {
+        const relatedProducts = await Product.find({
+          _id: { $in: product.relatedProducts || [] },
+        }).lean();
+  
+        const createdDate = new Date(product.createdAt);
+        const formattedDate = createdDate.toISOString().split('T')[0].replace(/-/g, '');
+        const uniqueId = `${product.title}${formattedDate}`;
+  
+        // Overwrite sellingPrice with the converted price
+        const convertedSellingPrice = (product.sellingPrice * req.conversionRate).toFixed(2);
+        
+        return {
+          ...product,
+          uniqueId,
+          totalPrice: convertedSellingPrice,
+          currency: req.currency,
+          relatedProducts: relatedProducts.map(rp => ({
+            _id: rp._id,
+            title: rp.title,
+            images: rp.images,
+            totalPrice: (rp.sellingPrice * req.conversionRate).toFixed(2),
+            currency: req.currency,
+          })),
+        };
+      }));
+  
+      // Response
+      res.status(200).json({
+        success: true,
+        message: 'Products fetched successfully!',
+        products: formattedProducts,
+        pagination: {
+          total: count,
+          page: parseInt(page, 10),
+          limit: parseInt(limit, 10),
+          totalPages: Math.ceil(count / limit),
+        },
+      });
+    } catch (err) {
+      return next(err);
+    }
+  };
+
+  //get product 
+  getProduct = async (req, res, next) => {
+    try {
+      const { productID } = req.params;
+  
+      if (!productID) {
+        return res.status(404).json({
+          success: false,
+          message: 'Invalid Product ID!',
+        });
+      }
+  
+      // Fetch the main product by ID
+      const product = await Product.findById(productID);
+  
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: 'Product not found!',
+        });
+      }
+  
+      // Fetch related products
+      const relatedProducts = await Product.find({
+        _id: { $in: product.relatedProducts || [] },
+      });
+  
+      const convertedSellingPrice = (product.sellingPrice * req.conversionRate).toFixed(2);
+  
+      res.status(200).json({
+        success: true,
+        message: 'Product fetched Successfully!',
+        product: {
+          ...product.toObject(),
+          totalPrice: convertedSellingPrice,
+          currency: req.currency,
+          relatedProducts: relatedProducts.map(rp => ({
+            _id: rp._id,
+            title: rp.title,
+            images: rp.images,
+            sellingPrice: rp.sellingPrice,
+            totalPrice: (rp.sellingPrice * req.conversionRate).toFixed(2),
+            productCode: rp.productCode,
+          })),
+        },
+      });
+    } catch (err) {
+      return next(err);
+    }
+  };
+//get all products by category
+const getProductsByCategory = async (req, res, next) => {
+    try {
+      const { category } = req.params;
+  
+      if (!category) {
+        return res.status(400).json({
+          success: false,
+          message: 'Category is required!',
+        });
+      }
+  
+      // Fetch products by category
+      const products = await Product.find({ category });
+  
+      if (!products || products.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'No products found in this category!',
+        });
+      }
+  
+      // Format Products
+      const formattedProducts = await Promise.all(products.map(async (product) => {
+        const relatedProducts = await Product.find({
+          _id: { $in: product.relatedProducts || [] },
+        }).lean();
+  
+        const createdDate = new Date(product.createdAt);
+        const formattedDate = createdDate.toISOString().split('T')[0].replace(/-/g, '');
+        const uniqueId = `${product.title}${formattedDate}`;
+  
+        // Overwrite sellingPrice with the converted price
+        const convertedSellingPrice = (product.sellingPrice * req.conversionRate).toFixed(2);
+        
+        return {
+          ...product,
+          uniqueId,
+          totalPrice: convertedSellingPrice,
+          currency: req.currency,
+          relatedProducts: relatedProducts.map(rp => ({
+            _id: rp._id,
+            title: rp.title,
+            images: rp.images,
+            totalPrice: (rp.sellingPrice * req.conversionRate).toFixed(2),
+            currency: req.currency,
+          })),
+        };
+      }));
+  
+      // Response
+      res.status(200).json({
+        success: true,
+        message: 'Products fetched successfully!',
+        products: formattedProducts,
+      });
+    } catch (err) {
+      return next(err);
+    }
+  };  
