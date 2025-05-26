@@ -21,7 +21,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (_, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    const allowed = ['.jpg', '.jpeg', '.png'];
+    const allowed = ['.jpg', '.jpeg', '.png',' .gif', '.webp'];
     if (!allowed.includes(ext)) {
       return cb(new Error('Only .jpg, .jpeg and .png files are allowed'));
     }
