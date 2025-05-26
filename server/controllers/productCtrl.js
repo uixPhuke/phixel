@@ -382,7 +382,7 @@ const createProductAdmin = async (req, res, next) => {
       product: savedProduct.toJSON(),
     });
   } catch (err) {
-    console.error("🔥 Error creating product:", err); // Log full error with stack
+    console.error("Error creating product:", err); // Log full error with stack
   
     if (err.name === "ValidationError") {
       const messages = Object.values(err.errors).map((e) => e.message).join(", ");
@@ -406,7 +406,9 @@ const createProductAdmin = async (req, res, next) => {
 //edit product
 const editProductAdmin = async (req, res,next) => {
     try {
-        const {productId} = req.params
+      const productId = req.params.id;
+      //const { id } = req.params; // Use req.params.id to get the product ID from the URL
+
 
         if(!productId) {
             return res.status(400).json({ success: false, message: "Product ID is required!" });
@@ -454,37 +456,39 @@ const editProductAdmin = async (req, res,next) => {
           };
           // 1. Handle image deletion
         if (deleteImages && deleteImages.length > 0) {
-            for (const public_id of deleteImages) {
-            await cloudinary.uploader.destroy(public_id);
-            }
-        
-            sanitizedData.images = existingProduct.images.filter(
-            (image) => !deleteImages.includes(image.public_id)
-            );
-        }
-        
-        // 2. Handle image upload
-            if (req.files && req.files.images) {
-            const imageUrls = [];
-            const imageArray = Array.isArray(req.files.images)
-            ? req.files.images
-            : [req.files.images];
-        
-            for (const image of imageArray) {
-            const result = await cloudinary.uploader.upload(image.tempFilePath, {
-                folder: 'products',
-            });
-            imageUrls.push({
-                public_id: result.public_id,
-                url: result.secure_url,
-            });
-            }
-        
-            sanitizedData.images = [
-            ...(sanitizedData.images || []),
-            ...imageUrls,
-            ];
-        }         
+          // Delete from Cloudinary
+          await Promise.all(
+              deleteImages.map(public_id => cloudinary.uploader.destroy(public_id))
+          );
+          
+          // Update images array
+          sanitizedData.images = existingProduct.images.filter(
+              image => !deleteImages.includes(image.public_id)
+          );
+      }
+
+      // 2. Handle new image uploads
+      if (req.files && req.files.length > 0) {
+          const uploadedImages = await Promise.all(
+              req.files.map(async (image) => {
+                  const result = await cloudinary.uploader.upload(image.path, {
+                      folder: 'products'
+                  });
+                  // Clean up temp file
+                  fs.unlinkSync(image.path);
+                  return {
+                      public_id: result.public_id,
+                      url: result.secure_url
+                  };
+              })
+          );
+
+          // Merge existing (non-deleted) images with new ones
+          sanitizedData.images = [
+              ...(sanitizedData.images || existingProduct.images || []),
+              ...uploadedImages
+          ];
+      }
             // Validate the updated data
             if (Object.keys(sanitizedData).length === 0) {
                 return res.status(400).json({ success: false, message: "No valid fields to update!" });
@@ -513,7 +517,7 @@ const editProductAdmin = async (req, res,next) => {
 //delete product
 const deleteProductAdmin = async (req, res) => {
     try {
-        const { productId } = req.params;
+        const productId = req.params.productID;
     
         if (!productId) {
         return res.status(400).json({ success: false, message: "Product ID is required!" });
