@@ -11,7 +11,7 @@ const {
   getProduct
 } = require('../controllers/productCtrl');
 
-const uploadMiddleware = require('../middlewares/upload.middleware'); // ✅ now a real middleware
+const uploadMiddleware = require('../middlewares/upload.middleware'); 
 const { isAuthenticated, isAdmin } = require('../middlewares/auth');
 // Route to create a new product (admin only)
 

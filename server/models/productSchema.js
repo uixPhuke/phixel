@@ -21,7 +21,14 @@ const productSchema= new mongoose.Schema({
         required: true,
         maxlength: 2000, // Limit to 2000 characters for performance
     },
-    images: [{ type: String, required: true }], // Array of image URLs
+    // Update your schema:
+    images: [
+        {
+        public_id: { type: String, required: true },
+        url: { type: String, required: true }
+        }
+    ],
+  
     totalPrice: { type: Number, required: true, min: 0 },
     sellingPrice: { type: Number, required: true, min: 0 },
     costPrice: { type: Number, required: true, min: 0 },
@@ -89,25 +96,30 @@ const productSchema= new mongoose.Schema({
         required: true,
         unique: true, // Ensure uniqueness
     },
-    relatedProducts: [
-        {
-            productId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Product',
-                default:[]
-            },
-        },
-    ],
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-    },
-    updatedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-    },
+    // In productSchema (simpler approach)
+    // relatedProducts: {
+    //     type: [String], // Array of productCodes
+    //     default: [],    // Initialize with an empty array
+    // },
+    // relatedProducts: [
+    //     {
+    //         productId: {
+    //             type: mongoose.Schema.Types.ObjectId,
+    //             ref: 'Product',
+    //             default:[]
+    //         },
+    //     },
+    // ],
+    // createdBy: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'User',
+    //     required: true,
+    // },
+    // updatedBy: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'User',
+    //     required: true,
+    // },
 }, { timestamps: true });
 
 //indexing

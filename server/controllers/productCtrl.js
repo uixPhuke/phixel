@@ -2,6 +2,8 @@ const Product = require("../models/productSchema");
 const mongoose = require("mongoose");
 const xss = require("xss");
 const validator = require("validator");
+const cloudinary = require('cloudinary').v2;
+const fs = require('fs');
 
 const createProductAdmin = async (req, res, next) => {
   try {
@@ -27,10 +29,11 @@ const createProductAdmin = async (req, res, next) => {
       country,
       active,
       productCode,
-      relatedProducts,
+      // relatedProducts,
     } = req.body;
 
-    const { images } = req.files;
+    //const { images } = req.files;
+    const images = req.files;
 
     // Check for required fields
     if (!title)
@@ -139,6 +142,27 @@ const createProductAdmin = async (req, res, next) => {
     const sanitizedProductCode = xss(
       validator.trim(validator.escape(productCode))
     );
+    
+    //existing Product id
+    const existingProductId = req.body.productId;
+    if (existingProductId && !mongoose.Types.ObjectId.isValid(existingProductId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid Product ID!" });}
+    //existing product title
+        const existingProduct = await Product.findOne({ title: sanitizedTitle });
+        if (existingProduct) {
+          return res
+            .status(400)
+            .json({ success: false, message: "Product with this title already exists!" });
+        }
+    //existing product code
+    const existingProductCode = await Product.findOne({ productCode: sanitizedProductCode });
+    if (existingProductCode) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Product with this code already exists!" });
+    }
 
     //upload images to cloudinary
     const imageUrls = [];
@@ -146,20 +170,182 @@ const createProductAdmin = async (req, res, next) => {
     const imageArray = Array.isArray(images) ? images : [images];
 
     for (const image of imageArray) {
-      const result = await cloudinary.uploader.upload(image.tempFilePath, {
+      const result = await cloudinary.uploader.upload(image.path, {
         folder: "products",
       });
-
+    
       imageUrls.push({
         public_id: result.public_id,
         url: result.secure_url,
       });
+    
+      fs.unlinkSync(image.path); // Clean up local file
     }
+    
     if (!imageUrls || imageUrls.length === 0) {
       return res
         .status(400)
         .json({ success: false, message: "Image upload failed!" });
     }
+    // if (req.body.relatedProducts) {
+    //   try {
+    //     // Parse stringified JSON (if sent as a string)
+    //     const parsedRelated = typeof req.body.relatedProducts === 'string' 
+    //       ? JSON.parse(req.body.relatedProducts) 
+    //       : req.body.relatedProducts;
+    
+    //     // Convert to schema format: [{ productId: ObjectId }]
+    //     sanitizedRelatedProducts = parsedRelated.map(id => ({
+    //       productId: new mongoose.Types.ObjectId(id) // Convert string to ObjectId
+    //     }));
+    //   } catch (err) {
+    //     return res.status(400).json({
+    //       success: false,
+    //       message: "Invalid relatedProducts format. Expected array of product IDs."
+    //     });
+    //   }
+    // }
+    //validate Category
+    const validCategories = [
+      'tshirts', 'shirts', 'jeans', 'jackets', 'hoodies', 'dresses', 'skirts', 'shorts', 'pants', 'ethnic', 'formal', 'casual', 'activewear'
+    ];
+    if (!validCategories.includes(sanitizedCategory)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid category!" });
+    }
+    //validate Sizes
+    const validSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+    if (sanitizedSizes.length > 0) {
+      for (const size of sanitizedSizes) {
+        if (!validSizes.includes(size)) {
+          return res
+            .status(400)
+            .json({ success: false, message: `Invalid size: ${size}` });
+        }
+      }
+    } else {
+      return res
+        .status(400)
+        .json({ success: false, message: "Sizes are required!" });
+    }
+    //validate Fabric Type
+    // const validFabricTypes = [
+    //   "Cotton",
+    //   "Polyester",
+    //   "Wool",
+    //   "Silk",
+    //   "Linen",
+    //   "Denim",
+    //   "Rayon",
+    //   "Spandex",
+    // ];
+    // if (!validFabricTypes.includes(sanitizedFabricType)) {
+    //   return res
+    //     .status(400)
+    //     .json({ success: false, message: "Invalid fabric type!" });
+    // }
+    //validate Fit Type
+    const validFitTypes = ["Slim Fit", "Regular Fit", "Loose Fit", "Oversized"];
+    if (!validFitTypes.includes(sanitizedFitType)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid fit type!" });
+    }
+    //validate Pattern
+    const validPatterns = [
+      "Solid",
+      "Striped",
+      "Checked",
+      "Floral",
+      "Printed",
+      "Graphic",
+      "Abstract",
+    ];
+    if (!validPatterns.includes(sanitizedPattern)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid pattern!" });
+    }
+    //validate Sleeve Type
+    const validSleeveTypes = [
+      "Full Sleeve",
+      "Half Sleeve",
+      "Sleeveless",
+      "Cap Sleeve",
+      "Three-Quarter Sleeve",
+    ];  
+    if (
+      sanitizedSleeveType &&
+      !validSleeveTypes.includes(sanitizedSleeveType)
+    ) {
+      return res  
+        .status(400)
+        .json({ success: false, message: "Invalid sleeve type!" });
+    }
+    //validate Collar Type
+    const validCollarTypes = [
+      "Round Neck",
+      "V Neck",
+      "Polo",
+      "Turtleneck",
+      "Collared",
+      "Mandarin Collar",
+    ];
+    if (
+      sanitizedCollarType &&
+      !validCollarTypes.includes(sanitizedCollarType)
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid collar type!" });
+    } 
+    //validate gender
+    const validateGender=['Men', 'Women', 'Unisex', 'Kids']
+    if(!validateGender.includes(sanitizedGender)) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: 'Invalid gender!',
+        });
+      }
+
+      //validate positive stock
+      if (sanitizedTotalPrice < 0 || sanitizedSellingPrice < 0   || sanitizedCostPrice < 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Total price, selling price, labor, packaging, country tax, and cost price must be positive numbers!',
+        });
+      }
+      // if (relatedProducts && !Array.isArray(relatedProducts)) {
+      //   return res.status(400).json({ 
+      //     success: false, 
+      //     message: 'Related products should be an array of product codes!' 
+      //   });
+      // }
+      
+      // // With this more robust version:
+      // let sanitizedRelatedProducts = [];
+      // if (relatedProducts) {
+      //   try {
+      //     // Handle both stringified array and direct array input
+      //     sanitizedRelatedProducts = typeof relatedProducts === 'string' 
+      //       ? JSON.parse(relatedProducts) 
+      //       : relatedProducts;
+          
+      //     // Ensure it's an array
+      //     if (!Array.isArray(sanitizedRelatedProducts)) {
+      //       throw new Error('Not an array');
+      //     }
+      //   } catch (err) {
+      //     return res.status(400).json({
+      //       success: false,
+      //       message: "Related products must be an array of product codes (e.g., [\"CODE1\", \"CODE2\"])"
+      //     });
+      //   }
+      // }
+    
     //create product
     const product = new Product({
       title: sanitizedTitle,
@@ -184,7 +370,7 @@ const createProductAdmin = async (req, res, next) => {
       country: sanitizedCountry,
       active: sanitizedActive,
       productCode: sanitizedProductCode,
-      relatedProducts: relatedProducts || [],
+      // relatedProducts: sanitizedRelatedProducts,
     });
 
     // Save the product to the database
@@ -196,10 +382,9 @@ const createProductAdmin = async (req, res, next) => {
       product: savedProduct.toJSON(),
     });
   } catch (err) {
-    console.error("Error creating product:", err);
+    console.error("🔥 Error creating product:", err); // Log full error with stack
   
     if (err.name === "ValidationError") {
-      // Provide detailed validation error messages
       const messages = Object.values(err.errors).map((e) => e.message).join(", ");
       return res.status(400).json({
         success: false,
@@ -207,12 +392,15 @@ const createProductAdmin = async (req, res, next) => {
       });
     }
   
+    // Return full error during development (optional: restrict in production)
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: err.message,
+      error: err.message,  // "fs is not defined", etc.
+      stack: err.stack     // Shows where the error occurred
     });
   }
+  
 };
 
 //edit product
@@ -231,13 +419,15 @@ const editProductAdmin = async (req, res,next) => {
             return res.status(404).json({ success: false, message: "Product not found!" });
         }
         const {
-            title, description, totalPrice, sellingPrice, costPrice, category, sizes, fabricType, fitType, pattern, sleeveType, collarType, gender, color, stock, availableState, madeToOrder, popular, country, active, productCode, relatedProducts, deleteImages
+            title, description, totalPrice, sellingPrice, costPrice, category, sizes, fabricType, fitType, pattern, sleeveType, collarType, gender, color, stock, availableState, madeToOrder, popular, country, active, productCode,  deleteImages
           } = req.body;
       
           if (title !== undefined && !title) return res.status(400).json({ success: false, message: 'Title is required!' });
           if (description !== undefined && !description) return res.status(400).json({ success: false, message: 'Description is required!' });
           if (Object.prototype.hasOwnProperty.call(req.body, 'totalPrice') && totalPrice < 0) return res.status(400).json({ success: false, message: 'Total price must be a positive number!' });
-      
+          // if (relatedProducts && !Array.isArray(relatedProducts)) {
+          //   return res.status(400).json({ success: false, message: 'Related products should be an array of product codes!' });
+          // }
           const sanitizedData = {
             ...(title !== undefined && { title: xss(validator.trim(validator.escape(title))) }),
             ...(description !== undefined && { description: xss(validator.trim(validator.escape(description))) }),
@@ -260,7 +450,7 @@ const editProductAdmin = async (req, res,next) => {
             ...(country && { country: xss(validator.trim(validator.escape(country))) }),
             ...(active && { active: xss(validator.trim(validator.escape(active))) }),
             ...(productCode && { productCode: xss(validator.trim(validator.escape(productCode))) }),
-            ...(relatedProducts && { relatedProducts }),
+            //...(relatedProducts && { relatedProducts }),
           };
           // 1. Handle image deletion
         if (deleteImages && deleteImages.length > 0) {
@@ -503,9 +693,9 @@ const getAllProducts = async (req, res, next) => {
   
       // Format Products
       const formattedProducts = await Promise.all(products.map(async (product) => {
-        const relatedProducts = await Product.find({
-          _id: { $in: product.relatedProducts || [] },
-        }).lean();
+        // const relatedProducts = await Product.find({
+        //   _id: { $in: product.relatedProducts || [] },
+        // }).lean();
   
         const createdDate = new Date(product.createdAt);
         const formattedDate = createdDate.toISOString().split('T')[0].replace(/-/g, '');
@@ -517,12 +707,12 @@ const getAllProducts = async (req, res, next) => {
         return {
           ...product,
           uniqueId,
-          relatedProducts: relatedProducts.map(rp => ({
-            _id: rp._id,
-            title: rp.title,
-            images: rp.images,
-            totalPrice: rp.sellingPrice,
-          })),
+          // relatedProducts: relatedProducts.map(rp => ({
+          //   _id: rp._id,
+          //   title: rp.title,
+          //   images: rp.images,
+          //   totalPrice: rp.sellingPrice,
+          // })),
         };
       }));
   
@@ -566,9 +756,9 @@ const getAllProducts = async (req, res, next) => {
       }
   
       // Fetch related products
-      const relatedProducts = await Product.find({
-        _id: { $in: product.relatedProducts || [] },
-      });
+      // const relatedProducts = await Product.find({
+      //   _id: { $in: product.relatedProducts || [] },
+      // });
   
       //const convertedSellingPrice = (product.sellingPrice * req.conversionRate).toFixed(2);
   
@@ -578,14 +768,14 @@ const getAllProducts = async (req, res, next) => {
         product: {
           ...product.toObject(),
           totalPrice: product.sellingPrice, // use sellingPrice directly as totalPrice
-          relatedProducts: relatedProducts.map(rp => ({
-            _id: rp._id,
-            title: rp.title,
-            images: rp.images,
-            sellingPrice: rp.sellingPrice,
-            totalPrice: rp.sellingPrice, // consistent naming
-            productCode: rp.productCode,
-          })),
+          // relatedProducts: relatedProducts.map(rp => ({
+          //   _id: rp._id,
+          //   title: rp.title,
+          //   images: rp.images,
+          //   sellingPrice: rp.sellingPrice,
+          //   totalPrice: rp.sellingPrice, // consistent naming
+          //   productCode: rp.productCode,
+          // })),
         },
       });
     } catch (err) {
@@ -616,29 +806,29 @@ const getProductsByCategory = async (req, res, next) => {
   
       // Format Products
       const formattedProducts = await Promise.all(products.map(async (product) => {
-        const relatedProducts = await Product.find({
-          _id: { $in: product.relatedProducts || [] },
-        }).lean();
+        // const relatedProducts = await Product.find({
+        //   _id: { $in: product.relatedProducts || [] },
+        // }).lean();
   
         const createdDate = new Date(product.createdAt);
         const formattedDate = createdDate.toISOString().split('T')[0].replace(/-/g, '');
         const uniqueId = `${product.title}${formattedDate}`;
   
         // Overwrite sellingPrice with the converted price
-        const convertedSellingPrice = (product.sellingPrice * req.conversionRate).toFixed(2);
+        //const convertedSellingPrice = (product.sellingPrice * req.conversionRate).toFixed(2);
         
         return {
           ...product,
           uniqueId,
-          totalPrice: convertedSellingPrice,
-          currency: req.currency,
-          relatedProducts: relatedProducts.map(rp => ({
-            _id: rp._id,
-            title: rp.title,
-            images: rp.images,
-            totalPrice: (rp.sellingPrice * req.conversionRate).toFixed(2),
-            currency: req.currency,
-          })),
+          //totalPrice: convertedSellingPrice,
+          //currency: req.currency,
+          // relatedProducts: relatedProducts.map(rp => ({
+          //   _id: rp._id,
+          //   title: rp.title,
+          //   images: rp.images,
+          //   totalPrice: (rp.sellingPrice * req.conversionRate).toFixed(2),
+          //   currency: req.currency,
+          // })),
         };
       }));
   
