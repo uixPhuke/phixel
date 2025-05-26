@@ -145,4 +145,4 @@ const productSchema= new mongoose.Schema({
 // productSchema.index({ collarType: 1 });
 
 const Product = mongoose.model('Product', productSchema);
-module.exports = Product;images
+module.exports = Product;
