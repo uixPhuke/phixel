@@ -106,3 +106,6 @@ const orderSchema = new mongoose.Schema({
   orderSchema.index({ deliveryStatus: 1 });
   orderSchema.index({ placedAt: 1 });
   orderSchema.index({ returnStatus: 1 }); // Faster return queries
+
+const Order = mongoose.model('Order', orderSchema);
+module.exports = Order;
