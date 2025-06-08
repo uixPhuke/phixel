@@ -53,65 +53,77 @@ const createDiscount = async (req, res) => {
   }
 };
 
-//apply discount
 const applyDiscount = async (req, res) => {
   const { code } = req.body;
 
   try {
-    // Validate code
     if (!code || typeof code !== 'string') {
       return res.status(400).json({ message: 'Invalid discount code' });
     }
 
-    // Find discount
     const discount = await Discount.findOne({ code: code.toUpperCase() });
-    if (!discount || !discount.isActive || discount.usedCount >= discount.usageLimit) {
+
+    if (
+      !discount ||
+      !discount.isActive ||
+      (discount.usageLimit && discount.usedCount >= discount.usageLimit)
+    ) {
       return res.status(404).json({ message: 'Discount not found or inactive' });
     }
 
-    // Check date validity
     const now = new Date();
-    if (now < discount.startDate || now > discount.endDate) {
+    if (
+      (discount.startDate && now < discount.startDate) ||
+      (discount.endDate && now > discount.endDate)
+    ) {
       return res.status(400).json({ message: 'Discount is not valid at this time' });
     }
+
     if (discount.usedBy.includes(req.user._id)) {
       return res.status(400).json({ message: 'Discount code already used by this user' });
     }
-    // Apply discount logic
-    // Assuming you have a cart or order object to apply the discount to
-    // Example: Assuming you have a cart object in the request
-    const cart=await Cart.findOne({ user: req.user._id });
+
+    const cart = await Cart.findOne({ user: req.user._id });
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ message: 'No cart found to apply discount' });
     }
-    // Calculate discount amount
 
+    // Calculate discount amount
     let discountAmount = 0;
     if (discount.discountType === 'percentage') {
-        const discountAmount = (cart.totalPrice * discount.discountPercentage) / 100;
-        const discountedPrice = cart.totalPrice - discountAmount;
+      discountAmount = (cart.totalPrice * discount.discountPercentage) / 100;
     } else if (discount.discountType === 'fixed') {
       discountAmount = discount.discountValue;
     }
-    // Ensure discount does not exceed cart total
-    if (discountAmount > cart.total) {
-      discountAmount = cart.total;
+
+    if (discountAmount > cart.totalPrice) {
+      discountAmount = cart.totalPrice;
     }
-    // Apply discount to cart total
-    cart.total -= discountAmount;
-    // Add discount code to usedBy array
-    discount.usedBy.push(req.user._id); 
 
+    const finalPrice = cart.totalPrice - discountAmount;
 
-    // Update usage count
+    // Update cart
+    cart.totalPrice = finalPrice;
+    cart.discountApplied = {
+      code: discount.code,
+      amount: discountAmount,
+      type: discount.discountType,
+    };
+
+    await cart.save();
+
+    // Update discount usage
+    discount.usedBy.push(req.user._id);
     discount.usedCount += 1;
     await discount.save();
 
     res.json({
       message: 'Discount applied successfully',
+      cart,
       discount,
     });
   } catch (error) {
+    console.error('Error applying discount:', error);
     res.status(500).json({ message: 'Error applying discount', error });
   }
 };

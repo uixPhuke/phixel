@@ -40,7 +40,7 @@ const discountSchema = new mongoose.Schema({
                 // Only validate if discountType is 'percentage'
                 return this.discountType !== 'percentage' || (value >= 0 && value <= 100);
             },
-            message: 'Hi ,Percentage must be between 0-100 when discountType is percentage'
+            message: 'Percentage must be between 0-100 when discountType is percentage'
         }
     },
     discountValue: {
