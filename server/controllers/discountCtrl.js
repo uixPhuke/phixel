@@ -127,3 +127,83 @@ const applyDiscount = async (req, res) => {
     res.status(500).json({ message: 'Error applying discount', error });
   }
 };
+
+//remove discount
+const removeDiscount = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      return res.status(400).json({ message: 'Cart not found.' });
+  }
+
+  if (!cart.discountApplied) {
+      return res.status(400).json({ message: 'No discount code applied to your cart.' });
+  }
+
+  const discountCode = cart.discountApplied.code;
+
+  // Fetch the discount associated with the code
+  const discount = await Discount.findOne({ code: discountCode });
+
+  if (discount) {
+      // Remove the user from the discount's `usedBy` array
+      discount.usedBy = discount.usedBy.filter(id => id.toString() !== userId.toString());
+      await discount.save();
+  }
+
+  // Clear the discount from the cart
+  cart.discountApplied = null;
+  await cart.save();
+
+    res.json({
+      message: 'Discount removed successfully',
+      cart,
+    });
+  } catch (error) {
+    console.error('Error removing discount:', error);
+    res.status(500).json({ message: 'Error removing discount', error });
+  }
+};
+
+//discouct check
+const checkDiscount = async (req, res) => {
+  try {
+    const { code } = req.body;
+
+    if (!code || typeof code !== 'string') {
+      return res.status(400).json({ message: 'Invalid discount code' });
+    }
+
+    const discount = await Discount.findOne({ code: code.toUpperCase() });
+
+    if (!discount) {
+      return res.status(404).json({ message: 'Discount not found' });
+    }
+
+    const now = new Date();
+    if (
+      (discount.startDate && now < discount.startDate) ||
+      (discount.endDate && now > discount.endDate)
+    ) {
+      return res.status(400).json({ message: 'Discount is not valid at this time' });
+    }
+
+    res.json({
+      message: 'Discount is valid',
+      discount,
+    });
+  } catch (error) {
+    console.error('Error checking discount:', error);
+    res.status(500).json({ message: 'Error checking discount', error });
+  }
+};  
+
+// Export the functions
+module.exports = {
+  createDiscount,
+  applyDiscount,
+  removeDiscount,
+  checkDiscount,
+};
