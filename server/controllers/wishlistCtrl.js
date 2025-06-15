@@ -86,7 +86,7 @@ const removeFromWishlist = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Wishlist not found'
-      });
+      });       
     }
 
     res.status(200).json({
