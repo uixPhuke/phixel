@@ -293,7 +293,7 @@ export const sendOrderStatusUpdateEmail = async (email, order) => {
         <body>
             <div class="container">
                 <div class="header">
-                    <img src="https://i.ibb.co/5TcFNHM/dkraj-Logo-Variant2-White.png" alt="UiX Logo">
+                    <img src="https://res.cloudinary.com/dsn8gtduk/image/upload/v1741380094/uixW_s4qlmn.png" alt="UiX Logo">
                 </div>
                 <div class="content">
                     ${message}
