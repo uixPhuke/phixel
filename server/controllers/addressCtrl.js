@@ -93,7 +93,7 @@ const updateAddress = async (req, res) => {
     try {
         const userId = req.user._id;  // Get user ID from the authenticated user
         const addressId = req.params.id; // Get address ID from the request params
-        const { name, mobileNo, address, pincode, city, state, country, landmark } = req.body;
+        const { name, mobileNo, address, pinCode, city, state, country, landmark } = req.body;
 
         // Validate addressId
         if (!mongoose.Types.ObjectId.isValid(addressId)) {
@@ -111,7 +111,7 @@ const updateAddress = async (req, res) => {
         addressToUpdate.name = name || addressToUpdate.name;
         addressToUpdate.mobileNo = mobileNo || addressToUpdate.mobileNo;
         addressToUpdate.address = address || addressToUpdate.address;
-        addressToUpdate.pincode = pincode || addressToUpdate.pincode;
+        addressToUpdate.pinCode = pinCode || addressToUpdate.pinCode;
         addressToUpdate.city = city || addressToUpdate.city;
         addressToUpdate.state = state || addressToUpdate.state;
         addressToUpdate.country = country || addressToUpdate.country;
