@@ -22,7 +22,7 @@ try {
 
 export const sendOtpEmail = async (email, otp, type = "verification") => {
     if (!email || !otp) {
-        throw new Error("Email and OTP are required to send an email.");
+        throw new Error("Hi ,Email and OTP are required to send an email.");
     }
 
     let subject, message;
