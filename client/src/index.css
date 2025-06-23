@@ -3,10 +3,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap');
 @import "tailwindcss";
 @theme{
-  --font-primary: "Syne", 'sans-serif';
-  --font-secondary: "Inter", 'sans-serif';
+  --font-primary:"Inter", 'sans-serif' ;
+  --font-secondary:  "Syne", 'sans-serif';
   --color-primary: #000000;
   --color-secondary: #ffffff;
-  --color-accent: ##808080;
+  --color-accent: #808080;
  
 }
