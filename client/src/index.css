@@ -2,11 +2,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap');
 @import "tailwindcss";
+
+:root {
+  font-size: 62.5%;
+}
+
 @theme{
+  
   --font-primary:"Inter", 'sans-serif' ;
   --font-secondary:  "Syne", 'sans-serif';
   --color-primary: #000000;
   --color-secondary: #ffffff;
   --color-accent: #808080;
+
+  --text-xs: 1.6rem;
+  --text-sm: 1.8rem;
+  --text-md: 2.2rem;
+  --text-lg: 3.6rem;
+  --text-xl: 5.6rem;
+  --text-2xl: 9.6rem;
  
 }
