@@ -4,6 +4,7 @@ import logo from "../../assets/logo.png";
 import SearchBar from "../../pages/SearchBar/SearchBar";
 import { FaRegHeart, FaUserCircle } from "react-icons/fa";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
+import { BsBorderStyle } from "react-icons/bs";
 import { IoCartOutline } from "react-icons/io5";
 
 const Navbar = () => {
@@ -49,8 +50,7 @@ const Navbar = () => {
           <Link to="/wishlist" className="hover:text-accent ">
             <FaRegHeart className=" transition-all duration-300 text-sm" />
           </Link>
-
-          {/*Cart */}
+         {/*Cart */}
           <Link to="/cart" className="relative hover:text-accent ">
             <IoCartOutline className="text-sm transition-all duration-300 text-md" />
             <span className="absolute -top-2 -right-2 bg-red-500 text-secondary text-xs rounded-full w-4 h-4 flex items-center justify-center">
@@ -59,48 +59,48 @@ const Navbar = () => {
           </Link>
           {/* Hamburger Menu for Small Screens */}
           <div className="lg:hidden z-50">
-            <button onClick={toggleMenu} aria-label="Toggle Menu">
+            <button onClick={toggleMenu}  aria-label="Toggle Menu" className="text-primary hover:text-accent focus:outline-none cursor-pointer">
               {isOpen ? (
-                <AiOutlineClose size={24} className="text-black" />
+                <AiOutlineClose size={24}  />
               ) : (
-                <AiOutlineMenu size={24} />
+                <AiOutlineMenu size={24}  />
               )}
             </button>
           </div>
         </div>
 
         <div
-          className={`fixed inset-y-0 right-0 w-full bg-accent shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${
+          className={`fixed inset-y-0 right-0 w-full bg-secondary shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${
             isOpen ? "translate-x-0" : "translate-x-full"
           } lg:hidden`}
         >
-          <nav className="flex flex-col p-6 space-y-6 text-primary  bg-accent text-md">
-            <Link to="/new" onClick={toggleMenu}>
+          <nav className="flex flex-col p-12 pt-24 space-y-6 text-primary  bg-secondary text-md">
+            <Link to="/new" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
               New & Featured
             </Link>
-            <Link to="/men" onClick={toggleMenu}>
+            <Link to="/men" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
               Men
             </Link>
-            <Link to="/women" onClick={toggleMenu}>
+            <Link to="/women" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
               Women
             </Link>
-            <Link to="/kids" onClick={toggleMenu}>
+            <Link to="/kids" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
               Kids
             </Link>
-            <Link to="/unisex" onClick={toggleMenu}>
+            <Link to="/unisex" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
               Unisex
             </Link>
             
           </nav>
 
-          <div className="p-6 text-sm text-secondary bg-primary">
+          <div className="p-12 text-sm text-primary">
             <Link
               to="/"
               className="flex items-center space-x-2 mb-4"
               onClick={toggleMenu}
             >
-              <img src={logo} alt="Jordan" className="h-6" />
-              <span>UiX</span>
+              <img src={logo} alt="Jordan" className="h-24" />
+              
             </Link>
             <p>
               Become a Member for the best product and Design{" "}
@@ -112,14 +112,35 @@ const Navbar = () => {
              
                 <Link
                   to="/login"
-                  className="bg-primary text-secondary px-4 py-2 rounded-full"
-                  onClick={toggleMenu}
-                >
+                  className="bg-primary text-secondary px-6 py-2 rounded-full"
+                  onClick={toggleMenu}>
                   Join Us
                 </Link>
              
             </div>
+           
           </div>
+          <div className="flex flex-col p-12 space-y-6 text-primary  bg-secondary text-md">
+              {/*orders*/}
+              <Link to="/orders" onClick={toggleMenu} className="hover:text-accent flex items-center space-x-6">
+              <BsBorderStyle className="text-sm transition-all duration-300 text-md" /> <span>Orders</span>
+            </Link>
+            {/* User Profile */}
+          <Link to="/profile" onClick={toggleMenu} className="hover:text-accent flex items-center space-x-6">
+            <FaUserCircle className="text-sm transition-all duration-300" /><span>Profile</span>
+          </Link>
+          {/* Wishlist */}
+          <Link to="/wishlist" onClick={toggleMenu} className="hover:text-accent flex items-center space-x-6 ">
+            <FaRegHeart className=" transition-all duration-300 text-sm" /><span>Wishlist</span>
+          </Link>
+         {/*Cart */}
+          <Link to="/cart" onClick={toggleMenu} className=" hover:text-accent flex items-center space-x-6 ">
+            <IoCartOutline className="text-sm transition-all duration-300 text-md" />
+            <span>Cart</span>
+          </Link>
+              
+
+            </div>
         </div>
       </div>
   
