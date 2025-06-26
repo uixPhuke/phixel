@@ -10,18 +10,32 @@ import { IoCartOutline } from "react-icons/io5";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // Track visibility of the header
+  const [lastScrollY, setLastScrollY] = useState(0); // Track the last scroll positio
 
   useEffect(() => {
+    // console.log('this')
     const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      setIsScrolled(scrollTop > 50);
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY) {
+        // Scrolling down
+        setIsVisible(false);
+      } else {
+        // Scrolling up
+        setIsVisible(true);
+      }
+
+      setIsScrolled(currentScrollY > 50);
+      setLastScrollY(currentScrollY);
     };
 
     window.addEventListener("scroll", handleScroll);
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [lastScrollY]);
 
   
 
@@ -30,11 +44,11 @@ const Navbar = () => {
   };
   return (
     <header
-      className={`fixed text-primary w-full z-50 p-4 ${
+      className={`fixed text-primary top-0 left-0 w-full z-50 p-4 transition-all duration-300 ${
         isScrolled
-          ? "bg-secondary shadow-md opacity-95"
+          ? "bg-secondary shadow-md opacity-90"
           : "bg-secondary shadow-none opacity-100"
-      }`}
+      } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
     >
       <div className="flex mx-auto items-center justify-between">
         {/* Logo */}
@@ -79,6 +93,8 @@ const Navbar = () => {
               1
             </span>
           </Link>
+          
+          
           {/* Hamburger Menu for Small Screens*/}
           <div className="lg:hidden z-50">
             <button onClick={toggleMenu}  aria-label="Toggle Menu" className="text-primary hover:text-accent focus:outline-none cursor-pointer">
@@ -92,7 +108,7 @@ const Navbar = () => {
         </div>
 
         <div
-          className={`fixed inset-y-0 right-0 w-full bg-secondary shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${
+          className={`fixed inset-y-0 right-0 w-full  bg-secondary shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${
             isOpen ? "translate-x-0" : "translate-x-full"
           } lg:hidden`}
         >
@@ -115,7 +131,7 @@ const Navbar = () => {
             
           </nav>
 
-          <div className="p-12 text-sm text-primary">
+          <div className="p-12 text-sm bg-secondary  text-primary">
             <Link
               to="/"
               className="flex items-center space-x-2 mb-4"
