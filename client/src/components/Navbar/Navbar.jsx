@@ -9,13 +9,32 @@ import { IoCartOutline } from "react-icons/io5";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
   return (
     <header
-      className={`fixed w-full font-secondary bg-secondary shadow-md  z-50 p-6 pl-12 pr-12`}
+      className={`fixed text-primary w-full z-50 p-4 ${
+        isScrolled
+          ? "bg-secondary shadow-md opacity-95"
+          : "bg-secondary shadow-none opacity-100"
+      }`}
     >
       <div className="flex mx-auto items-center justify-between">
         {/* Logo */}
@@ -26,6 +45,9 @@ const Navbar = () => {
         </div>
         {/* Navigation Links for Large Screens */}
         <nav className="text-primary  hidden lg:flex lg:items-center space-x-20 text-xs  transition-all duration-300">
+          <Link to="/new" className="hover:text-accent">
+            New & Featured
+          </Link>
           <Link to="/men" className="hover:text-accent">
             MEN
           </Link>
@@ -44,20 +66,20 @@ const Navbar = () => {
           <SearchBar />
           {/* User Profile */}
           <Link to="/profile" className="hover:text-accent ">
-            <FaUserCircle className="text-sm transition-all duration-300" />
+            <FaUserCircle size={24} className="text-sm transition-all duration-300" />
           </Link>
           {/* Wishlist */}
           <Link to="/wishlist" className="hover:text-accent ">
-            <FaRegHeart className=" transition-all duration-300 text-sm" />
+            <FaRegHeart size={24} className=" transition-all duration-300 text-sm" />
           </Link>
          {/*Cart */}
           <Link to="/cart" className="relative hover:text-accent ">
-            <IoCartOutline className="text-sm transition-all duration-300 text-md" />
+            <IoCartOutline size={24} className="text-sm transition-all duration-300 text-md" />
             <span className="absolute -top-2 -right-2 bg-red-500 text-secondary text-xs rounded-full w-4 h-4 flex items-center justify-center">
               1
             </span>
           </Link>
-          {/* Hamburger Menu for Small Screens */}
+          {/* Hamburger Menu for Small Screens*/}
           <div className="lg:hidden z-50">
             <button onClick={toggleMenu}  aria-label="Toggle Menu" className="text-primary hover:text-accent focus:outline-none cursor-pointer">
               {isOpen ? (
