@@ -88,7 +88,7 @@ const Navbar = () => {
           </Link>
          {/*Cart */}
           <Link to="/cart" className="relative hover:text-accent ">
-            <IoCartOutline size={24} className="text-sm transition-all duration-300 text-md" />
+            <IoCartOutline size={24} className="text-sm transition-all duration-300 " />
             <span className="absolute -top-2 -right-2 bg-red-500 text-secondary text-xs rounded-full w-4 h-4 flex items-center justify-center">
               1
             </span>
