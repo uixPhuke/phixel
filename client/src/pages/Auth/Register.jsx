@@ -30,7 +30,7 @@ export const Register = () => {
 
   return (
     <>
-      <div className="min-h-screen pt-30 flex justify-center items-center pb-24 font-primary">
+      <div className="min-h-screen pt-20 flex justify-center items-center pb-24 font-primary">
         <form
           onSubmit={register}
           className="md:w-1/3 w-full md:mx-0 mx-6 md:mt-8 flex flex-col  p-8 rounded-xl "
@@ -143,10 +143,37 @@ export const Register = () => {
             </label>
           </div>
 
+          {/* phone */}
+          <div className="relative mt-5">
+            <input
+              type="text"
+              required
+              onChange={(e) => {
+                setUserData({
+                  ...userData,
+                  email: e.target.value,
+                });
+              }}
+              onFocus={() => handleFocus("phone")}
+              onBlur={(e) => handleBlur("phone", e.target.value)}
+              className="border text-sm rounded-lg py-3 px-4 w-full border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent peer"
+            />
+            <label
+              className={`absolute left-4 transition-all duration-200 pointer-events-none ${
+                focusedFields.phone || userData.phone
+                  ? "top-0  bg-secondary px-1 -translate-y-1/2  text-accent"
+                  : "top-4  text-accent text-xs"
+              }`}
+            >
+              Phone
+            </label>
+          </div>
+
           {/* Date of Birth */}
           <div className="relative mt-5">
+            <div className="border text-sm rounded-lg py-3 px-4 w-full border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent peer">
             <DatePicker
-              className="border text-sm rounded-lg py-3 px-4 w-full border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent peer"
+              
               selected={userData.dob}
               onChange={(date) =>
                 setUserData({
@@ -158,6 +185,7 @@ export const Register = () => {
               onBlur={() => handleBlur("dob", userData.dob)}
               placeholderText=""
             />
+            </div>
             <label
               className={`absolute left-4 transition-all duration-200 pointer-events-none ${
                 focusedFields.dob || userData.dob
@@ -208,32 +236,7 @@ export const Register = () => {
 
 
 
-          {/* Confirm Password */}
-          <div className="relative mt-5">
-            <input
-              type="password"
-              required
-              onChange={(e) => {
-                setUserData({
-                  ...userData,
-                  confirmPassword: e.target.value,
-                });
-              }}
-              onFocus={() => handleFocus("confirmPassword")}
-              onBlur={(e) => handleBlur("confirmPassword", e.target.value)}
-              className="border text-sm rounded-lg py-3 px-4 w-full border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent peer"
-            />
-            <label
-              className={`absolute left-4 transition-all duration-200 pointer-events-none ${
-                focusedFields.confirmPassword || userData.confirmPassword
-                  ? "top-0  bg-secondary px-1 -translate-y-1/2  text-accent"
-                  : "top-4  text-accent text-xs"
-              }`}
-            >
-              Confirm Password
-            </label>
-          </div>
-
+         
           {/* Privacy Consent */}
           <div className="mt-4 flex items-start">
             <input

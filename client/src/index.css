@@ -1,6 +1,9 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap');
+
 @import "tailwindcss";
 
 :root {
@@ -8,7 +11,7 @@
 }
 @theme{
   
-  --font-primary:"Inter", 'sans-serif' ;
+  --font-primary:"Arimo", 'sans-serif' ;
   --font-secondary:  "Syne", 'sans-serif';
   --color-primary: #000000;
   --color-secondary: #ffffff;
