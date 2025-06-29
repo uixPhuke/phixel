@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar/Navbar";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Hero from "./pages/Home/Hero";
 import About from "./pages/Home/About";
+import { Register } from "./pages/Auth/Register";
 
 const App = () => {
   return (
@@ -16,7 +17,7 @@ const App = () => {
                 <Hero />
                 <About />
               </>} />
-          <Route path="/about" element={<About />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </div>
     </BrowserRouter>
