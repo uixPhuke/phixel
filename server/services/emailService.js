@@ -21,7 +21,7 @@ const initTransporter = async () => {
     } catch (error) {
         console.error("Failed to configure email transporter:", error.message);
         throw new Error("Failed to configure email transporter. Please check your credentials.");
-    }
+    }  
 };
 
 // Call the transporter initializer immediately

@@ -181,9 +181,208 @@ const verifyUserOtp = async (req, res) => {
   });
 }
 
+//resend otp if user miss the verification email
+const resendOtp = async (req, res,next) => {
+  try {
+    const {username,password} = req.body;
+    if (!username || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide username and password",
+      });
+    }
+    // Find the user by username
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    //check if user is already verified
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "User is already verified",
+      });
+    }
+    // Check if the password is correct
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+   {/* // Check if the OTP is still valid
+    if (user.otp && user.otpExpiration && new Date() < user.otpExpiration) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP is still valid, please check your email",
+      });
+    }
+    // If OTP is expired or not set, generate a new OTP
+    if (!user.otp || !user.otpExpiration || new Date() > user.otpExpiration) {
+      // Generate a new OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpiration = new Date(Date.now() + 5 * 60 * 1000);
+      user.otp = otp;
+      user.otpExpiration = otpExpiration;
+      await user.save();
+    }
+    // Send the OTP to the user's email
+    try {
+      await sendOtpEmail(user.email, user.otp, "verification");
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send OTP email",
+        error: error.message,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "OTP resent successfully to your email",
+    });
+  } catch (error) {
+    return next(error);
+  }*/}
+// Generate a new OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiration = new Date(Date.now() + 5 * 60 * 1000);
+    user.otp = otp;
+    user.otpExpiration = otpExpiration;
+    await user.save();
+    // Send the OTP to the user's email
+    try {
+      await sendOtpEmail(user.email, otp, "verification");
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send OTP email",
+        error: error.message,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "OTP resent successfully to your email",
+    });
+  } catch (error) {
+    return next(error);
+    
+  }
+}
+
+
+//forget password-send OTP to user's email
+const forgetPassword = async (req, res,next) => {
+  try{
+    const {email}= req.body;
+    //validate input
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide email",
+      });
+    }
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    // Generate a new OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiration = new Date(Date.now() + 5 * 60 * 1000);
+    // Update the user with the new OTP and expiration
+    user.otp = otp;
+    user.otpExpiration = otpExpiration;
+    await user.save();
+    // Send the OTP to the user's email
+    try {
+      await sendOtpEmail(user.email, otp, "verification");
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send OTP email",
+        error: error.message,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "OTP sent successfully to your email",
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+//verify otp and reset password
+const resetPassword = async (req, res) => {
+  const { userId, otp, newPassword,confirmPassword } = req.body;
+  //validate input
+  if (!userId || !otp || !newPassword || !confirmPassword) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide userId, OTP, new password and confirm password",
+    });
+  }
+//check if new password and confirm password match
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({
+      success: false,
+      message: "New password and confirm password do not match",
+    });
+  }
+  // Check if password is at least 6 characters long
+  if (newPassword.length < 6) {
+    return res.status(400).json({
+      success: false,
+      message: "Password must be at least 6 characters long",
+    });
+  }
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false, 
+        message: "User not found",
+      });
+    }
+    // Check if the OTP matches and hasn't expired
+    if (user.otp !== otp || new Date() > user.otpExpiration) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired OTP",
+      });
+    }
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    // Update the user's password and clear the OTP
+    user.password = hashedPassword;
+    user.otp = null; // Clear OTP after password reset
+    user.otpExpiration = null; // Clear OTP expiration after password reset
+    await user.save();
+    res.status(200).json({
+      success: true,
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+}
+
 //login user
 const loginUser = async (req, res) => {
   const { emailOrUsername, password } = req.body;
+  //validate input
   if (!emailOrUsername || !password) {
     return res.status(400).json({
       success: false,
@@ -207,6 +406,19 @@ const loginUser = async (req, res) => {
         message: "Invalid credentials",
       });
     }
+    if(!user.isVerified) {
+      return res.status(403).json({
+        success: false,
+        message: "User is not verified",
+      });
+    }
+    if(user.isFirebaseAuth){
+      return res.status(403).json({
+        success: false,
+        message: "User is not authenticated with Firebase",
+      });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({
@@ -214,6 +426,7 @@ const loginUser = async (req, res) => {
         message: "Invalid credentials",
       });
     }
+    //Generate a token
     const token = createToken(user._id, user.email, res);
     res.status(200).json({
       success: true,
@@ -228,7 +441,9 @@ const loginUser = async (req, res) => {
       error: error.message,
     });
   }
-};
+}
+
+//
 
 //update User
 const updateUser = async (req, res, next) => {
@@ -318,6 +533,65 @@ const getUsers = async (req, res,next) => {
     });
   } catch (error) {
     return next(error);
+  }
+};
+
+//Google and facebook Auth through Firebase
+const firbaseAuth=async(req,res,next)=>{
+  try{
+    const {uid, email,name} = req.body;
+    //validate input
+    if (!uid || !email || !name) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide uid, email and name",
+      });
+    }
+    //check if user already exists
+    let user = await User.findOne({ email });
+    if (!user) {
+      user= await User.Create({
+        isFirebaseAuth: true,
+        email,
+        firstName: name.split(' ')[0],
+        lastName: name.split(' ')[1],
+        username: uid,
+        isVerified: true
+      })
+    }
+
+    //generate a token
+    const token = createToken(user._id, user.email, res);
+    res.status(200).json({
+      success: true,
+      message: "User logged in successfully",
+      user,
+      token,
+    });
+  }catch (error) {
+    return next(error); 
+  
+  }
+}
+
+//Auth Verify
+const verifyAuth = async (req, res, next) => {
+  try {
+    const user=req.user;
+    if (user) {
+      return res.status(200).json({
+        success: true,
+        isLogin: true
+      });
+    }
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        isLogin: false
+      });
+    }
+  } catch (err) {
+    return next(err);
   }
 };
 
