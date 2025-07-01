@@ -443,8 +443,6 @@ const loginUser = async (req, res) => {
   }
 }
 
-//
-
 //update User
 const updateUser = async (req, res, next) => {
   try {
@@ -664,4 +662,5 @@ const logoutUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, updateUser ,getUsers,getUserById,deleteUser,logoutUser};
+module.exports = { registerUser, loginUser, updateUser ,getUsers,getUserById,deleteUser,logoutUser,
+  verifyUserOtp, resendOtp, forgetPassword, resetPassword, firbaseAuth, verifyAuth };

@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { registerUser,loginUser,updateUser,getUsers ,getUserById,deleteUser,logoutUser} = require('../controllers/userCtrl');
+const {registerUser, loginUser, updateUser ,getUsers,getUserById,deleteUser,logoutUser,
+  verifyUserOtp, resendOtp, forgetPassword, resetPassword, firbaseAuth, verifyAuth} = require('../controllers/userCtrl');
+
 const {isAuthenticated}= require('../middlewares/auth');
 
 
@@ -13,5 +15,4 @@ router.get('/logout',logoutUser);
 
 
 module.exports = router;
-
 
