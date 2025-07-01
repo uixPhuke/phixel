@@ -37,12 +37,12 @@ const sendOrderConfirmationEmail = async (email, order) => {
         <p style="color: whitesmoke;"><strong>Order ID:</strong> ${order._id}</p>
         <p style="color: whitesmoke;"><strong>Estimated Delivery:</strong> 5-7 business days</p>
         <br/>
-        <p style="color: whitesmoke;">For any queries, contact us at <a href="mailto:rohanuix@gmail.com" style="color: whitesmoke;">support@uix.com</a></p>
+        <p style="color: whitesmoke;">For any queries, contact us at <a href="mailto:uixphuke@gmail.com" style="color: whitesmoke;">support@uix.com</a></p>
     `;
     const mailOptions = {
-        from: '"UiX" <rohanuix@gmail.com>',
+        from: '"UiX" <uixphuke@gmail.com>',
         to: email,
-        bcc: 'rohanuix@gmail.com',
+        bcc: 'uixphuke@gmail.com',
         subject,
         html: `
         <html>
@@ -144,9 +144,9 @@ export const sendOrderCancellationEmail = async (email, order) => {
     `;
 
     const mailOptions = {
-        from: '"UiX" <rohanuix@gmail.com>',
+        from: '"UiX" <uixphuke@gmail.com>',
         to: email,
-        bcc: 'rohanuix@gmail.com',
+        bcc: 'uixphuke@gmail.com',
         subject,
         html: `
         <html>
@@ -239,9 +239,9 @@ export const sendOrderStatusUpdateEmail = async (email, order) => {
     `;
 
     const mailOptions = {
-        from: '"UiX" <rohanuix@gmail.com>',
+        from: '"UiX" <uixphuke@gmail.com>',
         to: email,
-        bcc: 'rohanuix@gmail.com',
+        bcc: 'uixphuke@gmail.com',
         subject,
         html: `
         <html>
@@ -323,8 +323,8 @@ export const sendOrderStatusUpdateEmail = async (email, order) => {
 
 export const sendReturnRequestEmailToAdmin = async (user, order) => {
     const mailOptions = {
-        from: '"UiX" <rohanuix@gmail.com>',
-        to: "rohanuix@gmail.com",
+        from: '"UiX" <uixphuke@gmail.com>',
+        to: "uixphuke@gmail.com",
         subject: `Return Request - Order ID: ${order._id}`,
         html: `
         <html>
@@ -391,7 +391,7 @@ export const sendReturnRequestEmailToAdmin = async (user, order) => {
 
 export const sendReturnStatusEmailToUser = async (user, order) => {
     const mailOptions = {
-        from: '"UiX" <rohanuix@gmail.com',
+        from: '"UiX" <uixphuke@gmail.com',
         to: user.email, // User email
         subject: `Return Request ${order.returnStatus.toUpperCase()} - Order ID: ${order._id}`,
         html: `
@@ -441,7 +441,7 @@ export const sendReturnStatusEmailToUser = async (user, order) => {
                     `}
                 </div>
                 <div class="footer">
-                    <p>If you have any questions, contact us at <a href="mailto:rohanuix@gmail.com">rohanuix@gmail.com</a></p>
+                    <p>If you have any questions, contact us at <a href="mailto:uixphuke@gmail.com">uixphuke@gmail.com</a></p>
                     <p>&copy; ${new Date().getFullYear()} UiX</p>
                 </div>
             </div>
@@ -462,7 +462,7 @@ export const sendReturnStatusEmailToUser = async (user, order) => {
 
 export const sendRefundStatusEmailToUser = async (user, order) => {
     const mailOptions = {
-        from: '"UiX" <rohanuix@gmail.com>',
+        from: '"UiX" <uixphuke@gmail.com>',
         to: user.email, // User email
         subject: `Refund ${order.refundStatus.toUpperCase()} - Order ID: ${order._id}`,
         html: `
@@ -513,7 +513,7 @@ export const sendRefundStatusEmailToUser = async (user, order) => {
                     `}
                 </div>
                 <div class="footer">
-                    <p>If you have any questions, contact us at <a href="mailto:rohanuix@gmail.com">rohanuix@gmail.com</a></p>
+                    <p>If you have any questions, contact us at <a href="mailto:uixphuke@gmail.com">uixphuke@gmail.com</a></p>
                     <p>&copy; ${new Date().getFullYear()} UiX</p>
                 </div>
             </div>

@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { createToken } = require("../middlewares/auth");
 const { get } = require("mongoose");
+const {sendOtpEmail} = require("../services/emailService");
 
 // Register a new user
 const registerUser = async (req, res) => {
@@ -90,11 +91,20 @@ const registerUser = async (req, res) => {
         message: "Phone number already exists",
       });
     }
+
+    //Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP
+    
+    
+    //expire the OTP after 5 minutes
+    const otpExpiration = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+
     //Hashed the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    //create a new user
-    const newUser = new User({
+    //create a new user but not verified yet
+    
+    const newUser = new User.create({
       firstName,
       lastName,
       username,
@@ -103,9 +113,22 @@ const registerUser = async (req, res) => {
       dob,
       password: hashedPassword,
       isAdmin: isAdmin || false,
+      otp, // Store the OTP
+      otpExpiration, // Store the OTP expiration time
+      isVerified: false, // Initially set to false
     });
+// Send OTP to user's email
+    try {
+      await sendOtpEmail(email, otp, "verification");
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send OTP email",
+        error: error.message,
+      });
+    }
 
-    await newUser.save();
+   
     const token = createToken(newUser._id, newUser.email, res);
     res.status(201).json({
       success: true,
@@ -121,6 +144,42 @@ const registerUser = async (req, res) => {
     });
   }
 };
+
+//verify user OTP
+const verifyUserOtp = async (req, res) => {
+  const { userId, otp } = req.body;
+  //validate input
+  if (!userId || !otp) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide userId and OTP",
+    });
+  }
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User not found",
+    });
+  }
+  //check if OTP matches hasn't expired
+  if (user.otp !== otp || new Date() > user.otpExpiration) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid or expired OTP",
+    });
+  }
+  //OTP is valid, update user status
+  user.isVerified = true;
+  user.otp = null; // Clear OTP after verification
+  user.otpExpiration = null; // Clear OTP expiration after verification
+  await newUser.save();
+  res.status(200).json({
+    success: true,
+    message: "User Email verified successfully",
+    user,
+  });
+}
 
 //login user
 const loginUser = async (req, res) => {

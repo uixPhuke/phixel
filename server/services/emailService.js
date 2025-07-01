@@ -20,7 +20,7 @@ try {
     );
 }
 
-export const sendOtpEmail = async (email, otp, type = "verification") => {
+const sendOtpEmail = async (email, otp, type = "verification") => {
     if (!email || !otp) {
         throw new Error("Hi ,Email and OTP are required to send an email.");
     }
@@ -43,7 +43,7 @@ export const sendOtpEmail = async (email, otp, type = "verification") => {
     }
 
     const mailOptions = {
-        from: '"UiX JEWELS" <UiXjewelsasia@gmail.com>',
+        from: '"UiX" <uixphuke@gmail.com>',
         to: email,
         subject,
         html: `
@@ -134,4 +134,10 @@ export const sendOtpEmail = async (email, otp, type = "verification") => {
         }
         throw new Error("Failed to send email. Please try again later.");
     }
+};
+
+
+//export
+module.exports = {
+    sendOtpEmail,
 };
