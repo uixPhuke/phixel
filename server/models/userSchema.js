@@ -54,8 +54,20 @@ const userSchema=new mongoose.Schema({
       isAdmin: {
         type: Boolean,
         default: false,
+    },isFirebaseAuth: {
+        type: Boolean,
+        default: false,
     },
-
+    otp: {
+        type: String
+    },
+    otpExpires: {
+        type: Date
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    }
 },{timestamps:true});
 
 const User= mongoose.model("User",userSchema);

@@ -14,6 +14,7 @@ const registerUser = async (req, res) => {
     phone,
     dob,
     password,
+    confirmPassword,
     isAdmin,
   } = req.body;
 
@@ -24,7 +25,8 @@ const registerUser = async (req, res) => {
     !email ||
     !phone ||
     !dob ||
-    !password
+    !password ||
+    !confirmPassword
   ) {
     return res.status(400).json({
       success: false,
@@ -38,12 +40,14 @@ const registerUser = async (req, res) => {
       message: "Please enter a valid email",
     });
   }
+  //phone no validation
   if (!/^\d{10}$/.test(phone)) {
     return res.status(400).json({
       success: false,
       message: "Please enter a valid phone number",
     });
   }
+  // Check if password is at least 8 characters long and contains at least 1 uppercase letter, 1 number, and 1 special character
   if (
     !/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)
   ) {
@@ -54,6 +58,13 @@ const registerUser = async (req, res) => {
     });
   }
 
+ // Check if password is at least 6 characters long
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password does not match!',
+      });
+    }
   try {
     // check username if already exists
     const existingUsername = await User.findOne({ username });
