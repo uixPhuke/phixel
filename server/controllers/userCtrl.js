@@ -104,7 +104,7 @@ const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
     //create a new user but not verified yet
     
-    const newUser = new User.create({
+    const newUser = await User.create({
       firstName,
       lastName,
       username,
@@ -132,7 +132,7 @@ const registerUser = async (req, res) => {
     const token = createToken(newUser._id, newUser.email, res);
     res.status(201).json({
       success: true,
-      message: "User registered successfully",
+      message: "User registered successfully, Please verify your email using you email",
       user: newUser,
       token,
     });
@@ -155,11 +155,19 @@ const verifyUserOtp = async (req, res) => {
       message: "Please provide userId and OTP",
     });
   }
+
   const user = await User.findById(userId);
   if (!user) {
     return res.status(404).json({
       success: false,
       message: "User not found",
+    });
+  }
+    // Check if user exists
+  if(user.isVerified) {
+    return res.status(400).json({
+      success: false,
+      message: "User is already verified",
     });
   }
   //check if OTP matches hasn't expired
@@ -169,30 +177,36 @@ const verifyUserOtp = async (req, res) => {
       message: "Invalid or expired OTP",
     });
   }
+ 
+
   //OTP is valid, update user status
   user.isVerified = true;
   user.otp = null; // Clear OTP after verification
   user.otpExpiration = null; // Clear OTP expiration after verification
-  await newUser.save();
+  await user.save();
   res.status(200).json({
     success: true,
     message: "User Email verified successfully",
     user,
+    
   });
+   console.log("Current time:", new Date());
+console.log("OTP Expiry:", user.otpExpiration);
 }
 
 //resend otp if user miss the verification email
 const resendOtp = async (req, res,next) => {
   try {
-    const {username,password} = req.body;
-    if (!username || !password) {
+    const {emailOrUsername,password} = req.body;
+    if (!emailOrUsername || !password) {
       return res.status(400).json({
         success: false,
-        message: "Please provide username and password",
+        message: "Please provide emailOrUsername and password",
       });
     }
-    // Find the user by username
-    const user = await User.findOne({ username });
+    const user = await User.findOne({
+      $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
+    });
     if (!user) {
       return res.status(404).json({
         success: false,

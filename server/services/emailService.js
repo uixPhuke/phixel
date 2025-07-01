@@ -37,13 +37,13 @@ const sendOtpEmail = async (email, otp, type = "verification") => {
         subject = "Your OTP for Account Verification";
         message = `
         <h2>Your OTP for Account Verification</h2>
-        <p>Please use the OTP below to verify your account:</p>
+        <p>Please use the OTP below to verify your account</p>
         `;
     } else if (type === "forgot-password") {
         subject = "Your OTP for Password Recovery";
         message = `
         <h2>Your OTP for Password Recovery</h2>
-        <p>Please use the OTP below to reset your password:</p>
+        <p>Please use the OTP below to reset your password</p>
         `;
     } else {
         throw new Error("Invalid email type specified.");
@@ -82,7 +82,7 @@ const sendOtpEmail = async (email, otp, type = "verification") => {
                 color: #ffffff;
             }
             .header img {
-                max-width: 150px;
+                max-width: 100px;
             }
             .content {
                 text-align: center;
@@ -90,13 +90,13 @@ const sendOtpEmail = async (email, otp, type = "verification") => {
                 color: #ffffff;
             }
             .otp {
-                font-size: 24px;
+                font-size: 20px;
                 font-weight: bold;
-                color: #d63384;
+                color: #cccccc;
                 margin: 10px 0;
             }
             .footer {
-                margin-top: 20px;
+                margin-top: 24px;
                 font-size: 12px;
                 color: #bbbbbb;
                 text-align: center;
@@ -106,15 +106,15 @@ const sendOtpEmail = async (email, otp, type = "verification") => {
         <body>
             <div class="email-container">
             <div class="header">
-                <img src="https://res.cloudinary.com/dsn8gtduk/image/upload/v1741380094/uixW_s4qlmn.png" alt="Uix Logo">
+                <img src="https://res.cloudinary.com/dsn8gtduk/image/upload/v1751398709/logo_ginh5d.png" alt="Uix Logo">
             </div>
             <div class="content">
                 ${message}
                 <p class="otp">${otp}</p>
-                <p>This OTP is valid for 10 minutes. If you did not request this, please ignore this email.</p>
+                <p>This OTP is valid for 5 minutes. If you did not request this, please ignore this email.</p>
             </div>
             <div class="footer">
-                <p>&copy; ${new Date().getFullYear()} UiX JEWELS. All rights reserved.</p>
+                <p>&copy; ${new Date().getFullYear()} UiX. All rights reserved.</p>
             </div>
             </div>
         </body>
