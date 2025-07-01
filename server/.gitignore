@@ -2,3 +2,5 @@ node_modules
 
 
 .env
+Phixel Firebase Admin SDK.json
+# Ignore the Firebase Admin SDK JSON file
