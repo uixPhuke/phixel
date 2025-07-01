@@ -236,7 +236,32 @@ export const Register = () => {
 
 
 
-         
+         {/* Confirm Password */}
+          <div className="relative mt-5">
+            <input
+              type="password"
+              required
+              onChange={(e) => {
+                setUserData({
+                  ...userData,
+                  confirmPassword: e.target.value,
+                });
+              }}
+              onFocus={() => handleFocus("confirmPassword")}
+              onBlur={(e) => handleBlur("confirmPassword", e.target.value)}
+              className="border text-sm rounded-lg py-3 px-4 w-full border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent peer"
+            />
+            <label
+              className={`absolute left-4 transition-all duration-200 pointer-events-none ${
+                focusedFields.confirmPassword || userData.confirmPassword
+                  ? "top-0  bg-secondary px-1 -translate-y-1/2  text-accent"
+                  : "top-4  text-accent text-xs"
+              }`}
+            >
+              Confirm Password
+            </label>
+          </div>
+
           {/* Privacy Consent */}
           <div className="mt-4 flex items-start">
             <input
