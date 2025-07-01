@@ -535,7 +535,7 @@ const getUsers = async (req, res,next) => {
 };
 
 //Google and facebook Auth through Firebase
-const firbaseAuth=async(req,res,next)=>{
+const firebaseAuth=async(req,res,next)=>{
   try{
     const {uid, email,name} = req.body;
     //validate input
@@ -663,4 +663,4 @@ const logoutUser = async (req, res) => {
 };
 
 module.exports = { registerUser, loginUser, updateUser ,getUsers,getUserById,deleteUser,logoutUser,
-  verifyUserOtp, resendOtp, forgetPassword, resetPassword, firbaseAuth, verifyAuth };
+  verifyUserOtp, resendOtp, forgetPassword, resetPassword, firebaseAuth, verifyAuth };
