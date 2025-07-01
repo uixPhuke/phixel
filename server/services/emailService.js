@@ -2,27 +2,34 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 let transporter;
-try {
-    transporter = nodemailer.createTransport({
-        service: "Gmail",
-        host: "smtp.gmail.com",
-        port: 587,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
 
-    await transporter.verify();
-} catch (error) {
-    throw new Error(
-        "Failed to configure email transporter. Please check your credentials."
-    );
-}
+// Async function to initialize the transporter
+const initTransporter = async () => {
+    try {
+        transporter = nodemailer.createTransport({
+            service: "Gmail",
+            host: "smtp.gmail.com",
+            port: 587,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        await transporter.verify();
+        console.log("Email transporter verified and ready.");
+    } catch (error) {
+        console.error("Failed to configure email transporter:", error.message);
+        throw new Error("Failed to configure email transporter. Please check your credentials.");
+    }
+};
+
+// Call the transporter initializer immediately
+initTransporter();
 
 const sendOtpEmail = async (email, otp, type = "verification") => {
     if (!email || !otp) {
-        throw new Error("Hi ,Email and OTP are required to send an email.");
+        throw new Error("Hi, Email and OTP are required to send an email.");
     }
 
     let subject, message;
@@ -57,22 +64,22 @@ const sendOtpEmail = async (email, otp, type = "verification") => {
                 font-family: Arial, sans-serif;
                 margin: 0;
                 padding: 0;
-                background-color: #000000; /* Black background */
-                color: #ffffff; /* White text */
+                background-color: #000000;
+                color: #ffffff;
             }
             .email-container {
                 max-width: 600px;
                 margin: 20px auto;
-                background: #1a1a1a; /* Darker shade for email container */
-                border: 1px solid #333333; /* Subtle border */
+                background: #1a1a1a;
+                border: 1px solid #333333;
                 border-radius: 8px;
                 padding: 20px;
-                box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); /* Subtle white glow */
+                box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
             }
             .header {
                 text-align: center;
                 margin-bottom: 20px;
-                color: #ffffff; /* White text */
+                color: #ffffff;
             }
             .header img {
                 max-width: 150px;
@@ -80,18 +87,18 @@ const sendOtpEmail = async (email, otp, type = "verification") => {
             .content {
                 text-align: center;
                 line-height: 1.6;
-                color: #ffffff; /* Ensure content text is white */
+                color: #ffffff;
             }
             .otp {
                 font-size: 24px;
                 font-weight: bold;
-                color: #d63384; /* Highlight the OTP in a vibrant color */
+                color: #d63384;
                 margin: 10px 0;
             }
             .footer {
                 margin-top: 20px;
                 font-size: 12px;
-                color: #bbbbbb; /* Lighter gray for footer text */
+                color: #bbbbbb;
                 text-align: center;
             }
         </style>
@@ -99,7 +106,7 @@ const sendOtpEmail = async (email, otp, type = "verification") => {
         <body>
             <div class="email-container">
             <div class="header">
-                <img src="https://res.cloudinary.com/dsn8gtduk/image/upload/v1741380094/uixW_s4qlmn.png" alt="Uix Logo Logo">
+                <img src="https://res.cloudinary.com/dsn8gtduk/image/upload/v1741380094/uixW_s4qlmn.png" alt="Uix Logo">
             </div>
             <div class="content">
                 ${message}
@@ -124,9 +131,7 @@ const sendOtpEmail = async (email, otp, type = "verification") => {
         } else if (error.message.includes("ENOTFOUND")) {
             console.error("Network Error: Unable to connect to the email server.");
         } else if (error.message.includes("ETIMEDOUT")) {
-            console.error(
-                "Timeout Error: Email server is taking too long to respond."
-            );
+            console.error("Timeout Error: Email server is taking too long to respond.");
         } else if (error.message.includes("ECONNREFUSED")) {
             console.error("Connection Error: Email server refused the connection.");
         } else {
@@ -136,8 +141,6 @@ const sendOtpEmail = async (email, otp, type = "verification") => {
     }
 };
 
-
-//export
 module.exports = {
-    sendOtpEmail,
+    sendOtpEmail
 };

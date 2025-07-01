@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export const sendContactEmail = async ({ name, email, phone, message }) => {
+ const sendContactEmail = async ({ name, email, phone, message }) => {
     const mailOptions = {
         from: `"UiX" <${process.env.EMAIL}>`,
         to: "uixphuke@gmail.com",
@@ -34,4 +34,9 @@ export const sendContactEmail = async ({ name, email, phone, message }) => {
         console.error("Failed to send contact email:", error);
         throw new Error("Email service failed. Please try again later.");
     }
+};
+
+//export all email service functions
+export {
+    sendContactEmail
 };

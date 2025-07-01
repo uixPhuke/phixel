@@ -120,7 +120,7 @@ const sendOrderConfirmationEmail = async (email, order) => {
 
 
 
-export const sendOrderCancellationEmail = async (email, order) => {
+const sendOrderCancellationEmail = async (email, order) => {
     if (!email || !order) {
         throw new Error("Email and order details are required.");
     }
@@ -214,7 +214,7 @@ export const sendOrderCancellationEmail = async (email, order) => {
 
 
 
-export const sendOrderStatusUpdateEmail = async (email, order) => {
+ const sendOrderStatusUpdateEmail = async (email, order) => {
     if (!email || !order) {
         throw new Error("Email and order details are required.");
     }
@@ -321,7 +321,7 @@ export const sendOrderStatusUpdateEmail = async (email, order) => {
 
 
 
-export const sendReturnRequestEmailToAdmin = async (user, order) => {
+ const sendReturnRequestEmailToAdmin = async (user, order) => {
     const mailOptions = {
         from: '"UiX" <uixphuke@gmail.com>',
         to: "uixphuke@gmail.com",
@@ -389,7 +389,7 @@ export const sendReturnRequestEmailToAdmin = async (user, order) => {
 
 
 
-export const sendReturnStatusEmailToUser = async (user, order) => {
+ const sendReturnStatusEmailToUser = async (user, order) => {
     const mailOptions = {
         from: '"UiX" <uixphuke@gmail.com',
         to: user.email, // User email
@@ -460,7 +460,7 @@ export const sendReturnStatusEmailToUser = async (user, order) => {
 
 
 
-export const sendRefundStatusEmailToUser = async (user, order) => {
+ const sendRefundStatusEmailToUser = async (user, order) => {
     const mailOptions = {
         from: '"UiX" <uixphuke@gmail.com>',
         to: user.email, // User email
@@ -530,3 +530,12 @@ export const sendRefundStatusEmailToUser = async (user, order) => {
     }
 };
 
+//export all email service functions
+export {
+    sendOrderConfirmationEmail,
+    sendOrderCancellationEmail,
+    sendOrderStatusUpdateEmail,
+    sendReturnRequestEmailToAdmin,
+    sendReturnStatusEmailToUser,
+    sendRefundStatusEmailToUser
+};
