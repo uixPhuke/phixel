@@ -5,7 +5,7 @@ const {
   addToWishlist,
   removeFromWishlist,
   syncGuestWishlist
-} = require('../controllers/wishlistController');
+} = require('../controllers/wishlistCtrl');
 const {isAuthenticated } = require('../middlewares/auth');
 
 // Protected routes (require login)

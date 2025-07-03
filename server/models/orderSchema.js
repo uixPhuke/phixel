@@ -6,7 +6,7 @@ const orderSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
-        index: true,
+        
     },
     cart: {
         type: mongoose.Schema.Types.ObjectId,
@@ -87,7 +87,7 @@ const orderSchema = new mongoose.Schema({
           type: String,
           enum: ['pending', 'approved', 'rejected', 'completed'],
           default: null, // No return by default
-          index: true,
+         
       },
       refundStatus: {
           type: String,
@@ -103,7 +103,7 @@ const orderSchema = new mongoose.Schema({
   
   orderSchema.index({ userId: 1, orderStatus: 1 });
   orderSchema.index({ orderStatus: 1, placedAt: -1 });
-  orderSchema.index({ deliveryStatus: 1 });
+  orderSchema.index({ isDelivered: 1 });
   orderSchema.index({ placedAt: 1 });
   orderSchema.index({ returnStatus: 1 }); // Faster return queries
 

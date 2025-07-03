@@ -9,6 +9,11 @@ const userRoutes=require('./routes/userRoutes')
 const addressRoutes=require('./routes/addressRoutes')
 const productRoutes=require('./routes/productRoutes')
 const cartRoutes=require('./routes/cartRoutes')
+const contactRoutes=require('./routes/contactRoutes')
+const wishlistRoutes=require('./routes/wishlistRoutes')
+const discountRoutes=require('./routes/discountRoutes')
+const orderRoutes=require('./routes/orderRoutes')
+
 const PORT=process.env.PORT
 
 //connect to database
@@ -31,7 +36,11 @@ app.get('/',(req,res)=>{
 }
 )
 //other routes
-app.use('/api/users',userRoutes)
-app.use('/api/address',addressRoutes)
-app.use('/api/products',productRoutes)
-app.use('/api/cart',cartRoutes)
+app.use('/api/v1/user',userRoutes)
+app.use('/api/v2/address',addressRoutes)
+app.use('/api/v3/product',productRoutes)
+app.use('/api/v4/cart',cartRoutes)
+app.use('/api/v5/discount',discountRoutes)
+//app.use('/api/v6/order',orderRoutes)
+app.use('/api/v7/contact',contactRoutes)
+app.use('/api/v8/wishlist',wishlistRoutes)

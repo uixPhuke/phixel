@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // Define the CookieConsentModal component
-export const CookieConsentModal = () => {
+export const CookieConsent = () => {
     // State variable to track whether the modal is open
     const [open, setOpen] = useState(false);
 

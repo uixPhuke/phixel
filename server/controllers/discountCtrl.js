@@ -1,9 +1,10 @@
-const Discount = require('../models/discountModel');
+const Discount = require('../models/discountSchema');
 const Cart = require('../models/cartSchema');
 
 // Create a new discount
 const createDiscount = async (req, res) => {
    try {
+    // Extract data from request body
     const { code, description, usageLimit, discountType, discountPercentage, discountValue, startDate, endDate } = req.body;
     // Validate required fields
     if (!code || !description || !usageLimit || !discountType || (!discountPercentage && !discountValue) || !startDate || !endDate) {
