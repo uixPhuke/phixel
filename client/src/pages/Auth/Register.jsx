@@ -8,7 +8,7 @@ import { CgSpinnerTwoAlt } from "react-icons/cg";
 import { Country } from "country-state-city";
 import parsePhoneNumberFromString from "libphonenumber-js";
 import { useDispatch, useSelector } from "react-redux";
-import { register, resendOtp, verifyOtp, googleAuth, facebookAuth } from "../../slices/userSlice"
+import { register, resendOtp, verifyOtp, googleAuth, facebookAuth } from "../../actions/userActions";
 
 export const Register = ({ setToggleAuth, handleOnClose }) => {
   const [userData, setUserData] = useState({
