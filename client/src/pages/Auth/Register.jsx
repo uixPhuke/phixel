@@ -483,7 +483,8 @@ export const Register = ({ setToggleAuth, handleOnClose }) => {
               onBlur={() => handleBlur("country", userData.country)}
               className="border text-sm rounded-lg py-3 px-4 w-full border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent peer appearance-none"
             >
-              <option value="">Select Country</option>
+              {/*<option value="">Select Country</option>*/}
+              <option value=""></option>
               {allCountries.map((country) => (
                 <option key={country.isoCode} value={country.isoCode}>
                   {country.name}
@@ -506,7 +507,7 @@ export const Register = ({ setToggleAuth, handleOnClose }) => {
           
           <div className="relative flex-1">
             <div className="flex items-center border text-sm rounded-lg border-primary focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent">
-              <span className="px-3 py-3 bg-gray-100 border-r border-primary">
+              <span className="px-3 py-3  border-r border-primary">
                 {selectedCountry ? `+${selectedCountry.phonecode}` : "+XX"}
               </span>
               <input
