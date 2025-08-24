@@ -1,20 +1,75 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { FaEye, FaEyeSlash, } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
+import { CgSpinnerTwoAlt } from "react-icons/cg";
+import { useDispatch, useSelector } from "react-redux";
+import { login, googleAuth, facebookAuth, setShowLoginModalFalse } from "../../actions/userActions";
 
-export const Login = () => {
+export const Login = ({ setToggleAuth, handleOnClose }) => {
   const [loginData, setLoginData] = useState({
     emailOrUsername: "",
     password: ""
   });
   const [showPassword, setShowPassword] = useState(false);
   const [focusedFields, setFocusedFields] = useState({});
+  const [errorMessage, setErrorMessage] = useState("");
+  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { authLoading, user } = useSelector((state) => state.user);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(loginData);
+    setErrorMessage("");
+    
+    dispatch(
+      login(loginData, (success, error) => {
+        if (success) {
+          if (handleOnClose) {
+            handleOnClose();
+          }
+          if (user?.isAdmin) {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/profile");
+          }
+        } else {
+          setErrorMessage(error || "Invalid email/username or password");
+        }
+      })
+    );
+  };
+
+  const handleContinueWithGoogle = () => {
+    dispatch(googleAuth((success) => {
+      if (success) {
+        if (handleOnClose) {
+          handleOnClose();
+        }
+        if (user?.isAdmin) {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/profile");
+        }
+      }
+    }));
+  };
+
+  const handleContinueWithFacebook = () => {
+    dispatch(facebookAuth((success) => {
+      if (success) {
+        if (handleOnClose) {
+          handleOnClose();
+        }
+        if (user?.isAdmin) {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/profile");
+        }
+      }
+    }));
   };
 
   const handleFocus = (field) => {
@@ -27,6 +82,28 @@ export const Login = () => {
     }
   };
 
+  const handleForgotPassword = () => {
+    if (handleOnClose) {
+      dispatch(setShowLoginModalFalse());
+    }
+    navigate("/forgot-password");
+  };
+
+  const handleChangeToRegister = (e) => {
+    e.preventDefault();
+    setLoginData({
+      emailOrUsername: "",
+      password: ""
+    });
+    setErrorMessage("");
+    
+    if (setToggleAuth) {
+      setToggleAuth("register");
+    } else {
+      navigate("/register");
+    }
+  };
+
   return (
     <div className="min-h-screen pt-30 flex justify-center items-center pb-24 font-primary">
       <form
@@ -34,6 +111,13 @@ export const Login = () => {
         className="md:w-1/3 w-full md:mx-0 mx-6 md:mt-8 flex flex-col p-8 rounded-xl"
       >
         <p className="text-center text-lg font-secondary mb-8">Login to Your Account</p>
+
+        {/* Error Message */}
+        {errorMessage && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+            {errorMessage}
+          </div>
+        )}
 
         {/* Email/Username Input */}
         <div className="relative mt-5">
@@ -82,21 +166,30 @@ export const Login = () => {
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary"
           >
-            {showPassword ? <FaEyeSlash className="h-8 w-8" /> : <FaEye className="h-8 w-8" />}
+            {showPassword ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
           </button>
         </div>
 
         <div className="flex justify-end mt-2">
-          <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            className="text-xs text-primary hover:underline"
+          >
             Forgot Password?
-          </Link>
+          </button>
         </div>
 
         <button
           type="submit"
-          className="cursor-pointer bg-primary w-full mt-6 text-sm rounded-lg  text-secondary hover:bg-accent px-3 py-3 transition-colors"
+          disabled={authLoading}
+          className="cursor-pointer bg-primary w-full mt-6 text-sm rounded-lg text-secondary hover:bg-accent px-3 py-3 transition-colors flex justify-center items-center"
         >
-          LOGIN
+          {authLoading ? (
+            <CgSpinnerTwoAlt className="animate-spin h-5 w-5" />
+          ) : (
+            "LOGIN"
+          )}
         </button>
 
         <div className="flex items-center my-4">
@@ -106,28 +199,37 @@ export const Login = () => {
         </div>
 
         {/* Social Login Buttons */}
-                  <div className="flex justify-center space-x-4 my-4">
-                    <button
-                      type="button"
-                      className="flex items-center justify-center w-24 h-24 rounded-lg border border-accent hover:bg-primary transition-colors"
-                      aria-label="Continue with Google"
-                    >
-                      <FcGoogle className="text-primary text-lg" />
-                    </button>
-                    <button
-                      type="button"
-                      className="flex items-center justify-center w-24 h-24 rounded-lg border border-accent hover:bg-primary transition-colors"
-                      aria-label="Continue with Facebook"
-                    >
-                      <FaFacebookF className="text-blue-600 text-lg" />
-                    </button>
-                  </div>
+        <div className="flex justify-center space-x-4 my-4">
+          <button
+            type="button"
+            onClick={handleContinueWithGoogle}
+            className="flex items-center justify-center w-24 h-24 rounded-lg border border-accent hover:bg-primary transition-colors"
+            aria-label="Continue with Google"
+            disabled={authLoading}
+          >
+            <FcGoogle className="text-primary text-lg" />
+          </button>
+          <button
+            type="button"
+            onClick={handleContinueWithFacebook}
+            className="flex items-center justify-center w-24 h-24 rounded-lg border border-accent hover:bg-primary transition-colors"
+            aria-label="Continue with Facebook"
+            disabled={authLoading}
+          >
+            <FaFacebookF className="text-blue-600 text-lg" />
+          </button>
+        </div>
+
         <div className="mt-6 text-center">
           <p className="text-accent">
             Don't have an account?{" "}
-            <Link to="/register" className="text-primary underline hover:text-accent">
+            <button
+              type="button"
+              onClick={handleChangeToRegister}
+              className="text-primary underline hover:text-accent"
+            >
               Register
-            </Link>
+            </button>
           </p>
         </div>
       </form>
