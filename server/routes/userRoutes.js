@@ -16,11 +16,11 @@ router.post('/auth/forget-password',forgetPassword);
 router.post('/auth/reset-password',resetPassword);
 
 //firebase auth
-router.post('/firebase-auth',verifyFirebaseToken,firebaseAuth);
+router.post('/auth/firebase',verifyFirebaseToken,firebaseAuth);
 
 //user verify in frontend
 // This route is used to verify the user in the frontend after firebase authentication
-router.get('/verify-auth',verifyFirebaseToken,verifyAuth);
+router.get('/auth/verify',isAuthenticated,verifyAuth);
 
 //user routes
 
