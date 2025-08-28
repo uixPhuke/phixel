@@ -135,6 +135,7 @@ const registerUser = async (req, res) => {
       message: "User registered successfully, Please verify your email using you email",
       user: newUser,
       token,
+      userId: newUser._id
     });
   } catch (error) {
     return res.status(500).json({

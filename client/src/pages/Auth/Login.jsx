@@ -5,7 +5,8 @@ import { FaFacebookF } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
 import { CgSpinnerTwoAlt } from "react-icons/cg";
 import { useDispatch, useSelector } from "react-redux";
-import { login, googleAuth, facebookAuth, setShowLoginModalFalse } from "../../actions/userActions";
+import { login, googleAuth, facebookAuth, } from "../../actions/userActions";
+import { setShowLoginModalFalse } from "../../slices/userSlice"
 
 export const Login = ({ setToggleAuth, handleOnClose }) => {
   const [loginData, setLoginData] = useState({

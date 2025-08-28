@@ -199,7 +199,7 @@ export const Register = ({ setToggleAuth, handleOnClose }) => {
     if (hasErrors) {
       setInputErrors(prev => ({
         ...prev,
-        phoneNo: userData.mobile ? "" : "Phone number is required.",
+        phone: userData.mobile ? "" : "Phone number is required.",
         country: userData.country ? "" : "Country is required.",
       }));
       return;
@@ -207,7 +207,7 @@ export const Register = ({ setToggleAuth, handleOnClose }) => {
 
     const formData = {
       ...userData,
-      phoneNo: userData.mobile,
+      phone: userData.mobile,
     };
     delete formData.countryCode;
 

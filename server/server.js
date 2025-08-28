@@ -2,6 +2,7 @@ const express=require('express')
 const app=express()
 require('dotenv').config()
 const cookieParser = require('cookie-parser')
+const cors=require('cors')
 const fileUpload = require("express-fileupload");
 
 const connectDB = require('./config/db')
@@ -20,6 +21,7 @@ const PORT=process.env.PORT
 connectDB()
 
 //pass the middleware
+app.use(cors())
 app.use(express.json())
 app.use(cookieParser());
 app.use(express.urlencoded({extended:true}))

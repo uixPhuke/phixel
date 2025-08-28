@@ -77,8 +77,17 @@ export const register = (userData, setSuccessToggle, setOtpToggle, setUserId, se
 
         const { data } = await axios.post(`${API_KEY}/api/v1/user/auth/register`, userData, config)
 
-        //localStorage.setItem('token', data.token);
+
+        const userId = data.userId || data.user?._id || data.user?.id;
         const token = data.token;
+
+        if (!userId) {
+            throw new Error("User ID not received from server");
+        }
+        //localStorage.setItem('token', data.token);
+        
+
+        
         setUserId(data.userId); // Save userId for OTP verification
         setToken(token); 
 
@@ -102,6 +111,7 @@ export const register = (userData, setSuccessToggle, setOtpToggle, setUserId, se
 
 export const verifyOtp = (userId, otp, token, setSuccessToggle) => async (dispatch) => {
     try {
+         console.log("Verifying OTP with:", { userId, otp, token }); 
         const config = {
             headers: {
                 'Content-Type': 'application/json'
@@ -110,6 +120,7 @@ export const verifyOtp = (userId, otp, token, setSuccessToggle) => async (dispat
 
         const { data } = await axios.post(`${API_KEY}/api/v1/user/auth/verify-otp`, { userId, otp }, config);
 
+        
         localStorage.setItem('token', token);
 
         toast.success("OTP Verified Successfully!", {

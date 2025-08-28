@@ -6,14 +6,14 @@ const {isAuthenticated}= require('../middlewares/auth');
 const {verifyFirebaseToken} = require('../middlewares/verifyFirebaseToken');
 
 //auth
-router.post('/register',registerUser);
-router.post('/login',loginUser);
+router.post('/auth/register',registerUser);
+router.post('/auth/login',loginUser);
 
 //auth verification and password reset
-router.post('/verify-otp',verifyUserOtp);
-router.post('/resend-otp',resendOtp);
-router.post('/forget-password',forgetPassword);
-router.post('/reset-password',resetPassword);
+router.post('/auth/verify-otp',verifyUserOtp);
+router.post('/auth/resend-otp',resendOtp);
+router.post('/auth/forget-password',forgetPassword);
+router.post('/auth/reset-password',resetPassword);
 
 //firebase auth
 router.post('/firebase-auth',verifyFirebaseToken,firebaseAuth);

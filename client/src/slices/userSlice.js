@@ -32,9 +32,9 @@ const userSlice=createSlice({
         registerSuccess:(state)=>{
             state.authLoading=false;
         },
-        registerFail:(state)=>{
+        registerFail:(state,action)=>{
             state.authLoading=false;
-            state.error=isAction.payload;
+            state.error= action.payload;
         },
         loginRequest: (state) => {
             state.authLoading = true;
