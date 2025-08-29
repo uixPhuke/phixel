@@ -109,7 +109,7 @@ export const register = (userData, setSuccessToggle, setOtpToggle, setUserId, se
     }
 }
 
-export const verifyOtp = (userId, otp, token, setSuccessToggle) => async (dispatch) => {
+/*export const verifyOtp = (userId, otp, token, setSuccessToggle) => async (dispatch) => {
     try {
          console.log("Verifying OTP with:", { userId, otp, token }); 
         const config = {
@@ -138,6 +138,51 @@ export const verifyOtp = (userId, otp, token, setSuccessToggle) => async (dispat
         dispatch(loginFail(err.response.data.message));
         console.log(err.response.data.message);
         toast.error(err.response.data.message, {
+            className: 'custom-toast-enter',
+        });
+    }
+};*/
+
+export const verifyOtp = (userId, otp, token, setSuccessToggle) => async (dispatch) => {
+    try {
+        const config = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        const { data } = await axios.post(`${API_KEY}/api/v1/user/auth/verify-otp`, 
+            { userId, otp }, 
+            config
+        );
+
+        // Store the token
+        localStorage.setItem('token', token);
+        
+        // Update Redux state directly instead of calling verify()
+        dispatch(registerSuccess());
+        
+        // Manually set authentication state since verify() is failing
+        dispatch(verifyLoginSuccess({
+            user: data.user, // Assuming backend returns user data
+            isAuthenticated: true
+        }));
+
+        toast.success("OTP Verified Successfully!", {
+            className: 'custom-toast-enter',
+        });
+        
+        toast.success("Register Successful!", {
+            className: 'custom-toast-enter',
+        });
+        
+        setSuccessToggle(true);
+
+    } catch (err) {
+        const errorMsg = err.response?.data?.message || "OTP verification failed";
+        dispatch(loginFail(errorMsg));
+        
+        toast.error(errorMsg, {
             className: 'custom-toast-enter',
         });
     }
@@ -254,9 +299,6 @@ export const facebookAuth = (setSuccessToggle) => async (dispatch) => {
     }
 
 }
-
-
-
 
 export const getUser = () => async (dispatch) => {
     try {

@@ -227,7 +227,7 @@ export const Register = ({ setToggleAuth, handleOnClose }) => {
       if (handleOnClose) {
         handleOnClose();
       } else {
-        navigate("/profile");
+        navigate("/");
       }
     }));
   };
