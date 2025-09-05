@@ -5,76 +5,93 @@ const cartSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
-    cartItems: [],
-    totalCartPrice: 0,
-    cartStatus: 'active',
-    updatedAt: null,
-    itemCount: 0, // New field to track the number of items
+    cartItems: [], // This will store the products array from your backend
+    itemCount: 0, // Number of distinct items in cart
+    totalQuantity: 0, // Total quantity of all items
   },
   reducers: {
-    // Actions to handle adding/updating/removing items from the cart
-    updateCartRequest: (state) => {
+    // Request actions
+    cartRequest: (state) => {
       state.loading = true;
+      state.error = null;
     },
-    updateCartSuccess: (state, action) => {
-      state.loading = false;
-      state.cartItems = [...action.payload.items]; // Ensure immutability by spreading new items
-      state.totalCartPrice = action.payload.totalCartPrice;
-      state.updatedAt = action.payload.updatedAt;
-      
-      
-      // Update itemCount based on the quantity of items
-      state.itemCount = action.payload.items.reduce(
-        (count, item) => count + (item.quantity > 0 ? 1 : 0),
-        0
-      );
-    },
-    updateCartFail: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-
-    // Actions to handle fetching the cart
-    getCartRequest: (state) => {
-      state.loading = true;
-    },
+    
+    // Success actions
     getCartSuccess: (state, action) => {
       state.loading = false;
-      state.cartItems = [...action.payload.items]; // Ensure immutability
-      state.totalCartPrice = action.payload.totalCartPrice;
-      state.afterDiscountCartPrice = action.payload.afterDiscountCartPrice;
-      state.cartStatus = action.payload.cartStatus;
-      state._id = action.payload._id;
-      state.updatedAt = action.payload.updatedAt;
-      state.deliveryCharge = action.payload.deliveryCharge; // Store deliveryCharge
-      // Update itemCount based on the quantity of items
-      state.itemCount = action.payload.items.reduce(
-        (count, item) => count + (item.quantity > 0 ? 1 : 0),
-        0
+      state.cartItems = action.payload;
+      
+      // Calculate derived values
+      state.itemCount = action.payload.length;
+      state.totalQuantity = action.payload.reduce(
+        (total, item) => total + item.quantity, 0
       );
     },
     
-    getCartFail: (state, action) => {
+    addToCartSuccess: (state, action) => {
+      state.loading = false;
+      state.cartItems = action.payload;
+      
+      // Calculate derived values
+      state.itemCount = action.payload.length;
+      state.totalQuantity = action.payload.reduce(
+        (total, item) => total + item.quantity, 0
+      );
+    },
+    
+    syncCartSuccess: (state, action) => {
+      state.loading = false;
+      state.cartItems = action.payload;
+      
+      // Calculate derived values
+      state.itemCount = action.payload.length;
+      state.totalQuantity = action.payload.reduce(
+        (total, item) => total + item.quantity, 0
+      );
+    },
+    
+    removeFromCartSuccess: (state, action) => {
+      state.loading = false;
+      state.cartItems = action.payload;
+      
+      // Calculate derived values
+      state.itemCount = action.payload.length;
+      state.totalQuantity = action.payload.reduce(
+        (total, item) => total + item.quantity, 0
+      );
+    },
+    
+    clearCartSuccess: (state) => {
+      state.loading = false;
+      state.cartItems = [];
+      state.itemCount = 0;
+      state.totalQuantity = 0;
+    },
+    
+    // Failure action
+    cartFail: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
-
-    clearCart: (state) => {
+    
+    // Clear cart in state (without API call)
+    clearCartState: (state) => {
       state.cartItems = [];
-      state.totalCartPrice = 0;
-      state.itemCount = 0; // Reset the item count
+      state.itemCount = 0;
+      state.totalQuantity = 0;
     },
   },
 });
 
 export const {
-  updateCartRequest,
-  updateCartSuccess,
-  updateCartFail,
-  getCartRequest,
+  cartRequest,
   getCartSuccess,
-  getCartFail,
-  clearCart,
+  addToCartSuccess,
+  syncCartSuccess,
+  removeFromCartSuccess,
+  clearCartSuccess,
+  cartFail,
+  clearCartState,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
