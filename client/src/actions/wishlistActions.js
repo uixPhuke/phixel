@@ -30,7 +30,7 @@ export const getWishlist = () => async (dispatch) => {
       return;
     }
 
-    const { data } = await axios.get(`${API_URL}/wishlist`, getAuthConfig());
+    const { data } = await axios.get(`${API_URL}/api/v8/wishlist`, getAuthConfig());
     dispatch(getWishlistSuccess(data));
   } catch (err) {
     console.error('Get Wishlist Error:', err);
@@ -60,7 +60,7 @@ export const addToWishlist = (productId) => async (dispatch) => {
     }
 
     const { data } = await axios.post(
-      `${API_URL}/wishlist/add`,
+      `${API_URL}/api/v8/wishlist/add`,
       { productId },
       getAuthConfig()
     );
@@ -103,7 +103,7 @@ export const removeFromWishlist = (productId) => async (dispatch) => {
     }
 
     const { data } = await axios.delete(
-      `${API_URL}/wishlist/${productId}`,
+      `${API_URL}/api/v8/wishlist/${productId}`,
       getAuthConfig()
     );
 
@@ -137,7 +137,7 @@ export const syncGuestWishlist = (guestWishlistItems) => async (dispatch) => {
     }
 
     const { data } = await axios.post(
-      `${API_URL}/wishlist/sync`,
+      `${API_URL}/api/v8/wishlist/sync`,
       { guestWishlist: guestWishlistItems },
       getAuthConfig()
     );

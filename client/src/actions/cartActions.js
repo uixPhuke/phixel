@@ -30,7 +30,7 @@ export const getCart = () => async (dispatch) => {
       },
     };
 
-    const { data } = await axios.get(`${API_URL}/api/v3/cart`, config);
+    const { data } = await axios.get(`${API_URL}/api/v4/cart`, config);
     dispatch(getCartSuccess(data));
   } catch (err) {
     console.error('Get Cart Error:', err);
@@ -66,7 +66,7 @@ export const addToCart = (productData) => async (dispatch) => {
       },
     };
 
-    const { data } = await axios.post(`${API_URL}/api/v3/cart`, productData, config);
+    const { data } = await axios.post(`${API_URL}/api/v4/cart`, productData, config);
     dispatch(addToCartSuccess(data));
     toast.success('Item added to cart successfully!');
   } catch (err) {
@@ -107,7 +107,7 @@ export const syncGuestCart = (guestCartItems) => async (dispatch) => {
     };
 
     const { data } = await axios.post(
-      `${API_URL}/api/v3/cart/sync`, 
+      `${API_URL}/api/v4/cart/sync`, 
       { guestCart: guestCartItems }, 
       config
     );
@@ -148,7 +148,7 @@ export const removeFromCart = (productId) => async (dispatch) => {
     };
 
     const { data } = await axios.delete(
-      `${API_URL}/api/v3/cart/${productId}`, 
+      `${API_URL}/api/v4/cart/${productId}`, 
       config
     );
     
@@ -183,9 +183,9 @@ export const clearCart = () => async (dispatch) => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    };
+    };  ``
 
-    const { data } = await axios.delete(`${API_URL}/api/v3/cart`, config);
+    const { data } = await axios.delete(`${API_URL}/api/v4/cart`, config);
     dispatch(clearCartSuccess(data));
     toast.success('Cart cleared successfully!');
   } catch (err) {
@@ -201,3 +201,4 @@ export const clearCart = () => async (dispatch) => {
     }
   }
 };
+

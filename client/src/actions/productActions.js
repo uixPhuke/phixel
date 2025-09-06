@@ -34,7 +34,7 @@ export const addProduct = (productData, formData, resetForm) => async (dispatch)
     };
 
     const { data } = await axios.post(
-      `${API_URL}/product/admin/product/create`,
+      `${API_URL}/api/v3/product/admin/product/create`,
       formData,
       config
     );
@@ -70,7 +70,7 @@ export const getProductsAdmin = () => async (dispatch) => {
     dispatch(productRequest());
 
     const { data } = await axios.get(
-      `${API_URL}/product/admin/products`,
+      `${API_URL}/api/v3/product/admin/products`,
       getAuthConfig()
     );
 
@@ -90,7 +90,7 @@ export const deleteProductAdmin = (productID) => async (dispatch) => {
     dispatch(productRequest());
 
     const { data } = await axios.delete(
-      `${API_URL}/product/admin/product/delete/${productID}`,
+      `${API_URL}/api/v3/product/admin/product/delete/${productID}`,
       getAuthConfig()
     );
 
@@ -114,7 +114,7 @@ export const getProductAdmin = (productID) => async (dispatch) => {
     dispatch(productRequest());
 
     const { data } = await axios.get(
-      `${API_URL}/product/admin/product/${productID}`,
+      `${API_URL}/api/v3/product/admin/product/${productID}`,
       getAuthConfig()
     );
 
@@ -144,7 +144,7 @@ export const updateProductAdmin = (productID, productData, formData) => async (d
     const requestData = formData || productData;
 
     const { data } = await axios.put(
-      `${API_URL}/product/admin/product/${productID}`,
+      `${API_URL}/api/v3/product/admin/product/${productID}`,
       requestData,
       config
     );
@@ -190,7 +190,7 @@ export const getProduct = (productID) => async (dispatch) => {
     dispatch(productRequest());
 
     const { data } = await axios.get(
-      `${API_URL}/product/product/${productID}`,
+      `${API_URL}/api/v3/product/product/${productID}`,
       getAuthConfig()
     );
 
@@ -230,7 +230,7 @@ export const getAllProducts = (queryParams = {}) => async (dispatch) => {
     }
 
     const { data } = await axios.get(
-      `${API_URL}/product/products?${queryString}`,
+      `${API_URL}/api/v3/product/products?${queryString}`,
       getAuthConfig()
     );
 
