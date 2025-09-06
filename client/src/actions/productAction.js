@@ -1,300 +1,253 @@
-import { useContext } from "react";
 import axios from "axios";
 import {
-    createProductRequest,
-    createProductSuccess,
-    createProductFail,
-    getProductsAdminRequest,
-    getProductsAdminSuccess,
-    getProductsAdminFail,
-    updateProductAdminRequest,
-    updateProductAdminSuccess,
-    updateProductAdminFail,
-    deleteProductAdminRequest,
-    deleteProductAdminSuccess,
-    deleteProductAdminFail,
-    getProductAdminRequest,
-    getProductAdminSuccess,
-    getProductAdminFail,
-    getProductRequest,
-    getProductSuccess,
-    getProductFail,
-    getProductsRequest,
-    getProductsSuccess,
-    getProductsFail,
+  productRequest,
+  getProductsSuccess,
+  getProductSuccess,
+  getProductsAdminSuccess,
+  getProductAdminSuccess,
+  createProductSuccess,
+  updateProductAdminSuccess,
+  deleteProductAdminSuccess,
+  productFail
 } from "../slices/productSlice";
 import { toast } from "react-hot-toast";
-// import { ClientIPContext } from "../context/ClientIPContext"
 
-const API_KEY = import.meta.env.VITE_API_KEY;
+const API_URL = import.meta.env.VITE_API_KEY;
 
+// Helper function to get auth config
+const getAuthConfig = () => ({
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  }
+});
 
-// Admin Route
-export const addProduct =
-    (product, setProductData, formRef) => async (dispatch) => {
-        try {
-            dispatch(createProductRequest());
+// Admin Route - Create Product
+export const addProduct = (productData, formData, resetForm) => async (dispatch) => {
+  try {
+    dispatch(productRequest());
 
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            };
-
-            const { data } = await axios.post(
-                `${API_KEY}/api/v2/product/admin/product/create`,
-                product,
-                config
-            );
-
-            dispatch(createProductSuccess());
-
-            // **Clear cached products after update**
-        Object.keys(localStorage).forEach((key) => {
-            if (key.startsWith("products_")) {
-                localStorage.removeItem(key);
-            }
-        });
-
-            toast.success("Product Added Successfully!", {
-                className: 'custom-toast-enter',
-            });
-
-            setProductData({
-                title: "",
-                desc: "",
-                imgs: [],
-                totalPrice: "",
-                costPrice: "",
-                sellingPrice: "",
-                category: "",
-                sizes: [],
-                fabricType:"",
-                fitType:"",
-                pattern:"",
-                sleeveType:"",
-                collarType:"",
-                gender: "",
-                color: "",
-                stock: "",
-                availableState: true,
-                madeToOrder: false,
-                popular: false,
-                labor: "",
-                packaging: "",
-                countryTax: "",
-                country: "",
-                active: "active",
-                productCode: "",
-            });
-            formRef.current.reset();
-        } catch (err) {
-            dispatch(createProductFail(err.response.data.message));
-            console.log(err.response.data.message);
-            toast.error(err.response.data.message, {
-                className: 'custom-toast-enter',
-            });
-        }
+    const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        'Content-Type': 'multipart/form-data'
+      }
     };
 
-// Admin Routes
+    const { data } = await axios.post(
+      `${API_URL}/product/admin/product/create`,
+      formData,
+      config
+    );
+
+    dispatch(createProductSuccess());
+
+    // Clear cached products after update
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("products_")) {
+        localStorage.removeItem(key);
+      }
+    });
+
+    toast.success("Product Added Successfully!");
+    
+    // Reset form if provided
+    if (resetForm && typeof resetForm === 'function') {
+      resetForm();
+    }
+  } catch (err) {
+    const errorMessage = err.response?.data?.message || 
+                         err.response?.data?.error || 
+                         'Failed to create product';
+    
+    dispatch(productFail(errorMessage));
+    toast.error(errorMessage);
+  }
+};
+
+// Admin Route - Get All Products
 export const getProductsAdmin = () => async (dispatch) => {
-    try {
-        dispatch(getProductsAdminRequest());
+  try {
+    dispatch(productRequest());
 
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-        };
+    const { data } = await axios.get(
+      `${API_URL}/product/admin/products`,
+      getAuthConfig()
+    );
 
-        const { data } = await axios.get(
-            `${API_KEY}/api/v2/product/admin/products`,
-            config
-        );
-        console.log("Fetched Products from the admin:", data.products); // Debug log
-        dispatch(getProductsAdminSuccess(data.products));
-    } catch (err) {
-        dispatch(getProductsAdminFail(err.response.data.message));
-        console.log(err.response.data.message);
-        toast.error(err.response.data.message, {
-            className: 'custom-toast-enter',
-        });
-    }
+    dispatch(getProductsAdminSuccess(data.products));
+  } catch (err) {
+    const errorMessage = err.response?.data?.message || 
+                         'Failed to fetch products';
+    
+    dispatch(productFail(errorMessage));
+    toast.error(errorMessage);
+  }
 };
 
-// Admin Routes
+// Admin Route - Delete Product
 export const deleteProductAdmin = (productID) => async (dispatch) => {
-    try {
-        dispatch(deleteProductAdminRequest());
+  try {
+    dispatch(productRequest());
 
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-        };
+    const { data } = await axios.delete(
+      `${API_URL}/product/admin/product/delete/${productID}`,
+      getAuthConfig()
+    );
 
-        const { data } = await axios.delete(
-            `${API_KEY}/api/v2/product/admin/product/delete/${productID}`,
-            config
-        );
-
-        dispatch(deleteProductAdminSuccess());
-
-        toast.success("Product removed successfully!", {
-            className: 'custom-toast-enter',
-        });
-        dispatch(getProductsAdmin());
-    } catch (err) {
-        dispatch(deleteProductAdminFail(err.response.data.message));
-        console.log(err.response.data.message);
-        toast.error(`error of delete is ${err.response.data.message}`);
-    }
+    dispatch(deleteProductAdminSuccess());
+    toast.success("Product removed successfully!");
+    
+    // Refresh the products list
+    dispatch(getProductsAdmin());
+  } catch (err) {
+    const errorMessage = err.response?.data?.message || 
+                         'Failed to delete product';
+    
+    dispatch(productFail(errorMessage));
+    toast.error(errorMessage);
+  }
 };
 
-// Admin Route
+// Admin Route - Get Single Product
 export const getProductAdmin = (productID) => async (dispatch) => {
-    try {
-        dispatch(getProductAdminRequest());
+  try {
+    dispatch(productRequest());
 
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-        };
+    const { data } = await axios.get(
+      `${API_URL}/product/admin/product/${productID}`,
+      getAuthConfig()
+    );
 
-        const { data } = await axios.get(
-            `${API_KEY}/api/v2/product/admin/product/${productID}`,
-            config
-        );
-
-        dispatch(getProductAdminSuccess(data.product));
-    } catch (err) {
-        dispatch(getProductAdminFail(err.response.data.message));
-        console.log(err.response.data.message);
-        toast.error(err.response.data.message, {
-            className: 'custom-toast-enter',
-        });
-    }
+    dispatch(getProductAdminSuccess(data.product));
+  } catch (err) {
+    const errorMessage = err.response?.data?.message || 
+                         'Failed to fetch product';
+    
+    dispatch(productFail(errorMessage));
+    toast.error(errorMessage);
+  }
 };
 
-// Admin Route
-export const updateProductAdmin = (product, productID) => async (dispatch) => {
-    try {
-        dispatch(updateProductAdminRequest());
+// Admin Route - Update Product
+export const updateProductAdmin = (productID, productData, formData) => async (dispatch) => {
+  try {
+    dispatch(productRequest());
 
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-        };
+    const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        'Content-Type': formData ? 'multipart/form-data' : 'application/json'
+      }
+    };
 
-        const { data } = await axios.put(
-            `${API_KEY}/api/v2/product/admin/product/update/${productID}`,
-            product,
-            config
-        );
+    // Use formData if provided, otherwise use productData
+    const requestData = formData || productData;
 
-        dispatch(updateProductAdminSuccess());
-        dispatch(getProductAdmin(productID));
+    const { data } = await axios.put(
+      `${API_URL}/product/admin/product/${productID}`,
+      requestData,
+      config
+    );
 
-        // **Clear cached products after update**
-        Object.keys(localStorage).forEach((key) => {
-            if (key.startsWith("products_")) {
-                localStorage.removeItem(key);
-            }
-        });
+    dispatch(updateProductAdminSuccess());
+    
+    // Clear cached products after update
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("products_")) {
+        localStorage.removeItem(key);
+      }
+    });
 
-        // **Update cache version to notify all users of new data**
-        localStorage.setItem("products_cache_version", Date.now());
+    // Update cache version to notify all users of new data
+    localStorage.setItem("products_cache_version", Date.now());
 
-        toast.success("Product updated successfully!", {
-            className: 'custom-toast-enter',
-        });
-    } catch (err) {
-        dispatch(updateProductAdminFail(err.response.data.message));
-        console.log(err.response.data.message);
-        toast.error(err.response.data.message, {
-            className: 'custom-toast-enter',
-        });
-    }
+    toast.success("Product updated successfully!");
+    
+    // Refresh the product data
+    dispatch(getProductAdmin(productID));
+  } catch (err) {
+    const errorMessage = err.response?.data?.message || 
+                         'Failed to update product';
+    
+    dispatch(productFail(errorMessage));
+    toast.error(errorMessage);
+  }
 };
 
-// Normal User Route
-export const getProduct = (productID, clientIP) => async (dispatch, getState) => {
-    try {
-        const { product } = getState().product; // Get current Redux state
+// User Route - Get Single Product
+export const getProduct = (productID) => async (dispatch) => {
+  try {
+    // Check cache first
+    const cachedData = localStorage.getItem(`product_${productID}`);
+    const cacheTime = localStorage.getItem(`product_${productID}_timestamp`);
+    const CACHE_EXPIRATION = 10 * 60 * 1000; // 10 minutes
 
-        // // Get cached product and timestamp
-        // const cachedData = localStorage.getItem(`product_${productID}`);
-        // const cacheTime = localStorage.getItem(`product_${productID}_timestamp`);
-
-        // // Set cache expiration time (10 minutes)
-        // const CACHE_EXPIRATION = 1 * 60 * 1000;
-
-        // if (cachedData && cacheTime && Date.now() - cacheTime < CACHE_EXPIRATION) {
-        //     dispatch(getProductSuccess(JSON.parse(cachedData)));
-        //     return;
-        // }
-
-        dispatch(getProductRequest());
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              
-            },
-        };
-
-        const { data } = await axios.get(
-            `${API_KEY}/api/v2/product/product/${productID}`,
-            config
-        );
-
-        dispatch(getProductSuccess(data.product));
-
-        // Store in localStorage with timestamp
-        localStorage.setItem(`product_${productID}`, JSON.stringify(data.product));
-        localStorage.setItem(`product_${productID}_timestamp`, Date.now());
-    } catch (err) {
-        dispatch(getProductFail(err.response.data.message));
+    if (cachedData && cacheTime && Date.now() - cacheTime < CACHE_EXPIRATION) {
+      dispatch(getProductSuccess(JSON.parse(cachedData)));
+      return;
     }
+
+    dispatch(productRequest());
+
+    const { data } = await axios.get(
+      `${API_URL}/product/product/${productID}`,
+      getAuthConfig()
+    );
+
+    dispatch(getProductSuccess(data.product));
+
+    // Store in cache
+    localStorage.setItem(`product_${productID}`, JSON.stringify(data.product));
+    localStorage.setItem(`product_${productID}_timestamp`, Date.now());
+  } catch (err) {
+    const errorMessage = err.response?.data?.message || 
+                         'Failed to fetch product';
+    
+    dispatch(productFail(errorMessage));
+  }
 };
 
+// User Route - Get All Products with filters
+export const getAllProducts = (queryParams = {}) => async (dispatch) => {
+  try {
+    dispatch(productRequest());
 
-export const getAllProducts = (query, clientIP) => async (dispatch) => {
-    try {
-        dispatch(getProductsRequest());
+    // Build query string
+    const queryString = new URLSearchParams(queryParams).toString();
+    const cacheKey = `products_${queryString}`;
 
-        const cacheKey = `products_${query}`;
-        const cachedProducts = localStorage.getItem(cacheKey);
-        const cachedTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
-        const cacheVersion = localStorage.getItem("products_cache_version") || 0;
+    // Check cache
+    const cachedProducts = localStorage.getItem(cacheKey);
+    const cachedTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
+    const cacheVersion = localStorage.getItem("products_cache_version") || 0;
+    const CACHE_EXPIRATION = 10 * 60 * 1000; // 10 minutes
 
-        // Set cache expiration time (e.g., 10 minutes)
-        const CACHE_EXPIRATION = 4 * 60 * 1000;
-
-        // If cached data exists and is not expired, dispatch it from cache
-        if (cachedProducts && cachedTimestamp && Date.now() - cachedTimestamp < CACHE_EXPIRATION && Number(cachedTimestamp) >= Number(cacheVersion)) {
-            dispatch(getProductsSuccess(JSON.parse(cachedProducts)));
-            return;
-        }
-
-        const config = {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-                
-            },
-        };
-
-        const { data } = await axios.get(`${API_KEY}/api/v2/product/products?${query}`, config);
-        dispatch(getProductsSuccess(data.products));
-
-        // Cache the response in localStorage with timestamp
-        localStorage.setItem(cacheKey, JSON.stringify(data.products));
-        localStorage.setItem(`${cacheKey}_timestamp`, Date.now());
-    } catch (err) {
-        dispatch(getProductsFail(err.response.data.message));
-        console.log(err.response.data.message);
+    if (cachedProducts && cachedTimestamp && 
+        Date.now() - cachedTimestamp < CACHE_EXPIRATION && 
+        Number(cachedTimestamp) >= Number(cacheVersion)) {
+      dispatch(getProductsSuccess(JSON.parse(cachedProducts)));
+      return;
     }
+
+    const { data } = await axios.get(
+      `${API_URL}/product/products?${queryString}`,
+      getAuthConfig()
+    );
+
+    const responseData = {
+      products: data.products,
+      pagination: data.pagination
+    };
+
+    dispatch(getProductsSuccess(responseData));
+
+    // Cache the response
+    localStorage.setItem(cacheKey, JSON.stringify(responseData));
+    localStorage.setItem(`${cacheKey}_timestamp`, Date.now());
+  } catch (err) {
+    const errorMessage = err.response?.data?.message || 
+                         'Failed to fetch products';
+    
+    dispatch(productFail(errorMessage));
+  }
 };
