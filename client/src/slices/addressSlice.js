@@ -6,38 +6,27 @@ const addressSlice = createSlice({
     loading: false,
     error: null,
     addresses: [],
-    updatedAt: null,
   },
   reducers: {
-    // Actions for adding/updating/removing/fetching addresses
-    addAddressRequest: (state) => {
+    // Generic request action
+    addressRequest: (state) => {
       state.loading = true;
+      state.error = null;
     },
+    
+    // Add address success
     addAddressSuccess: (state, action) => {
       state.loading = false;
       state.addresses.push(action.payload);
-      state.updatedAt = action.payload.updatedAt;
     },
-    addAddressFail: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-
-    getAddressesRequest: (state) => {
-      state.loading = true;
-    },
+    
+    // Get addresses success
     getAddressesSuccess: (state, action) => {
       state.loading = false;
       state.addresses = action.payload;
     },
-    getAddressesFail: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-
-    updateAddressRequest: (state) => {
-      state.loading = true;
-    },
+    
+    // Update address success
     updateAddressSuccess: (state, action) => {
       state.loading = false;
       const index = state.addresses.findIndex(address => address._id === action.payload._id);
@@ -45,38 +34,40 @@ const addressSlice = createSlice({
         state.addresses[index] = action.payload;
       }
     },
-    updateAddressFail: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-
-    deleteAddressRequest: (state) => {
-      state.loading = true;
-    },
+    
+    // Delete address success
     deleteAddressSuccess: (state, action) => {
       state.loading = false;
       state.addresses = state.addresses.filter(address => address._id !== action.payload);
     },
-    deleteAddressFail: (state, action) => {
+    
+    // Failure action
+    addressFail: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
+    
+    // Clear error
+    clearAddressError: (state) => {
+      state.error = null;
+    },
+    
+    // Clear addresses
+    clearAddresses: (state) => {
+      state.addresses = [];
+    }
   },
 });
 
 export const {
-  addAddressRequest,
+  addressRequest,
   addAddressSuccess,
-  addAddressFail,
-  getAddressesRequest,
   getAddressesSuccess,
-  getAddressesFail,
-  updateAddressRequest,
   updateAddressSuccess,
-  updateAddressFail,
-  deleteAddressRequest,
   deleteAddressSuccess,
-  deleteAddressFail,
+  addressFail,
+  clearAddressError,
+  clearAddresses
 } = addressSlice.actions;
 
 export default addressSlice.reducer;
