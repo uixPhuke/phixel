@@ -5,6 +5,7 @@ import Hero from "./pages/Home/Hero";
 import About from "./pages/Home/About";
 import { Register } from "./pages/Auth/Register";
 import { Login } from "./pages/Auth/Login";
+import { Profile } from "./pages/Profile/Profile";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
               </>} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/profile" element={<Profile />} />
           
         </Routes>
       </div>
