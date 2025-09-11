@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { setShowLoginModalTrue } from '../../slices/userSlice' // Importing action creator
 import { useDispatch } from 'react-redux' // Importing useDispatch hook from react-redux
-import {acessDenied} from '../../assets/accessDenied.png'
+import {accessDenied} from '../../assets/accessDenied.png'
 
 // Define the UnAuthorized component
 export const UnAuthorized = () => {
@@ -20,7 +20,7 @@ export const UnAuthorized = () => {
                 {/* Image container with margin for spacing */}
                 <div className='mb-10 mt-40 w-64'>
                     {/* Access denied image */}
-                    <img src={acessDenied} className='w-full h-full object-cover' alt="accessDenied.png" />
+                    <img src={accessDenied} className='w-full h-full object-cover' alt="accessDenied.png" />
                 </div>
                 {/* Heading indicating unauthorized access */}
                 <h1 className="md:text-3xl text-2xl font-semibold mb-4 text-primary">You are unauthorized</h1>
