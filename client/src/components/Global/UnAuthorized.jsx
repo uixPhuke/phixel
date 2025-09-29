@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { setShowLoginModalTrue } from '../../slices/userSlice' // Importing action creator
 import { useDispatch } from 'react-redux' // Importing useDispatch hook from react-redux
-import {accessDenied} from '../../assets/accessDenied.png'
+import accessDenied from '../../assets/accessDenied.png'
 
 // Define the UnAuthorized component
 export const UnAuthorized = () => {
