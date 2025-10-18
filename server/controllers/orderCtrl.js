@@ -1,25 +1,25 @@
-import mongoose from "mongoose";
-import Order from "../models/orderSchema.js";
-import User from "../models/userSchema.js";
-import Cart from "../models/cartSchema.js";
-import Address from "../models/addressSchema.js";
-import Razorpay from "../config/razorpay.js";
-import crypto from "crypto";
-import Discount from "../models/discountSchema.js";
-import Product from "../models/productSchema.js";
-import {
+const mongoose=require('mongoose')
+const Order= require("../models/orderSchema.js");
+const User =require("../models/userSchema.js");
+const Cart =require("../models/cartSchema.js");
+const Address =require("../models/addressSchema.js");
+const Razorpay =require("../config/razorpay.js");
+const crypto =require("crypto");
+const Discount =require("../models/discountSchema.js");
+const Product =require("../models/productSchema.js");
+const {
     sendOrderCancellationEmail,
     sendOrderConfirmationEmail,
     sendOrderStatusUpdateEmail,
     sendReturnRequestEmailToAdmin,
     sendReturnStatusEmailToUser,
     sendRefundStatusEmailToUser,
-} from "../Services/orderEmailService.js";
+} =require("../Services/orderEmailService.js");
 
 // Utility functions
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
-class OrderController {
+class orderCtrl {
     // Create order with Razorpay integration
     createOrder = async (req, res) => {
         try {
@@ -610,4 +610,4 @@ class OrderController {
     };
 }
 
-export default new OrderController();
+module.exports = new orderCtrl();

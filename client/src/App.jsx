@@ -6,6 +6,9 @@ import About from "./pages/Home/About";
 import { Register } from "./pages/Auth/Register";
 import { Login } from "./pages/Auth/Login";
 import { Profile } from "./pages/Profile/Profile";
+import { ProductListingPage, ProductDetailPage } from '../pages/product';
+import { ProductCard, ProductFilters } from '../components/product';
+import { useProducts } from '../hooks/useProducts';
 
 const App = () => {
   return (

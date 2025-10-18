@@ -531,7 +531,7 @@ const sendOrderCancellationEmail = async (email, order) => {
 };
 
 //export all email service functions
-export {
+module.exports={
     sendOrderConfirmationEmail,
     sendOrderCancellationEmail,
     sendOrderStatusUpdateEmail,
