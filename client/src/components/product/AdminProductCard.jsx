@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { deleteProductAdmin } from '../../slices/productSlice';
+import { deleteProductAdminSuccess } from '../../slices/productSlice';
 import { formatPrice, getProductStatus } from '../../utils/productHelpers';
 import { toast } from 'react-hot-toast';
 
@@ -11,7 +11,7 @@ const AdminProductCard = ({ product }) => {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await dispatch(deleteProductAdmin(product._id)).unwrap();
+        await dispatch(deleteProductAdminSuccess(product._id)).unwrap();
         toast.success('Product deleted successfully!');
       } catch (error) {
         toast.error('Failed to delete product');

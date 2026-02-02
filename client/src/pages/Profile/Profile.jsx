@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { UnAuthorized } from "../../components/Global/UnAuthorized";
-import { getUser, getOrders } from "../../actions/userActions";
+import { getUser,getOrders } from "../../actions/userActions";
 import { Loader } from "../../components/Global/Loader";
 
 const getInitials = (firstName, lastName) => {

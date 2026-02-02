@@ -28,7 +28,7 @@ router.delete('/admin/product/delete/:productID', isAuthenticated, isAdmin, dele
 router.get('/admin/product/:productID', isAuthenticated, isAdmin, getProductAdmin);
 
 router.get('/product/:productID', isAuthenticated, getProduct);
-router.get('/products', isAuthenticated, getAllProducts);
+router.get('/products', getAllProducts);
 
 module.exports = router;
 

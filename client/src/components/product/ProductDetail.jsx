@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { addToCart } from '../../slices/cartSlice';
-import { addToWishlist } from '../../slices/wishlistSlice';
+import { addToCartSuccess } from '../../slices/cartSlice';
+import { addToWishlistSuccess } from '../../slices/wishlistSlice';
 import { formatPrice, getProductStatus } from '../../utils/productHelpers';
 import ProductImages from './ProductImages';
 import { toast } from 'react-hot-toast';
@@ -12,7 +12,7 @@ const ProductDetail = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
 
   const handleAddToCart = () => {
-    dispatch(addToCart({
+    dispatch(addToCartSuccess({
       productId: product._id,
       quantity,
       size: selectedSize
@@ -21,7 +21,7 @@ const ProductDetail = ({ product }) => {
   };
 
   const handleAddToWishlist = () => {
-    dispatch(addToWishlist(product._id));
+    dispatch(addToWishlistSuccess(product._id));
     toast.success('Added to wishlist!');
   };
 

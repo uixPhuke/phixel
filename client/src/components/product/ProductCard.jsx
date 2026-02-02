@@ -2,22 +2,22 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { formatPrice, getProductStatus } from '../../utils/productHelpers';
-import { addToCart } from '../../slices/cartSlice';
-import { addToWishlist } from '../../slices/wishlistSlice';
+import { addToCartSuccess } from "../../slices/cartSlice";
+import { addToWishlistSuccess } from '../../slices/wishlistSlice';
 import { toast } from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   
   const handleAddToCart = () => {
-    dispatch(addToCart({ 
+    dispatch(addToCartSuccess({ 
       productId: product._id, 
       quantity: 1 
     }));
   };
 
   const handleAddToWishlist = () => {
-    dispatch(addToWishlist(product._id));
+    dispatch(addToWishlistSuccess(product._id));
   };
 
   const status = getProductStatus(product);

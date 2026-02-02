@@ -7,7 +7,8 @@ import {
   addProduct,
   updateProductAdmin,
   deleteProductAdmin 
-} from '../slices/productSlice';
+} from '../actions/productActions';
+
 
 export const useProducts = () => {
   const dispatch = useDispatch();
