@@ -2,94 +2,128 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { formatPrice, getProductStatus } from '../../utils/productHelpers';
-import { addToCartSuccess } from "../../slices/cartSlice";
+import { addToCartSuccess } from '../../slices/cartSlice';
 import { addToWishlistSuccess } from '../../slices/wishlistSlice';
-import { toast } from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
-  
-  const handleAddToCart = () => {
-    dispatch(addToCartSuccess({ 
-      productId: product._id, 
-      quantity: 1 
-    }));
+
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    dispatch(addToCartSuccess({ productId: product._id, quantity: 1 }));
   };
 
-  const handleAddToWishlist = () => {
+  const handleAddToWishlist = (e) => {
+    e.preventDefault();
     dispatch(addToWishlistSuccess(product._id));
   };
 
   const status = getProductStatus(product);
-  const statusColor = status === 'Out of Stock' ? 'text-red-600' : 
-                     status === 'Low Stock' ? 'text-orange-600' : 
-                     'text-green-600';
+  const statusColor =
+    status === 'Out of Stock'
+      ? 'text-red-600'
+      : status === 'Low Stock'
+      ? 'text-orange-600'
+      : 'text-green-600';
 
   return (
-   <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col">
-  <Link to={`/products/${product._id}`} className="block">
-    <div className="relative overflow-hidden">
-      <img 
-        src={product.images[0]?.url} 
-        alt={product.title}
-        className="w-full h-64 object-cover"
-      />
-      {product.popular && (
-        <span className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs rounded">
-          Popular
-        </span>
-      )}
-      {product.madeToOrder && (
-        <span className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 text-xs rounded">
-          Made to Order
-        </span>
-      )}
-    </div>
-  </Link>
+    <div className="bg-white flex flex-col group">
+      <Link to={`/products/${product._id}`} className="block">
 
-  <div className="p-4 flex flex-col flex-1">
-    <Link to={`/products/${product._id}`}>
-      <h3 className="font-semibold text-lg mb-1 line-clamp-1 hover:text-blue-600">
-        {product.title}
-      </h3>
-    </Link>
+        {/* IMAGE */}
+        <div className="relative overflow-hidden">
+          {/* Main image */}
+          <img
+            src={product.images[0]?.url}
+            alt={product.title}
+            className="w-full aspect-[4/5] object-cover transition-opacity duration-300 group-hover:opacity-0"
+          />
 
-    <p className="text-gray-600 text-sm mb-2 line-clamp-2">
-      {product.description}
-    </p>
+          {/* Hover image */}
+          {product.images[1]?.url && (
+            <img
+              src={product.images[1].url}
+              alt={product.title}
+              className="absolute inset-0 w-full aspect-[4/5] object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            />
+          )}
 
-    <div className="flex items-center justify-between mb-2">
-      <span className="text-[clamp(1.25rem,2vw,1.6rem)] font-bold">
-        {formatPrice(product.sellingPrice)}
-      </span>
-      <span className={`text-sm font-medium ${statusColor}`}>
-        {status}
-      </span>
-    </div>
+          {/* Wishlist (hover desktop, always mobile) */}
+          <button
+            onClick={handleAddToWishlist}
+            className="
+              absolute top-3 right-3 z-10
+              bg-white/90 backdrop-blur
+              border rounded-full p-2
+              opacity-100 lg:opacity-0
+              lg:group-hover:opacity-100
+              transition-opacity
+            "
+            title="Add to Wishlist"
+          >
+            ♡
+          </button>
 
-    <div className="flex justify-between text-sm text-gray-500 mb-3">
-      <span>Size: {product.sizes.join(', ')}</span>
-      <span>Color: {product.color}</span>
-    </div>
+          {/* Badge */}
+          {product.popular && (
+            <span className="absolute top-3 left-3 bg-black text-white px-2 py-1 text-xs">
+              Popular
+            </span>
+          )}
+        </div>
 
-    <div className="mt-auto flex space-x-2">
-      <button
-        onClick={handleAddToCart}
-        disabled={!product.availableState || product.stock === 0}
-        className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:bg-gray-400"
-      >
-        Add to Cart
-      </button>
-      <button
-        onClick={handleAddToWishlist}
-        className="p-2 border border-gray-300 rounded hover:bg-gray-50"
-      >
-        ♡
-      </button>
-    </div>
-  </div>
+        {/* CONTENT */}
+        <div className="p-3 space-y-2">
+          
+
+          <h3 className="text-sm font-medium text-gray-800 leading-snug line-clamp-2">
+            {product.title}
+          </h3>
+
+<div className="flex items-baseline gap-3">
+  {/* Selling Price — Primary */}
+  <span className="text-[clamp(1.5rem,2.4vw,1.9rem)] font-semibold text-gray-900 leading-none">
+    {formatPrice(product.sellingPrice)}
+  </span>
+
+  {/* Original Price — Secondary */}
+  {product.totalPrice > product.sellingPrice && (
+    <span className="text-sm text-gray-400 line-through leading-none">
+      {formatPrice(product.totalPrice)}
+    </span>
+  )}
 </div>
 
+
+
+          <p className="text-xs text-gray-500 capitalize">
+            {product.category}
+          </p>
+
+          <p className={`text-xs ${statusColor}`}>
+            {status}
+          </p>
+        </div>
+      </Link>
+
+      {/* CTA */}
+      <div className="px-3 pb-3">
+        <button
+          onClick={handleAddToCart}
+          disabled={!product.availableState || product.stock === 0}
+          className="
+            w-full py-1.5 text-sm
+            border border-gray-300
+            hover:border-black
+            transition-colors
+            disabled:opacity-50
+            disabled:cursor-not-allowed
+          "
+        >
+          Add to Cart
+        </button>
+      </div>
+    </div>
   );
 };
 
