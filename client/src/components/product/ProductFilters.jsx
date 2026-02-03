@@ -68,11 +68,12 @@ const ProductFilters = ({ filters, sort, onFilterChange, onSortChange }) => {
   };
 
   return (
-    <aside className="w-64 shrink-0 sticky top-24 h-fit bg-white">
+    <aside className="w-full px-5 lg:px-0 lg:w-80 lg:sticky lg:top-24 h-fit bg-white">
+
 
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">Filters</h2>
+      <div className="flex flex-row-reverse justify-between items-center mb-4">
+        {/*<h2 className="text-md font-semibold">Filters</h2>*/}
         <button
           onClick={clearFilters}
           className="
