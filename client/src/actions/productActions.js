@@ -190,7 +190,7 @@ export const getProduct = (productID) => async (dispatch) => {
     dispatch(productRequest());
 
     const { data } = await axios.get(
-      `${API_URL}/api/v3/product/product/${productID}`,
+      `${API_URL}/api/v3/product/products/${productID}`,
       getAuthConfig()
     );
 

@@ -47,7 +47,7 @@ export const getWishlist = () => async (dispatch) => {
 };
 
 // Action to add item to wishlist
-export const addToWishlist = (productId) => async (dispatch) => {
+export const addToWishlist = (productID) => async (dispatch) => {
   try {
     dispatch(wishlistRequest());
 
@@ -61,7 +61,7 @@ export const addToWishlist = (productId) => async (dispatch) => {
 
     const { data } = await axios.post(
       `${API_URL}/api/v8/wishlist/add`,
-      { productId },
+      { productID },
       getAuthConfig()
     );
 
@@ -92,7 +92,7 @@ export const addToWishlist = (productId) => async (dispatch) => {
 };
 
 // Action to remove item from wishlist
-export const removeFromWishlist = (productId) => async (dispatch) => {
+export const removeFromWishlist = (productID) => async (dispatch) => {
   try {
     dispatch(wishlistRequest());
 
@@ -103,7 +103,7 @@ export const removeFromWishlist = (productId) => async (dispatch) => {
     }
 
     const { data } = await axios.delete(
-      `${API_URL}/api/v8/wishlist/${productId}`,
+      `${API_URL}/api/v8/wishlist/${productID}`,
       getAuthConfig()
     );
 
@@ -162,19 +162,19 @@ export const syncGuestWishlist = (guestWishlistItems) => async (dispatch) => {
 };
 
 // Action to check if a product is in wishlist
-export const isInWishlist = (productId) => (_, getState) => {
+export const isInWishlist = (productID) => (_, getState) => {
   const { wishlistItems } = getState().wishlist;
-  return wishlistItems.some(item => item._id === productId);
+  return wishlistItems.some(item => item._id === productID);
 };
 
 // Action to toggle wishlist item (add if not present, remove if present)
-export const toggleWishlistItem = (productId) => async (dispatch, getState) => {
+export const toggleWishlistItem = (productID) => async (dispatch, getState) => {
   const { wishlistItems } = getState().wishlist;
-  const isCurrentlyInWishlist = wishlistItems.some(item => item._id === productId);
+  const isCurrentlyInWishlist = wishlistItems.some(item => item._id === productID);
   
   if (isCurrentlyInWishlist) {
-    await dispatch(removeFromWishlist(productId));
+    await dispatch(removeFromWishlist(productID));
   } else {
-    await dispatch(addToWishlist(productId));
+    await dispatch(addToWishlist(productID));
   }
 };

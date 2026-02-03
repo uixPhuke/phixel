@@ -13,7 +13,7 @@ router.post('/cart', isAuthenticated, addToDbCart);
 // Route to sync guest cart with user's DB cart
 router.post('/cart/sync', isAuthenticated, syncGuestCart);
 // Route to remove item from user's cart in DB
-router.delete('/cart/:productId', isAuthenticated, removeFromCart);
+router.delete('/cart/:productID', isAuthenticated, removeFromCart);
 // Route to clear user's cart in DB
 router.delete('/cart', isAuthenticated, clearCart);     
 

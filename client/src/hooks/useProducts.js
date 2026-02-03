@@ -30,8 +30,8 @@ export const useProducts = () => {
     dispatch(getAllProducts({ ...queryParams, ...filters, sort }));
   };
 
-  const fetchProduct = (productId) => {
-    dispatch(getProduct(productId));
+  const fetchProduct = (productID) => {
+    dispatch(getProduct(productID));
   };
 
   // Admin actions
@@ -43,12 +43,12 @@ export const useProducts = () => {
     dispatch(addProduct(productData, formData, resetForm));
   };
 
-  const updateProduct = (productId, productData, formData) => {
-    dispatch(updateProductAdmin(productId, productData, formData));
+  const updateProduct = (productID, productData, formData) => {
+    dispatch(updateProductAdmin(productID, productData, formData));
   };
 
-  const deleteProduct = (productId) => {
-    dispatch(deleteProductAdmin(productId));
+  const deleteProduct = (productID) => {
+    dispatch(deleteProductAdmin(productID));
   };
 
   // Filter and sort handlers

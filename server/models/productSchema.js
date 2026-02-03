@@ -1,7 +1,7 @@
 const mongoose=require('mongoose')
 
 const productSchema= new mongoose.Schema({
-    productId:{
+    productID:{
         type:String,
         default:() =>new mongoose.Types.ObjectId().toString(),
         ref:'Product',
@@ -103,7 +103,7 @@ const productSchema= new mongoose.Schema({
     // },
     // relatedProducts: [
     //     {
-    //         productId: {
+    //         productID: {
     //             type: mongoose.Schema.Types.ObjectId,
     //             ref: 'Product',
     //             default:[]
@@ -123,8 +123,8 @@ const productSchema= new mongoose.Schema({
 }, { timestamps: true });
 
 //indexing
-// productSchema.index({ productId: 1, createdBy: 1 });
-// productSchema.index({ productId: 1, updatedBy: 1 });
+// productSchema.index({ productID: 1, createdBy: 1 });
+// productSchema.index({ productID: 1, updatedBy: 1 });
 // productSchema.index({ createdAt: -1 });
 // productSchema.index({ updatedAt: -1 });
 // productSchema.index({ category: 1 });

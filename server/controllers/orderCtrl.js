@@ -41,7 +41,7 @@ class orderCtrl {
             }
 
             // Fetch cart and address
-            const cart = await Cart.findById(cartId).populate("items.productId");
+            const cart = await Cart.findById(cartId).populate("items.productID");
             if (!cart || cart.items.length === 0) {
                 return res.status(404).json({ error: "Cart not found or is empty" });
             }
@@ -119,9 +119,9 @@ class orderCtrl {
                 cart: cartId,
                 shippingAddress: addressId,
                 items: cart.items.map((item) => ({
-                    product: item.productId._id,
+                    product: item.productID._id,
                     quantity: item.quantity,
-                    price: (item.productId.sellingPrice * conversionRate).toFixed(2),
+                    price: (item.productID.sellingPrice * conversionRate).toFixed(2),
                 })),
                 totalAmount: totalAmount.toFixed(2),
                 isPaymentDone: true,
@@ -135,7 +135,7 @@ class orderCtrl {
 
             // Update product stock
             for (const item of cart.items) {
-                const product = await Product.findById(item.productId._id);
+                const product = await Product.findById(item.productID._id);
                 if (!product) continue;
 
                 if (product.stock < item.quantity) {

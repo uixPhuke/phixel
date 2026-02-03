@@ -5,7 +5,7 @@ import ProductForm from '../../components/product/ProductForm';
 import { toast } from 'react-hot-toast';
 
 const AdminProductFormPage = () => {
-  const { productId } = useParams();
+  const { productID } = useParams();
   const navigate = useNavigate();
   const { 
     productAdmin, 
@@ -15,18 +15,18 @@ const AdminProductFormPage = () => {
     fetchProductAdmin 
   } = useProducts();
 
-  const isEdit = Boolean(productId);
+  const isEdit = Boolean(productID);
 
   useEffect(() => {
-    if (productId) {
-      fetchProductAdmin(productId);
+    if (productID) {
+      fetchProductAdmin(productID);
     }
-  }, [productId]);
+  }, [productID]);
 
   const handleSubmit = async (formData, submitData) => {
     try {
       if (isEdit) {
-        await updateProduct(productId, formData, submitData).unwrap();
+        await updateProduct(productID, formData, submitData).unwrap();
         toast.success('Product updated successfully!');
       } else {
         await createProduct(formData, submitData, () => {

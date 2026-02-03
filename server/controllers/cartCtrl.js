@@ -19,11 +19,11 @@ const getDbCart = async (req, res) => {
 
 // Add to DB cart
 const addToDbCart = async (req, res) => {
-  const { productId, quantity } = req.body;
+  const { productID, quantity } = req.body;
 
   try {
     // Stock validation
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productID);
     if (!product || product.stock < quantity) {
       return res.status(400).json({ message: 'Insufficient stock' });
     }
@@ -36,13 +36,13 @@ const addToDbCart = async (req, res) => {
 
     // Update existing or add new item
     const itemIndex = cart.products.findIndex(
-      item => item.product.toString() === productId
+      item => item.product.toString() === productID
     );
 
     if (itemIndex > -1) {
       cart.products[itemIndex].quantity += quantity;
     } else {
-      cart.products.push({ product: productId, quantity });
+      cart.products.push({ product: productID, quantity });
     }
 
     await cart.save();
@@ -65,11 +65,11 @@ const syncGuestCart = async (req, res) => {
 
     // Merge guest cart with DB cart
     for (const guestItem of guestCart) {
-      const product = await Product.findById(guestItem.productId);
+      const product = await Product.findById(guestItem.productID);
       if (!product || product.stock < 1) continue;
 
       const existingItem = cart.products.find(
-        item => item.product.toString() === guestItem.productId
+        item => item.product.toString() === guestItem.productID
       );
 
       if (existingItem) {
@@ -81,7 +81,7 @@ const syncGuestCart = async (req, res) => {
         existingItem.quantity = newQty;
       } else {
         cart.products.push({
-          product: guestItem.productId,
+          product: guestItem.productID,
           quantity: Math.min(guestItem.quantity, product.stock)
         });
       }
@@ -102,7 +102,7 @@ const removeFromCart = async (req, res) => {
   try {
     const cart = await Cart.findOneAndUpdate(
       { user: req.user._id },
-      { $pull: { products: { product: req.params.productId } } },
+      { $pull: { products: { product: req.params.productID } } },
       { new: true }
     ).populate('products.product', 'name price images');
 

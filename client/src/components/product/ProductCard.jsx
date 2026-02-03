@@ -10,7 +10,7 @@ const ProductCard = ({ product }) => {
 
   const handleAddToCart = (e) => {
     e.preventDefault();
-    dispatch(addToCartSuccess({ productId: product._id, quantity: 1 }));
+    dispatch(addToCartSuccess({ productID: product._id, quantity: 1 }));
   };
 
   const handleAddToWishlist = (e) => {

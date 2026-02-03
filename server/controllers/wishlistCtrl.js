@@ -26,11 +26,11 @@ const getWishlist = async (req, res) => {
 
 // Add to wishlist (logged-in)
 const addToWishlist = async (req, res) => {
-  const { productId } = req.body;
+  const { productID } = req.body;
 
   try {
     // Verify product exists
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productID);
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -45,7 +45,7 @@ const addToWishlist = async (req, res) => {
     }
 
     // Check if already in wishlist
-    if (wishlist.products.includes(productId)) {
+    if (wishlist.products.includes(productID)) {
       return res.status(200).json({
         success: true,
         message: 'Product already in wishlist',
@@ -54,7 +54,7 @@ const addToWishlist = async (req, res) => {
     }
 
     // Add to wishlist
-    wishlist.products.push(productId);
+    wishlist.products.push(productID);
     await wishlist.save();
 
     res.status(200).json({
@@ -73,12 +73,12 @@ const addToWishlist = async (req, res) => {
 
 // Remove from wishlist (logged-in)
 const removeFromWishlist = async (req, res) => {
-  const { productId } = req.params;
+  const { productID } = req.params;
 
   try {
     const wishlist = await Wishlist.findOneAndUpdate(
       { user: req.user._id },
-      { $pull: { products: productId } },
+      { $pull: { products: productID } },
       { new: true }
     );
 
@@ -114,18 +114,18 @@ const syncGuestWishlist = async (req, res) => {
       isActive: true
     }).select('_id');
 
-    const validProductIds = validProducts.map(p => p._id);
+    const validproductIDs = validProducts.map(p => p._id);
 
     // Get or create user wishlist
     let wishlist = await Wishlist.findOne({ user: req.user._id });
     if (!wishlist) {
       wishlist = new Wishlist({ 
         user: req.user._id, 
-        products: validProductIds 
+        products: validproductIDs 
       });
     } else {
       // Merge without duplicates
-      const newProducts = validProductIds.filter(
+      const newProducts = validproductIDs.filter(
         id => !wishlist.products.includes(id)
       );
       wishlist.products.push(...newProducts);

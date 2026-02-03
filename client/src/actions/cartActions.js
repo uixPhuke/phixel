@@ -131,7 +131,7 @@ export const syncGuestCart = (guestCartItems) => async (dispatch) => {
 };
 
 // Action to remove item from cart
-export const removeFromCart = (productId) => async (dispatch) => {
+export const removeFromCart = (productID) => async (dispatch) => {
   try {
     dispatch(cartRequest());
 
@@ -148,7 +148,7 @@ export const removeFromCart = (productId) => async (dispatch) => {
     };
 
     const { data } = await axios.delete(
-      `${API_URL}/api/v4/cart/${productId}`, 
+      `${API_URL}/api/v4/cart/${productID}`, 
       config
     );
     

@@ -34,7 +34,7 @@ const App = () => {
 
           {/* Products */}
           <Route path="/products" element={<ProductListingPage />} />
-          <Route path="/products/:id" element={<ProductDetailPage />} />
+          <Route path="/products/:productID" element={<ProductDetailPage />} />
 
           {/* 404 fallback */}
           <Route path="*" element={<h1>Page Not Found</h1>} />

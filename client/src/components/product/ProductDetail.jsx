@@ -13,7 +13,7 @@ const ProductDetail = ({ product }) => {
 
   const handleAddToCart = () => {
     dispatch(addToCartSuccess({
-      productId: product._id,
+      productID: product._id,
       quantity,
       size: selectedSize
     }));

@@ -12,8 +12,8 @@ const wishlistSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product',
     validate: {
-      validator: async function(productId) {
-        const product = await mongoose.model('Product').exists({ _id: productId });
+      validator: async function(productID) {
+        const product = await mongoose.model('Product').exists({ _id: productID });
         return product;
       },
       message: props => `Product ${props.value} doesn't exist`

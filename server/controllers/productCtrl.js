@@ -144,8 +144,8 @@ const createProductAdmin = async (req, res, next) => {
     );
     
     //existing Product id
-    const existingProductId = req.body.productId;
-    if (existingProductId && !mongoose.Types.ObjectId.isValid(existingProductId)) {
+    const existingproductID = req.body.productID;
+    if (existingproductID && !mongoose.Types.ObjectId.isValid(existingproductID)) {
       return res
         .status(400)
         .json({ success: false, message: "Invalid Product ID!" });}
@@ -194,9 +194,9 @@ const createProductAdmin = async (req, res, next) => {
     //       ? JSON.parse(req.body.relatedProducts) 
     //       : req.body.relatedProducts;
     
-    //     // Convert to schema format: [{ productId: ObjectId }]
+    //     // Convert to schema format: [{ productID: ObjectId }]
     //     sanitizedRelatedProducts = parsedRelated.map(id => ({
-    //       productId: new mongoose.Types.ObjectId(id) // Convert string to ObjectId
+    //       productID: new mongoose.Types.ObjectId(id) // Convert string to ObjectId
     //     }));
     //   } catch (err) {
     //     return res.status(400).json({
@@ -406,17 +406,17 @@ const createProductAdmin = async (req, res, next) => {
 //edit product
 const editProductAdmin = async (req, res,next) => {
     try {
-      const productId = req.params.id;
+      const productID = req.params.id;
       //const { id } = req.params; // Use req.params.id to get the product ID from the URL
 
 
-        if(!productId) {
+        if(!productID) {
             return res.status(400).json({ success: false, message: "Product ID is required!" });
         }
-        if (!mongoose.Types.ObjectId.isValid(productId)) {
+        if (!mongoose.Types.ObjectId.isValid(productID)) {
             return res.status(400).json({ success: false, message: "Invalid Product ID!" });
         }
-        const existingProduct=await Product.findById(productId)
+        const existingProduct=await Product.findById(productID)
         if(!existingProduct) {
             return res.status(404).json({ success: false, message: "Product not found!" });
         }
@@ -495,7 +495,7 @@ const editProductAdmin = async (req, res,next) => {
             }
             // Update the product
             const updatedProduct = await Product.findByIdAndUpdate(
-                productId,
+                productID,
                 { $set: sanitizedData },
                 { new: true, runValidators: true }
             );
@@ -517,17 +517,17 @@ const editProductAdmin = async (req, res,next) => {
 //delete product
 const deleteProductAdmin = async (req, res) => {
     try {
-        const productId = req.params.productID;
+        const productID = req.params.productID;
     
-        if (!productId) {
+        if (!productID) {
         return res.status(400).json({ success: false, message: "Product ID is required!" });
         }
     
-        if (!mongoose.Types.ObjectId.isValid(productId)) {
+        if (!mongoose.Types.ObjectId.isValid(productID)) {
         return res.status(400).json({ success: false, message: "Invalid Product ID!" });
         }
     
-        const product = await Product.findById(productId);
+        const product = await Product.findById(productID);
     
         if (!product) {
         return res.status(404).json({ success: false, message: "Product not found!" });
@@ -539,7 +539,7 @@ const deleteProductAdmin = async (req, res) => {
         }
     
         // Delete the product from the database
-        await Product.findByIdAndDelete(productId);
+        await Product.findByIdAndDelete(productID);
     
         res.status(200).json({ success: true, message: "Product deleted successfully!" });
     } catch (err) {
@@ -598,17 +598,17 @@ const getProductsAdmin = async (req, res) => {
 //get Product
 const getProductAdmin = async (req, res) => {
     try {
-        const { productId } = req.params;
+        const { productID } = req.params;
 
-        if (!productId) {
+        if (!productID) {
             return res.status(400).json({ success: false, message: "Product ID is required!" });
         }
 
-        if (!mongoose.Types.ObjectId.isValid(productId)) {
+        if (!mongoose.Types.ObjectId.isValid(productID)) {
             return res.status(400).json({ success: false, message: "Invalid Product ID!" });
         }
 
-        const product = await Product.findById(productId);
+        const product = await Product.findById(productID);
 
         if (!product) {
             return res.status(404).json({ success: false, message: "Product not found!" });

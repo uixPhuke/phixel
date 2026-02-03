@@ -4,14 +4,14 @@ import { useProducts } from '../../hooks/useProducts';
 import ProductDetail from '../../components/product/ProductDetail';
 
 const ProductDetailPage = () => {
-  const { productId } = useParams();
+  const { productID } = useParams();
   const { product, loading, error, fetchProduct } = useProducts();
 
   useEffect(() => {
-    if (productId) {
-      fetchProduct(productId);
+    if (productID) {
+      fetchProduct(productID);
     }
-  }, [productId]);
+  }, [productID]);
 
   if (loading) {
     return (

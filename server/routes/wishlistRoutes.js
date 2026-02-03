@@ -11,7 +11,7 @@ const {isAuthenticated } = require('../middlewares/auth');
 // Protected routes (require login)
 router.get('/', isAuthenticated, getWishlist);
 router.post('/add', isAuthenticated, addToWishlist);
-router.delete('/:productId', isAuthenticated, removeFromWishlist);
+router.delete('/:productID', isAuthenticated, removeFromWishlist);
 router.post('/sync', isAuthenticated, syncGuestWishlist);
 
 module.exports = router;
