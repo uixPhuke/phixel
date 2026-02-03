@@ -771,7 +771,7 @@ const getAllProducts = async (req, res, next) => {
         message: 'Product fetched successfully!',
         product: {
           ...product.toObject(),
-          totalPrice: product.sellingPrice, // use sellingPrice directly as totalPrice
+          //totalPrice: product.sellingPrice, // use sellingPrice directly as totalPrice
           // relatedProducts: relatedProducts.map(rp => ({
           //   _id: rp._id,
           //   title: rp.title,

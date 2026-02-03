@@ -29,16 +29,16 @@ const ProductDetail = ({ product }) => {
   }
 
   return (
-  <div className="max-w-[1280px] mx-auto px-4 lg:px-8 py-10">
-    <div className="grid lg:grid-cols-[55%_45%] gap-8 items-start">
+  <div className="max-w-[1080px] mx-auto px-4 lg:px-8 py-10">
+  <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-20 items-start">
 
-      {/* LEFT – IMAGES (CONSTRAINED WIDTH) */}
-      <div className="max-w-[520px]">
-        <ProductImages images={product.images} title={product.title} />
-      </div>
+    {/* LEFT – IMAGES (STICKY) */}
+    <div className="w-full lg:sticky lg:top-24">
+      <ProductImages images={product.images} title={product.title} />
+    </div>
 
-      {/* RIGHT – PRODUCT INFO */}
-      <div className="space-y-6 lg:sticky lg:top-24">
+    {/* RIGHT – PRODUCT INFO (SCROLLS) */}
+    <div className="space-y-6">
 
         {/* Title */}
         <div>
@@ -53,10 +53,10 @@ const ProductDetail = ({ product }) => {
         {/* PRICE (REDUCED SIZE) */}
         <div>
           <div className="flex items-center gap-3">
-            <span className="text-[1.75rem] font-medium text-gray-900">
+            <span className="text-md font-medium text-gray-900">
               {formatPrice(product.sellingPrice)}
             </span>
-
+{console.log(product)}
             {product.totalPrice > product.sellingPrice && (
               <span className="text-base text-gray-400 line-through">
                 {formatPrice(product.totalPrice)}

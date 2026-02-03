@@ -85,7 +85,7 @@ const ProductCard = ({ product }) => {
   <span className="text-[clamp(1.5rem,2.4vw,1.9rem)] font-semibold text-gray-900 leading-none">
     {formatPrice(product.sellingPrice)}
   </span>
-
+{console.log(product)}
   {/* Original Price — Secondary */}
   {product.totalPrice > product.sellingPrice && (
     <span className="text-sm text-gray-400 line-through leading-none">
