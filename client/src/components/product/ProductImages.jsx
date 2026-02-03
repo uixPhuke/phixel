@@ -5,46 +5,60 @@ const ProductImages = ({ images, title }) => {
 
   if (!images || images.length === 0) {
     return (
-      <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
-        <span className="text-gray-400">No image available</span>
+      <div className="w-full h-[420px] bg-gray-100 flex items-center justify-center">
+        No Image
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col">
-      {/* Main Image */}
-      <div className="aspect-w-1 aspect-h-1">
-        <img
-          src={images[selectedImage]?.url}
-          alt={title}
-          className="w-full h-full object-center object-cover rounded-lg"
-        />
+    <div className="flex gap-4">
+      {/* Thumbnails */}
+      <div className="hidden lg:flex flex-col gap-3 w-20">
+        {images.map((img, i) => (
+          <button
+            key={img.public_id}
+            onClick={() => setSelectedImage(i)}
+            className={`border rounded-md overflow-hidden ${
+              selectedImage === i ? 'border-black' : 'border-gray-200'
+            }`}
+          >
+            <img
+              src={img.url}
+              alt={title}
+              className="w-full h-20 object-cover"
+            />
+          </button>
+        ))}
       </div>
 
-      {/* Image Thumbnails */}
-      {images.length > 1 && (
-        <div className="mt-4 grid grid-cols-4 gap-2">
-          {images.map((image, index) => (
+      {/* Main Image */}
+      <div className="flex-1">
+        <img
+          src={images[selectedImage].url}
+          alt={title}
+          className="w-full max-h-[680px] object-cover rounded-lg"
+        />
+
+        {/* Mobile thumbnails */}
+        <div className="flex gap-2 mt-3 lg:hidden overflow-x-auto">
+          {images.map((img, i) => (
             <button
-              key={image.public_id}
-              type="button"
-              onClick={() => setSelectedImage(index)}
-              className={`aspect-w-1 aspect-h-1 rounded-md overflow-hidden ${
-                selectedImage === index
-                  ? 'ring-2 ring-blue-500'
-                  : 'ring-1 ring-gray-200'
+              key={img.public_id}
+              onClick={() => setSelectedImage(i)}
+              className={`border rounded-md min-w-[64px] ${
+                selectedImage === i ? 'border-black' : 'border-gray-200'
               }`}
             >
               <img
-                src={image.url}
-                alt={`${title} ${index + 1}`}
-                className="w-full h-full object-center object-cover"
+                src={img.url}
+                alt=""
+                className="w-16 h-16 object-cover"
               />
             </button>
           ))}
         </div>
-      )}
+      </div>
     </div>
   );
 };
