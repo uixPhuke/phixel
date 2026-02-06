@@ -1,0 +1,195 @@
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getCart,
+  removeFromCart,
+  syncGuestCart,
+} from "../../actions/cartActions";
+import {
+  removeFromGuestCart,
+} from "../../slices/cartSlice";
+import { formatPrice } from "../../utils/productHelpers";
+
+const CartPage = () => {
+  const dispatch = useDispatch();
+
+  const {
+    cartItems,
+    guestCartItems,
+    loading,
+  } = useSelector((state) => state.cart);
+
+  const token = localStorage.getItem("token");
+
+  // ============================
+  // AUTO LOAD + AUTO SYNC
+  // ============================
+  useEffect(() => {
+    if (token && guestCartItems.length > 0) {
+      // Sync guest cart on login
+      dispatch(syncGuestCart(guestCartItems));
+    } else if (token) {
+      // Load DB cart
+      dispatch(getCart());
+    }
+  }, [dispatch, token]);
+
+  // ============================
+  // Decide cart source
+  // ============================
+  const itemsToShow = token ? cartItems : guestCartItems;
+
+  // ============================
+  // Calculate totals (UI SAFE)
+  // ============================
+  const itemCountToShow = itemsToShow.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+
+  const subtotalToShow = itemsToShow.reduce(
+    (sum, item) => sum + item.priceSnapshot * item.quantity,
+    0
+  );
+
+  return (
+    <div className="max-w-[1280px] mx-auto px-4 py-10">
+      <div className="grid lg:grid-cols-[65%_35%] gap-12 items-start">
+
+        {/* ================= LEFT — CART ITEMS ================= */}
+        <div>
+          <h1 className="text-2xl font-semibold mb-1">
+            YOUR BAG{" "}
+            <span className="text-gray-500">
+              ({itemCountToShow} items)
+            </span>
+          </h1>
+
+          <p className="text-sm text-gray-600 mb-6">
+            Items in your bag are not reserved — check out now.
+          </p>
+
+          {loading && <p>Loading...</p>}
+
+          {itemsToShow.length === 0 && (
+            <p className="text-gray-500">Your cart is empty.</p>
+          )}
+
+          <div className="space-y-6">
+            {itemsToShow.map((item) => {
+              const product = token ? item.product : item.product;
+
+              return (
+                <div
+                  key={`${token ? product._id : item.productID}-${item.size}`}
+                  className="flex gap-4 border-b pb-6"
+                >
+                  {/* IMAGE */}
+                  <img
+                    src={product.images?.[0]?.url}
+                    alt={product.title}
+                    className="w-28 h-28 object-cover bg-gray-100 rounded"
+                  />
+
+                  {/* INFO */}
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-medium">
+                        {product.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Size: {item.size}
+                      </p>
+                    </div>
+
+                    <div className="flex justify-between items-end">
+                      <span className="text-sm">
+                        Qty: {item.quantity}
+                      </span>
+
+                      {/* REMOVE */}
+                      <button
+                        onClick={() =>
+                          token
+                            ? dispatch(
+                                removeFromCart(
+                                  product._id,
+                                  item.size
+                                )
+                              )
+                            : dispatch(
+                                removeFromGuestCart({
+                                  productID: item.productID,
+                                  size: item.size,
+                                })
+                              )
+                        }
+                        className="text-sm underline text-gray-600 hover:text-black"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* PRICE */}
+                  <div className="text-right font-medium">
+                    {formatPrice(
+                      item.priceSnapshot * item.quantity
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ================= RIGHT — ORDER SUMMARY ================= */}
+        <div className="border p-6 sticky top-24 h-fit">
+          <h2 className="text-xl font-semibold mb-6">
+            ORDER SUMMARY
+          </h2>
+
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between">
+              <span>{itemCountToShow} items</span>
+              <span>{formatPrice(subtotalToShow)}</span>
+            </div>
+
+            <div className="flex justify-between">
+              <span>Delivery</span>
+              <span className="text-green-600">Free</span>
+            </div>
+
+            <div className="border-t pt-4 flex justify-between font-semibold">
+              <span>Total</span>
+              <span>{formatPrice(subtotalToShow)}</span>
+            </div>
+
+            <p className="text-xs text-gray-500">
+              Inclusive of all taxes
+            </p>
+          </div>
+
+          <button className="w-full bg-black text-white py-3 mt-6 rounded-full hover:bg-gray-900">
+            Checkout →
+          </button>
+
+          <div className="mt-6">
+            <p className="text-xs text-gray-500 mb-2">
+              ACCEPTED PAYMENT METHODS
+            </p>
+            <div className="flex gap-2 text-sm">
+              <span>VISA</span>
+              <span>Mastercard</span>
+              <span>RuPay</span>
+              <span>UPI</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default CartPage;
