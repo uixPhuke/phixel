@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 import {
   cartRequest,
   getCartSuccess,
@@ -7,22 +7,22 @@ import {
   removeFromCartSuccess,
   clearCartSuccess,
   cartFail,
-} from '../slices/cartSlice';
+  clearGuestCart,
+} from "../slices/cartSlice";
 import { setShowLoginModalTrue } from "../slices/userSlice";
-import { toast } from 'react-hot-toast';
+import { toast } from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_API_KEY;
 
-// Action to get user's cart
-export const getCart = () => async (dispatch) => {
+/* ================================
+   GET CART (AUTO SYNC ON LOGIN)
+================================ */
+export const getCart = () => async (dispatch, getState) => {
   try {
     dispatch(cartRequest());
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      dispatch(cartFail('No authentication token found'));
-      return;
-    }
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
     const config = {
       headers: {
@@ -30,75 +30,46 @@ export const getCart = () => async (dispatch) => {
       },
     };
 
+    // 1️⃣ Get DB cart
     const { data } = await axios.get(`${API_URL}/api/v4/cart`, config);
-    dispatch(getCartSuccess(data));
+
+    // 2️⃣ Check guest cart
+    const { guestCartItems } = getState().cart;
+
+    if (guestCartItems.length > 0) {
+      // 3️⃣ Sync guest cart
+      const syncRes = await axios.post(
+        `${API_URL}/api/v4/cart/sync`,
+        { guestCart: guestCartItems },
+        config
+      );
+
+      dispatch(syncCartSuccess(syncRes.data));
+      dispatch(clearGuestCart());
+      toast.success("Cart synced successfully!");
+    } else {
+      dispatch(getCartSuccess(data));
+    }
   } catch (err) {
-    console.error('Get Cart Error:', err);
-    
-    const errorMessage = err.response?.data?.message || 
-                         'Failed to fetch the cart. Please try again later.';
-    
-    dispatch(cartFail(errorMessage));
-    
+    dispatch(
+      cartFail(err.response?.data?.message || "Failed to fetch cart")
+    );
+
     if (err.response?.status === 401) {
       dispatch(setShowLoginModalTrue());
-      toast.error("Please login to view your cart");
     }
   }
 };
 
-// Action to add item to cart
+/* ================================
+   ADD TO CART (LOGGED-IN)
+================================ */
 export const addToCart = (productData) => async (dispatch) => {
   try {
     dispatch(cartRequest());
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      dispatch(cartFail('No authentication token found'));
-      dispatch(setShowLoginModalTrue());
-      toast.error("Please login to add items to your cart");
-      return;
-    }
-
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    const { data } = await axios.post(`${API_URL}/api/v4/cart`, productData, config);
-    dispatch(addToCartSuccess(data));
-    toast.success('Item added to cart successfully!');
-  } catch (err) {
-    console.error('Add to Cart Error:', err);
-    
-    const errorMessage = err.response?.data?.message || 
-                         'Failed to add item to cart. Please try again.';
-    
-    dispatch(cartFail(errorMessage));
-    
-    if (err.response?.status === 401) {
-      dispatch(setShowLoginModalTrue());
-      toast.error("Please login to add items to your cart");
-    } else if (err.response?.status === 400) {
-      // Handle insufficient stock error
-      toast.error(errorMessage);
-    } else {
-      toast.error('Failed to add item to cart. Please try again.');
-    }
-  }
-};
-
-// Action to sync guest cart with user cart
-export const syncGuestCart = (guestCartItems) => async (dispatch) => {
-  try {
-    dispatch(cartRequest());
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-      dispatch(cartFail('No authentication token found'));
-      return;
-    }
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
     const config = {
       headers: {
@@ -107,39 +78,67 @@ export const syncGuestCart = (guestCartItems) => async (dispatch) => {
     };
 
     const { data } = await axios.post(
-      `${API_URL}/api/v4/cart/sync`, 
-      { guestCart: guestCartItems }, 
+      `${API_URL}/api/v4/cart`,
+      productData,
       config
     );
-    
-    dispatch(syncCartSuccess(data));
-    if (guestCartItems.length > 0) {
-      toast.success('Cart synced successfully!');
-    }
+
+    dispatch(addToCartSuccess(data));
+    toast.success("Item added to cart");
   } catch (err) {
-    console.error('Sync Cart Error:', err);
-    
-    const errorMessage = err.response?.data?.message || 
-                         'Failed to sync cart. Please try again.';
-    
-    dispatch(cartFail(errorMessage));
-    
+    dispatch(
+      cartFail(err.response?.data?.message || "Failed to add item")
+    );
+
     if (err.response?.status === 401) {
       dispatch(setShowLoginModalTrue());
+    } else {
+      toast.error(err.response?.data?.message || "Add to cart failed");
     }
   }
 };
 
-// Action to remove item from cart
-export const removeFromCart = (productID) => async (dispatch) => {
+/* ================================
+   SYNC GUEST CART (MANUAL)
+================================ */
+export const syncGuestCart = (guestCartItems) => async (dispatch) => {
   try {
     dispatch(cartRequest());
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      dispatch(cartFail('No authentication token found'));
-      return;
-    }
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const { data } = await axios.post(
+      `${API_URL}/api/v4/cart/sync`,
+      { guestCart: guestCartItems },
+      config
+    );
+
+    dispatch(syncCartSuccess(data));   // ✅ DB cart updated
+    dispatch(clearGuestCart());        // ✅ CLEAR GUEST CART
+    localStorage.removeItem("guestCart"); // ✅ SAFETY
+
+  } catch (err) {
+    dispatch(cartFail("Failed to sync cart"));
+  }
+};
+
+
+/* ================================
+   REMOVE ITEM (PRODUCT + SIZE)
+================================ */
+export const removeFromCart = (productID, size) => async (dispatch) => {
+  try {
+    dispatch(cartRequest());
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
     const config = {
       headers: {
@@ -148,57 +147,42 @@ export const removeFromCart = (productID) => async (dispatch) => {
     };
 
     const { data } = await axios.delete(
-      `${API_URL}/api/v4/cart/${productID}`, 
+      `${API_URL}/api/v4/cart?productID=${productID}&size=${size}`,
       config
     );
-    
+
     dispatch(removeFromCartSuccess(data));
-    toast.success('Item removed from cart successfully!');
+    toast.success("Item removed from cart");
   } catch (err) {
-    console.error('Remove from Cart Error:', err);
-    
-    const errorMessage = err.response?.data?.message || 
-                         'Failed to remove item from cart. Please try again.';
-    
-    dispatch(cartFail(errorMessage));
-    
-    if (err.response?.status === 401) {
-      dispatch(setShowLoginModalTrue());
-    }
+    dispatch(
+      cartFail(err.response?.data?.message || "Remove failed")
+    );
   }
 };
 
-// Action to clear entire cart
+/* ================================
+   CLEAR CART (DB)
+================================ */
 export const clearCart = () => async (dispatch) => {
   try {
     dispatch(cartRequest());
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      dispatch(cartFail('No authentication token found'));
-      return;
-    }
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    };  ``
+    };
 
-    const { data } = await axios.delete(`${API_URL}/api/v4/cart`, config);
-    dispatch(clearCartSuccess(data));
-    toast.success('Cart cleared successfully!');
+    await axios.delete(`${API_URL}/api/v4/cart`, config);
+
+    dispatch(clearCartSuccess());
+    toast.success("Cart cleared");
   } catch (err) {
-    console.error('Clear Cart Error:', err);
-    
-    const errorMessage = err.response?.data?.message || 
-                         'Failed to clear cart. Please try again.';
-    
-    dispatch(cartFail(errorMessage));
-    
-    if (err.response?.status === 401) {
-      dispatch(setShowLoginModalTrue());
-    }
+    dispatch(
+      cartFail(err.response?.data?.message || "Clear cart failed")
+    );
   }
 };
-
