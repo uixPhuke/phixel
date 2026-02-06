@@ -5,6 +5,7 @@ import Hero from "./pages/Home/Hero";
 import About from "./pages/Home/About";
 import { Register } from "./pages/Auth/Register";
 import { Login } from "./pages/Auth/Login";
+import CartPage from "./pages/Cart/Cart";
  //import { Profile } from "./pages/Profile/Profile";
 import { ProductListingPage, ProductDetailPage } from "./pages/Product"
 import { ProductCard, ProductFilters } from './components/product';
@@ -36,8 +37,13 @@ const App = () => {
           <Route path="/products" element={<ProductListingPage />} />
           <Route path="/products/:productID" element={<ProductDetailPage />} />
 
+          {/* Cart */}
+          <Route path="/cart" element={<CartPage />} />
+
           {/* 404 fallback */}
           <Route path="*" element={<h1>Page Not Found</h1>} />
+
+
         </Routes>
       </div>
     </BrowserRouter>
