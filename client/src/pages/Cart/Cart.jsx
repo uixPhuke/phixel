@@ -7,17 +7,18 @@ import {
 } from "../../actions/cartActions";
 import {
   removeFromGuestCart,
+  updateGuestQuantity,
 } from "../../slices/cartSlice";
 import { formatPrice } from "../../utils/productHelpers";
+import { IoTrashBinOutline } from "react-icons/io5";
+import { FaPlus, FaMinus,FaRegHeart } from "react-icons/fa";
 
 const CartPage = () => {
   const dispatch = useDispatch();
 
-  const {
-    cartItems,
-    guestCartItems,
-    loading,
-  } = useSelector((state) => state.cart);
+  const { cartItems, guestCartItems, loading } = useSelector(
+    (state) => state.cart,
+  );
 
   const token = localStorage.getItem("token");
 
@@ -26,10 +27,8 @@ const CartPage = () => {
   // ============================
   useEffect(() => {
     if (token && guestCartItems.length > 0) {
-      // Sync guest cart on login
       dispatch(syncGuestCart(guestCartItems));
     } else if (token) {
-      // Load DB cart
       dispatch(getCart());
     }
   }, [dispatch, token]);
@@ -40,27 +39,26 @@ const CartPage = () => {
   const itemsToShow = token ? cartItems : guestCartItems;
 
   // ============================
-  // Calculate totals (UI SAFE)
+  // UI SAFE TOTALS
   // ============================
   const itemCountToShow = itemsToShow.reduce(
     (sum, item) => sum + item.quantity,
-    0
+    0,
   );
 
   const subtotalToShow = itemsToShow.reduce(
     (sum, item) => sum + item.priceSnapshot * item.quantity,
-    0
+    0,
   );
 
   return (
-    <div className="max-w-[1280px] mx-auto px-4 py-10">
-      <div className="grid lg:grid-cols-[65%_35%] gap-12 items-start">
-
+    <div className="max-w-[1280px] mx-auto px-4 py-8 sm:py-10">
+      <div className="grid lg:grid-cols-[65%_35%] gap-10 items-start">
         {/* ================= LEFT — CART ITEMS ================= */}
         <div>
           <h1 className="text-2xl font-semibold mb-1">
             YOUR BAG{" "}
-            <span className="text-gray-500">
+            <span className="text-gray-500 text-md">
               ({itemCountToShow} items)
             </span>
           </h1>
@@ -77,65 +75,114 @@ const CartPage = () => {
 
           <div className="space-y-6">
             {itemsToShow.map((item) => {
-              const product = token ? item.product : item.product;
+              const product = item.product;
 
               return (
                 <div
                   key={`${token ? product._id : item.productID}-${item.size}`}
-                  className="flex gap-4 border-b pb-6"
+                  className="flex flex-col sm:flex-row gap-4 border p-4 sm:p-6"
                 >
                   {/* IMAGE */}
                   <img
                     src={product.images?.[0]?.url}
                     alt={product.title}
-                    className="w-28 h-28 object-cover bg-gray-100 rounded"
+                    className="w-full sm:w-40 sm:h-40 object-cover bg-gray-100 rounded"
                   />
 
-                  {/* INFO */}
+                  {/* CONTENT */}
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className="font-medium">
+                      <h3 className="font-medium text-sm sm:text-md">
                         {product.title}
                       </h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs sm:text-sm text-gray-600">
                         Size: {item.size}
                       </p>
                     </div>
 
-                    <div className="flex justify-between items-end">
-                      <span className="text-sm">
-                        Qty: {item.quantity}
-                      </span>
+                    {/* ACTIONS */}
+                    <div className="flex items-center justify-between mt-4 gap-3 flex-wrap">
+                      {/* QUANTITY CONTROL */}
+                      <div className="flex items-center border rounded-full px-4 py-2 gap-4">
+                        {/* LEFT (FIXED WIDTH) */}
+                        <button
+                          className="w-6 h-6 flex items-center justify-center text-gray-700"
+                          onClick={() =>
+                            item.quantity === 1
+                              ? token
+                                ? dispatch(
+                                    removeFromCart(product._id, item.size),
+                                  )
+                                : dispatch(
+                                    removeFromGuestCart({
+                                      productID: item.productID,
+                                      size: item.size,
+                                    }),
+                                  )
+                              : token
+                                ? dispatch(
+                                    updateCartQuantity(
+                                      product._id,
+                                      item.size,
+                                      item.quantity - 1,
+                                    ),
+                                  )
+                                : dispatch(
+                                    updateGuestQuantity({
+                                      productID: item.productID,
+                                      size: item.size,
+                                      quantity: item.quantity - 1,
+                                    }),
+                                  )
+                          }
+                        >
+                          {item.quantity === 1 ? (
+                            <IoTrashBinOutline className="w-5 h-5" />
+                          ) : (
+                            <FaMinus className="w-4 h-4" />
+                          )}
+                        </button>
 
-                      {/* REMOVE */}
-                      <button
-                        onClick={() =>
-                          token
-                            ? dispatch(
-                                removeFromCart(
-                                  product._id,
-                                  item.size
+                        {/* QTY (FIXED WIDTH) */}
+                        <span className="w-6 text-center text-sm font-medium select-none">
+                          {item.quantity}
+                        </span>
+
+                        {/* RIGHT (FIXED WIDTH) */}
+                        <button
+                          className="w-6 h-6 flex items-center justify-center text-gray-900"
+                          onClick={() =>
+                            token
+                              ? dispatch(
+                                  updateCartQuantity(
+                                    product._id,
+                                    item.size,
+                                    item.quantity + 1,
+                                  ),
                                 )
-                              )
-                            : dispatch(
-                                removeFromGuestCart({
-                                  productID: item.productID,
-                                  size: item.size,
-                                })
-                              )
-                        }
-                        className="text-sm underline text-gray-600 hover:text-black"
-                      >
-                        Remove
+                              : dispatch(
+                                  updateGuestQuantity({
+                                    productID: item.productID,
+                                    size: item.size,
+                                    quantity: item.quantity + 1,
+                                  }),
+                                )
+                          }
+                        >
+                          <FaPlus className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {/* WISHLIST */}
+                      <button className="w-9 h-9 flex items-center justify-center border rounded-full hover:border-black">
+                        <FaRegHeart />
                       </button>
                     </div>
                   </div>
 
                   {/* PRICE */}
-                  <div className="text-right font-medium">
-                    {formatPrice(
-                      item.priceSnapshot * item.quantity
-                    )}
+                  <div className="text-right font-medium text-sm sm:text-md">
+                    {formatPrice(item.priceSnapshot * item.quantity)}
                   </div>
                 </div>
               );
@@ -145,9 +192,7 @@ const CartPage = () => {
 
         {/* ================= RIGHT — ORDER SUMMARY ================= */}
         <div className="border p-6 sticky top-24 h-fit">
-          <h2 className="text-xl font-semibold mb-6">
-            ORDER SUMMARY
-          </h2>
+          <h2 className="text-xl font-semibold mb-6">ORDER SUMMARY</h2>
 
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
@@ -165,9 +210,7 @@ const CartPage = () => {
               <span>{formatPrice(subtotalToShow)}</span>
             </div>
 
-            <p className="text-xs text-gray-500">
-              Inclusive of all taxes
-            </p>
+            <p className="text-xs text-gray-500">Inclusive of all taxes</p>
           </div>
 
           <button className="w-full bg-black text-white py-3 mt-6 rounded-full hover:bg-gray-900">
@@ -186,7 +229,6 @@ const CartPage = () => {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

@@ -1,17 +1,52 @@
 import React from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { addToCart } from "../../actions/cartActions";
+import { addToGuestCart } from "../../slices/cartSlice";
 import { formatPrice, getProductStatus } from '../../utils/productHelpers';
 import { addToCartSuccess } from '../../slices/cartSlice';
 import { addToWishlistSuccess } from '../../slices/wishlistSlice';
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
+  const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
 
-  const handleAddToCart = (e) => {
+  
+    const handleAddToCart = (e) => {
     e.preventDefault();
-    dispatch(addToCartSuccess({ productID: product._id, quantity: 1 }));
+    console.log("Hit")
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      // =====================
+      // GUEST USER (LOCAL CART)
+      // =====================
+      dispatch(
+        addToGuestCart({
+          productID: product._id,
+          quantity,
+          size: selectedSize, //
+          priceSnapshot: product.sellingPrice,
+          product, // optional but useful for UI
+        }),
+        
+      );
+    } else {
+      // =====================
+      // LOGGED-IN USER (DB CART)
+      // =====================
+      dispatch(
+        addToCart({
+          productID: product._id,
+          quantity,
+          size: selectedSize, //
+        }),
+      );
+    }
   };
+ 
 
   const handleAddToWishlist = (e) => {
     e.preventDefault();

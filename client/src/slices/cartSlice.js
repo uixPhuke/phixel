@@ -194,6 +194,27 @@ const cartSlice = createSlice({
       state.subtotal = 0;
       state.total = 0;
     },
+
+    updateGuestQuantity: (state, action) => {
+  const { productID, size, quantity } = action.payload;
+
+  const item = state.guestCartItems.find(
+    (i) => i.productID === productID && i.size === size
+  );
+
+  if (item) {
+    item.quantity = quantity;
+  }
+
+  const totals = calculateTotals(state.guestCartItems);
+  state.itemCount = totals.itemCount;
+  state.totalQuantity = totals.totalQuantity;
+  state.subtotal = totals.subtotal;
+  state.total = totals.total;
+
+  localStorage.setItem("guestCart", JSON.stringify(state.guestCartItems));
+},
+
   },
 });
 
@@ -210,6 +231,7 @@ export const {
   addToGuestCart,
   removeFromGuestCart,
   clearGuestCart,
+  updateGuestQuantity
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
