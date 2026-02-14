@@ -11,7 +11,7 @@ import {
 } from "../../slices/cartSlice";
 import { formatPrice } from "../../utils/productHelpers";
 import { IoTrashBinOutline } from "react-icons/io5";
-import { FaPlus, FaMinus,FaRegHeart } from "react-icons/fa";
+import { FaPlus, FaMinus, FaRegHeart } from "react-icons/fa";
 
 const CartPage = () => {
   const dispatch = useDispatch();
@@ -173,25 +173,57 @@ const CartPage = () => {
                         </button>
                       </div>
 
-                      {/* WISHLIST */}
-                      <button className="w-9 h-9 flex items-center justify-center border rounded-full hover:border-black">
-                        <FaRegHeart />
-                      </button>
+                      {/* WISHLIST — BOTTOM RIGHT 
+                      <button
+                        className="
+                           absolute
+                            bottom-4
+                            right-4
+                            w-9
+                            h-9
+                            
+                            flex
+                            items-center
+                            justify-center
+                            
+                            hover:border-black
+                            bg-white
+                          "
+                      >
+                        <FaRegHeart className="text-xl" />
+                      </button>*/}
                     </div>
                   </div>
 
-                  {/* PRICE */}
-                  <div className="text-right font-medium text-sm sm:text-md">
-                    {formatPrice(item.priceSnapshot * item.quantity)}
+                  {/* PRICE + WISHLIST COLUMN */}
+                  <div className="flex flex-col items-end justify-between h-full min-h-[140px] ">
+                    {/* PRICE */}
+                    <div className="text-right font-medium text-sm sm:text-md">
+                      {formatPrice(item.priceSnapshot * item.quantity)}
+                    </div>
+
+                    {/* HEART */}
+                    <button
+                      className="
+      w-9 h-9
+      flex items-center justify-center
+      
+      hover:border-black
+      bg-white
+    "
+                    >
+                      <FaRegHeart className="text-xl leading-none" />
+                    </button>
                   </div>
                 </div>
               );
             })}
+            
           </div>
         </div>
 
         {/* ================= RIGHT — ORDER SUMMARY ================= */}
-        <div className="border p-6 sticky top-24 h-fit">
+        <div className="border  p-6 sticky top-24 h-fit">
           <h2 className="text-xl font-semibold mb-6">ORDER SUMMARY</h2>
 
           <div className="space-y-3 text-sm">
@@ -213,8 +245,8 @@ const CartPage = () => {
             <p className="text-xs text-gray-500">Inclusive of all taxes</p>
           </div>
 
-          <button className="w-full bg-black text-white py-3 mt-6 rounded-full hover:bg-gray-900">
-            Checkout →
+          <button className="w-full bg-black text-white text-sm py-4 mt-6 rounded-full hover:bg-gray-900">
+            Checkout
           </button>
 
           <div className="mt-6">
