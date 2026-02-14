@@ -1,17 +1,30 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import logo from "../../assets/logo.png";
 import SearchBar from "../../pages/SearchBar/SearchBar";
 import { FaRegHeart, FaUserCircle } from "react-icons/fa";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { BsBorderStyle } from "react-icons/bs";
 import { IoCartOutline } from "react-icons/io5";
+import { getWishlist } from "./actions/wishlistActions";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true); // Track visibility of the header
   const [lastScrollY, setLastScrollY] = useState(0); // Track the last scroll positio
+
+
+//wishlist load on navbar load
+const dispatch = useDispatch();
+
+useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    dispatch(getWishlist());
+  }
+}, []);
 
   useEffect(() => {
     // console.log('this')
