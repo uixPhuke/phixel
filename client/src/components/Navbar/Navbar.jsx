@@ -16,15 +16,6 @@ const Navbar = () => {
   const [lastScrollY, setLastScrollY] = useState(0); // Track the last scroll positio
 
 
-//wishlist load on navbar load
-const dispatch = useDispatch();
-
-useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    dispatch(getWishlist());
-  }
-}, []);
 
   useEffect(() => {
     // console.log('this')
