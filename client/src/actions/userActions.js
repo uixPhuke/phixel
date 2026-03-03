@@ -29,38 +29,33 @@ import { signInSignUpWithFacebook, signInSignUpWithGoogle } from '../firebase';
 const API_KEY = import.meta.env.VITE_API_KEY;
 
 
-export const login = (userData, setSuccessToggle, callback) => async (dispatch) => {
+export const login = (userData, callback) => async (dispatch) => {
+  try {
+    dispatch(loginRequest());
 
-    // const navigate = useNavigate()
+    const { data } = await axios.post(
+      `${API_KEY}/api/v1/user/auth/login`,
+      userData,
+      { headers: { "Content-Type": "application/json" } }
+    );
 
-    try {
-        dispatch(loginRequest());
+    localStorage.setItem("token", data.token);
+    dispatch(loginSuccess());
+    dispatch(verify());
 
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        };
+    toast.success("Login Successful!");
 
-        const { data } = await axios.post(`${API_KEY}/api/v1/user/auth/login`, userData, config);
-
-        localStorage.setItem('token', data.token);
-        dispatch(loginSuccess());
-        setSuccessToggle(true)
-        dispatch(verify())
-        toast.success("Login Successful!", {
-            className: 'custom-toast-enter',
-        });
-        callback(true, null); // Success callback
-        // navigate('/')
-    } catch (err) {
-        dispatch(loginFail(err.response.data.message));
-        console.log(err);
-        // toast.error(err.response.data.message, {
-        //     className: 'custom-toast-enter',
-        // });
-        callback(false, err.response.data.message); // Error callback
+    if (typeof callback === "function") {
+      callback(true, null);
     }
+  } catch (err) {
+    const message = err.response?.data?.message || "Login failed";
+    dispatch(loginFail(message));
+
+    if (typeof callback === "function") {
+      callback(false, message);
+    }
+  }
 };
 
 export const register = (userData, setSuccessToggle, setOtpToggle, setUserId, setToken, setErrorMessage) => async (dispatch) => {
@@ -374,4 +369,36 @@ export const editProfile = (updatedUserData) => async (dispatch) => {
 
 // 
    
-    
+   /*export const login = (userData, setSuccessToggle, callback) => async (dispatch) => {
+
+    // const navigate = useNavigate()
+
+    try {
+        dispatch(loginRequest());
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        const { data } = await axios.post(`${API_KEY}/api/v1/user/auth/login`, userData, config);
+
+        localStorage.setItem('token', data.token);
+        dispatch(loginSuccess());
+        setSuccessToggle(true)
+        dispatch(verify())
+        toast.success("Login Successful!", {
+            className: 'custom-toast-enter',
+        });
+        callback(true, null); // Success callback
+        // navigate('/')
+    } catch (err) {
+        dispatch(loginFail(err.response.data.message));
+        console.log(err);
+        // toast.error(err.response.data.message, {
+        //     className: 'custom-toast-enter',
+        // });
+        callback(false, err.response.data.message); // Error callback
+    }
+};*/
