@@ -1,65 +1,70 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const wishlistSlice = createSlice({
-  name: 'wishlist',
+  name: "wishlist",
   initialState: {
     loading: false,
     error: null,
-    wishlistItems: [], // Array of product objects
-    itemCount: 0, // Number of items in wishlist
+    wishlistItems: [],
+    itemCount: 0,
   },
+
   reducers: {
-    // Request actions
     wishlistRequest: (state) => {
       state.loading = true;
       state.error = null;
     },
-    
-    // Get wishlist success
+
     getWishlistSuccess: (state, action) => {
       state.loading = false;
-      state.wishlistItems = action.payload;
-      state.itemCount = action.payload.length;
+      const items = Array.isArray(action.payload)
+        ? action.payload
+        : [];
+      state.wishlistItems = items;
+      state.itemCount = items.length;
     },
-    
-    // Add to wishlist success
+
     addToWishlistSuccess: (state, action) => {
       state.loading = false;
-      state.wishlistItems = action.payload;
-      state.itemCount = action.payload.length;
+      const items = Array.isArray(action.payload)
+        ? action.payload
+        : state.wishlistItems;
+      state.wishlistItems = items;
+      state.itemCount = items.length;
     },
-    
-    // Remove from wishlist success
+
     removeFromWishlistSuccess: (state, action) => {
       state.loading = false;
-      state.wishlistItems = action.payload;
-      state.itemCount = action.payload.length;
+      const items = Array.isArray(action.payload)
+        ? action.payload
+        : state.wishlistItems;
+      state.wishlistItems = items;
+      state.itemCount = items.length;
     },
-    
-    // Sync wishlist success
+
     syncWishlistSuccess: (state, action) => {
       state.loading = false;
-      state.wishlistItems = action.payload;
-      state.itemCount = action.payload.length;
+      const items = Array.isArray(action.payload)
+        ? action.payload
+        : state.wishlistItems;
+      state.wishlistItems = items;
+      state.itemCount = items.length;
     },
-    
-    // Failure action
+
     wishlistFail: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
-    
-    // Clear wishlist state
+
     clearWishlistState: (state) => {
       state.wishlistItems = [];
       state.itemCount = 0;
       state.error = null;
     },
-    
-    // Clear wishlist error
+
     clearWishlistError: (state) => {
       state.error = null;
-    }
+    },
   },
 });
 
@@ -71,7 +76,7 @@ export const {
   syncWishlistSuccess,
   wishlistFail,
   clearWishlistState,
-  clearWishlistError
+  clearWishlistError,
 } = wishlistSlice.actions;
 
 export default wishlistSlice.reducer;
