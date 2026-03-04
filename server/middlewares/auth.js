@@ -8,12 +8,12 @@ const createToken = (userID, email, res) => {
   });
 
   //set Cookie
-  res.cookie("token", token, {
-    httpOnly: true,
-    expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-    secure: process.env.NODE_ENV === "production" ? true : false,
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  });
+res.cookie("token", token, {
+  httpOnly: true,
+  sameSite: "none",
+  secure: true,
+  expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+});
   return token;
 };
 
