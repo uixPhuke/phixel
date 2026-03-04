@@ -7,13 +7,13 @@ import { FaRegHeart, FaUserCircle } from "react-icons/fa";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { BsBorderStyle } from "react-icons/bs";
 import { IoCartOutline } from "react-icons/io5";
-import { getWishlist } from "./actions/wishlistActions";
+import { getWishlist } from "../../actions/wishlistActions";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true); // Track visibility of the header
-  const [lastScrollY, setLastScrollY] = useState(0); // Track the last scroll positio
+  const [lastScrollY, setLastScrollY] = useState(0); // Track the last scroll position
 
 
 //wishlist load on navbar load
@@ -25,6 +25,10 @@ useEffect(() => {
     dispatch(getWishlist());
   }
 }, []);
+
+
+
+
 
   useEffect(() => {
     // console.log('this')
