@@ -10,6 +10,7 @@ import CartPage from "./pages/Cart/Cart";
 import { ProductListingPage, ProductDetailPage } from "./pages/Product"
 import { ProductCard, ProductFilters } from './components/product';
 import { useProducts } from './hooks/useProducts';
+import Wishlist from "./pages/Wishlist/Wishlist";
 
 const App = () => {
   return (
@@ -39,6 +40,9 @@ const App = () => {
 
           {/* Cart */}
           <Route path="/cart" element={<CartPage />} />
+
+          {/*Wishlist*/}
+          <Route path="/wishlist" element={<Wishlist />} />
 
           {/* 404 fallback */}
           <Route path="*" element={<h1>Page Not Found</h1>} />
