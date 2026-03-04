@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -6,18 +7,25 @@ import { addToCart } from "../../actions/cartActions";
 import { addToGuestCart } from "../../slices/cartSlice";
 import { formatPrice, getProductStatus } from '../../utils/productHelpers';
 import { addToCartSuccess } from '../../slices/cartSlice';
-import { addToWishlistSuccess } from '../../slices/wishlistSlice';
+//import { addToWishlistSuccess } from '../../slices/wishlistSlice';
+
+import { toggleWishlistItem } from "../../actions/wishlistActions";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
+
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
 
+const wishlistItems = useSelector(state => state.wishlist.wishlistItems);
+const isWishlisted = wishlistItems.some(w => w._id === product._id);
+
   
     const handleAddToCart = (e) => {
     e.preventDefault();
     console.log("Hit")
-    const token = localStorage.getItem("token");
+    //const token = localStorage.getItem("token");
 
     if (!token) {
       // =====================
@@ -48,10 +56,11 @@ const ProductCard = ({ product }) => {
   };
  
 
-  const handleAddToWishlist = (e) => {
-    e.preventDefault();
-    dispatch(addToWishlistSuccess(product._id));
-  };
+const handleAddToWishlist = (e) => {
+  e.preventDefault();
+  console.log("Wishlist toggle for product:", product._id);
+  dispatch(toggleWishlistItem(product._id));
+};
 
   const status = getProductStatus(product);
   const statusColor =
@@ -62,7 +71,7 @@ const ProductCard = ({ product }) => {
       : 'text-green-600';
 
   return (
-    <div className="bg-white flex flex-col group">
+    <div className="bg-white flex flex-col relative group">
       <Link to={`/products/${product._id}`} className="block">
 
         {/* IMAGE */}
@@ -85,19 +94,23 @@ const ProductCard = ({ product }) => {
 
           {/* Wishlist (hover desktop, always mobile) */}
           <button
-            onClick={handleAddToWishlist}
-            className="
-              absolute top-3 right-3 z-10
-              bg-white/90 backdrop-blur
-              border rounded-full p-2
-              opacity-100 lg:opacity-0
-              lg:group-hover:opacity-100
-              transition-opacity
-            "
-            title="Add to Wishlist"
-          >
-            ♡
-          </button>
+  onClick={handleAddToWishlist}
+  className="
+    absolute top-3 right-3 z-10
+    backdrop-blur
+    p-2
+    opacity-100 lg:opacity-0
+    lg:group-hover:opacity-100
+    transition-opacity
+  "
+  title="Add to Wishlist"
+>
+  {isWishlisted ? (
+    <FaHeart className="text-sm text-red-500" />
+  ) : (
+    <FaRegHeart className="text-sm" />
+  )}
+</button>
 
           {/* Badge */}
           {product.popular && (
