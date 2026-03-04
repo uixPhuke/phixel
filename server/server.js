@@ -16,12 +16,18 @@ const discountRoutes=require('./routes/discountRoutes')
 const orderRoutes=require('./routes/orderRoutes')
 
 const PORT=process.env.PORT
+const URL=process.env.FRONTEND_URL
 
 //connect to database
 connectDB()
 
 //pass the middleware
-app.use(cors())
+app.use(
+  cors({
+    origin: URL, // frontend URL
+    credentials: true,
+  })
+);
 app.use(express.json())
 app.use(cookieParser());
 app.use(express.urlencoded({extended:true}))
