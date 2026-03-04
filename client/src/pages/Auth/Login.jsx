@@ -26,21 +26,20 @@ export const Login = ({ setToggleAuth, handleOnClose }) => {
     setErrorMessage("");
     
     dispatch(
-      login(loginData, (success, error) => {
-        if (success) {
-          if (handleOnClose) {
-            handleOnClose();
-          }
-          if (user?.isAdmin) {
-            navigate("/admin/dashboard");
-          } else {
-            navigate("/profile");
-          }
-        } else {
-          setErrorMessage(error || "Invalid email/username or password");
-        }
-      })
-    );
+  login(loginData, (success, error) => {
+    if (success) {
+      if (handleOnClose) handleOnClose();
+
+      if (user?.isAdmin) {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/products");
+      }
+    } else {
+      setErrorMessage(error || "Invalid email/username or password");
+    }
+  })
+);
   };
 
   const handleContinueWithGoogle = () => {
