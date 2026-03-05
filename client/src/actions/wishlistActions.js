@@ -103,7 +103,7 @@ export const removeFromWishlist = (productID) => async (dispatch) => {
     // 🔥 refresh wishlist so UI updates instantly
     dispatch(getWishlist());
 
-    toast.success("Product removed from wishlist!");
+    //toast.success("Product removed from wishlist!");
 
   } catch (err) {
     console.error("Remove Wishlist Error:", err);
