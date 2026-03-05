@@ -8,6 +8,7 @@ import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { BsBorderStyle } from "react-icons/bs";
 import { IoCartOutline } from "react-icons/io5";
 import { getWishlist } from "../../actions/wishlistActions";
+import { logout } from "../../actions/userActions";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,6 +18,12 @@ const Navbar = () => {
   const { cartItems, guestCartItems, totalQuantity } = useSelector(
   (state) => state.cart
 );
+const { isLogin } = useSelector((state) => state.user);
+
+const handleLogout = () => {
+  dispatch(logout());
+  localStorage.removeItem("token");
+};
 
 const cartCount = cartItems.length > 0
   ? totalQuantity
@@ -81,21 +88,25 @@ useEffect(() => {
         </div>
         {/* Navigation Links for Large Screens */}
         <nav className="text-primary  hidden lg:flex lg:items-center space-x-20 text-xs  transition-all duration-300">
-          <Link to="/new" className="hover:text-accent">
-            New & Featured
-          </Link>
-          <Link to="/men" className="hover:text-accent">
-            MEN
-          </Link>
-          <Link to="/women" className="hover:text-accent">
-            WOMEN
-          </Link>
-          <Link to="/kids" className="hover:text-accent">
-            KIDS
-          </Link>
-          <Link to="/unisex" className="hover:text-accent">
-            UNISEX
-          </Link>
+        <Link to="/products?sort=newest" className="hover:text-accent">
+  New & Featured
+</Link>
+
+<Link to="/products?category=men" className="hover:text-accent">
+  MEN
+</Link>
+
+<Link to="/products?category=women" className="hover:text-accent">
+  WOMEN
+</Link>
+
+<Link to="/products?category=kids" className="hover:text-accent">
+  KIDS
+</Link>
+
+<Link to="/products?category=unisex" className="hover:text-accent">
+  UNISEX
+</Link>
         </nav>
         <div className="flex flex-row items-center space-x-6">
           {/* Search Bar */}
@@ -172,12 +183,25 @@ useEffect(() => {
             </p>
             <div className="flex space-x-4 mt-4">
              
-                <Link
-                  to="/login"
-                  className="bg-primary text-secondary px-6 py-2 rounded-full"
-                  onClick={toggleMenu}>
-                  Join Us
-                </Link>
+                {isLogin ? (
+  <button
+    onClick={() => {
+      handleLogout();
+      toggleMenu();
+    }}
+    className="bg-primary text-secondary px-6 py-2 rounded-full"
+  >
+    Logout
+  </button>
+) : (
+  <Link
+    to="/login"
+    className="bg-primary text-secondary px-6 py-2 rounded-full"
+    onClick={toggleMenu}
+  >
+    Join Us
+  </Link>
+)}
              
             </div>
            
