@@ -25,7 +25,7 @@ const isWishlisted = wishlistItems.some(w => w._id === product._id);
     const handleAddToCart = (e) => {
     e.preventDefault();
     console.log("Hit")
-    //const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
     if (!token) {
       // =====================
@@ -133,7 +133,7 @@ const handleAddToWishlist = (e) => {
   <span className="text-[clamp(1.5rem,2.4vw,1.9rem)] font-semibold text-gray-900 leading-none">
     {formatPrice(product.sellingPrice)}
   </span>
-{console.log(product)}
+
   {/* Original Price — Secondary */}
   {product.totalPrice > product.sellingPrice && (
     <span className="text-sm text-gray-400 line-through leading-none">
