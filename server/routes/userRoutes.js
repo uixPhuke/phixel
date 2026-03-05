@@ -27,7 +27,7 @@ router.get('/auth/verify',isAuthenticated,verifyAuth);
 router.route('/update').put(isAuthenticated,updateUser);
 router.route('/users').get(isAuthenticated,getUsers);
 router.route('/user/:id').get(isAuthenticated,getUserById).delete(isAuthenticated,deleteUser);
-router.get('/logout',logoutUser);
+router.post('/auth/logout',logoutUser);
 
 
 module.exports = router;
