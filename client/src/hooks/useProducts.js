@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { 
   getAllProducts, 
   getProduct, 
@@ -21,6 +22,9 @@ export const useProducts = () => {
     error,
     pagination 
   } = useSelector(state => state.product);
+
+  const navigate = useNavigate();
+const [searchParams] = useSearchParams();
 
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState('newest');

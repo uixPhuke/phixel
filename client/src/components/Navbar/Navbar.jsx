@@ -92,19 +92,19 @@ useEffect(() => {
   New & Featured
 </Link>
 
-<Link to="/products?category=men" className="hover:text-accent">
+<Link to="/products?gender=Men" className="hover:text-accent">
   MEN
 </Link>
 
-<Link to="/products?category=women" className="hover:text-accent">
+<Link to="/products?gender=Women" className="hover:text-accent">
   WOMEN
 </Link>
 
-<Link to="/products?category=kids" className="hover:text-accent">
+<Link to="/products?gender=Kids" className="hover:text-accent">
   KIDS
 </Link>
 
-<Link to="/products?category=unisex" className="hover:text-accent">
+<Link to="/products?gender=Unisex" className="hover:text-accent">
   UNISEX
 </Link>
         </nav>
@@ -151,16 +151,16 @@ useEffect(() => {
             <Link to="/new" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
               New & Featured
             </Link>
-            <Link to="/men" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
+            <Link to="/products?gender=Men" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
               Men
             </Link>
-            <Link to="/women" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
+            <Link to="/products?gender=Women" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
               Women
             </Link>
-            <Link to="/kids" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
+            <Link to="/products?gender=Kids" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
               Kids
             </Link>
-            <Link to="/unisex" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
+            <Link to="/products?gender=Unisex" onClick={toggleMenu} className="hover:text-accent transition-all duration-300">
               Unisex
             </Link>
             

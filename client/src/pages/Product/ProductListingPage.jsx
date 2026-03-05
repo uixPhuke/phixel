@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useProducts } from '../../hooks/useProducts';
 import ProductList from '../../components/product/ProductList';
 import ProductFilters from '../../components/product/ProductFilters';
+import { useSearchParams } from "react-router-dom";
+
 
 const ProductListingPage = () => {
   const {
@@ -17,11 +19,24 @@ const ProductListingPage = () => {
   } = useProducts();
 
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [searchParams] = useSearchParams();
+useEffect(() => {
 
-  useEffect(() => {
-    fetchProducts();
-  }, [filters, sort]);
+  const gender = searchParams.get("gender");
+  const category = searchParams.get("category");
+  const sortParam = searchParams.get("sort");
 
+  const params = {
+    ...filters,
+    sort: sortParam ? sortParam : sort || "newest",
+  };
+
+  if (gender) params.gender = gender;
+  if (category) params.category = category;
+
+  fetchProducts(params);
+
+}, [filters, sort, searchParams]);
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
 
