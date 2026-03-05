@@ -8,17 +8,19 @@ import { useNavigate } from "react-router-dom";
 import { setShowLoginModalTrue } from "../../slices/userSlice";
 import { addToCart } from "../../actions/cartActions";
 import { addToGuestCart } from "../../slices/cartSlice";
+import { toast } from "react-hot-toast";
 
 const WishlistPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { wishlistItems, loading } = useSelector((state) => state.wishlist);
-   const { isLogin } = useSelector((state) => state.user);
-   const [movedItems, setMovedItems] = useState([]);
+   //const { isLogin } = useSelector((state) => state.user);
+  const { isLogin, authLoading } = useSelector((state) => state.user);
  
 
-  useEffect(() => {
+ useEffect(() => {
+
     if (isLogin) {
       dispatch(getWishlist());
     }
@@ -47,32 +49,38 @@ const WishlistPage = () => {
       })
     );
   }
+  
   dispatch(removeFromWishlist(product._id));
+  toast.success("Moved to cart");
 };
    
   // ==============================
   // NOT LOGGED IN UI
   // ==============================
-  if (!isLogin) {
-    return (
-      <div className="max-w-[1400px] mx-auto px-6 py-24 text-center">
-        <h2 className="text-xl font-medium mb-3">
-          Please login to view your wishlist
-        </h2>
 
-        <p className="text-gray-500 mb-6">
-          Save your favourite products and access them anytime.
-        </p>
+  if (authLoading) {
+  return null;
+}
+if (!isLogin) {
+  return (
+    <div className="max-w-[1400px] mx-auto px-6 py-24 text-center">
+      <h2 className="text-xl font-medium mb-3">
+        Please login to view your wishlist
+      </h2>
 
-        <button
-          onClick={() => navigate("/login")}
-          className="px-6 py-2 bg-black text-white text-sm rounded"
-        >
-          Login
-        </button>
-      </div>
-    );
-  }
+      <p className="text-gray-500 mb-6">
+        Save your favourite products and access them anytime.
+      </p>
+
+      <button
+        onClick={() => navigate("/login")}
+        className="px-6 py-2 bg-black text-white text-sm rounded"
+      >
+        Login
+      </button>
+    </div>
+  );
+}
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-12">
@@ -90,17 +98,7 @@ const WishlistPage = () => {
       {/* ==============================
           LOADING STATE
       ============================== */}
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-20">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="animate-pulse">
-              <div className="bg-gray-200 h-48 w-full rounded"></div>
-              <div className="mt-4 h-4 bg-gray-200 w-3/4"></div>
-              <div className="mt-2 h-4 bg-gray-200 w-1/2"></div>
-            </div>
-          ))}
-        </div>
-      ) : wishlistItems?.length === 0 ? (
+      {wishlistItems?.length === 0  ? (
 
         /* ==============================
             EMPTY WISHLIST
