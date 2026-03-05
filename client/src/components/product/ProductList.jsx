@@ -44,7 +44,7 @@ const ProductList = ({ products, loading, error }) => {
     );
   }
 
-  if (!products || products.length === 0) {
+  if (!loading && (!products || products.length === 0)) {
     return (
       <div className="text-center py-8">
         <p className="text-gray-500 text-lg">No products found.</p>
