@@ -8,7 +8,7 @@ import { Login } from "./pages/Auth/Login";
 import CartPage from "./pages/Cart/Cart";
 import { ProductListingPage, ProductDetailPage } from "./pages/Product";
 import Wishlist from "./pages/Wishlist/Wishlist";
-
+import { Toaster } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { verify } from "./actions/userActions";
 
@@ -23,7 +23,21 @@ const App = () => {
   return (
     <BrowserRouter>
       <Navbar />
-
+<Toaster
+  position="top-center"
+  toastOptions={{
+    duration: 2500,
+    style: {
+      background: "#000",
+      color: "#fff",
+      padding: "14px 20px",
+      fontSize: "14px",
+      borderRadius: "30px",
+      fontWeight: "500",
+      letterSpacing: "0.3px",
+    },
+  }}
+/>
       <div className="pt-[60px] space-y-24">
         <Routes>
 
