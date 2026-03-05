@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, EffectFade } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
+import { Link } from 'react-router-dom';
 
 import img1 from '../../assets/img1.png';
 import img2 from '../../assets/img2.png';
@@ -40,7 +41,7 @@ const Hero = () => {
       {/* Button - Mobile & Tablet (below image) */}
       <div className="lg:hidden flex justify-center mt-6">
         <button className="bg-secondary text-primary px-6 py-3 rounded-full shadow-lg hover:shadow-2xl transition">
-          SHOP NOW
+          <Link to="/products">SHOP NOW</Link>
         </button>
       </div>
     </div>
