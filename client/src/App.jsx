@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Hero from "./pages/Home/Hero";
 import About from "./pages/Home/About";
 import { Register } from "./pages/Auth/Register";
+import { getWishlist } from "./actions/wishlistActions";
 import { Login } from "./pages/Auth/Login";
 import CartPage from "./pages/Cart/Cart";
 import { ProductListingPage, ProductDetailPage } from "./pages/Product";
@@ -18,6 +19,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(verify());
+    dispatch(getWishlist());
   }, [dispatch]);
 
   return (
