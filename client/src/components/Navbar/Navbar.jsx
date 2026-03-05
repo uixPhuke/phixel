@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch ,useSelector} from "react-redux";
 import logo from "../../assets/logo.png";
 import SearchBar from "../../pages/SearchBar/SearchBar";
 import { FaRegHeart, FaUserCircle } from "react-icons/fa";
@@ -14,8 +14,13 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true); // Track visibility of the header
   const [lastScrollY, setLastScrollY] = useState(0); // Track the last scroll position
+  const { cartItems, guestCartItems, totalQuantity } = useSelector(
+  (state) => state.cart
+);
 
-
+const cartCount = cartItems.length > 0
+  ? totalQuantity
+  : guestCartItems.reduce((sum, item) => sum + item.quantity, 0);
 //wishlist load on navbar load
 const dispatch = useDispatch();
 
@@ -106,9 +111,11 @@ useEffect(() => {
          {/*Cart */}
           <Link to="/cart" className="relative hover:text-accent ">
             <IoCartOutline size={24} className="text-sm transition-all duration-300 " />
-            <span className="absolute -top-2 -right-2 bg-red-500 text-secondary text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              1
-            </span>
+            {cartCount > 0 && (
+  <span className="absolute -top-2 -right-2 bg-primary text-secondary text-xs rounded-full w-6 h-6 flex items-center justify-center">
+    {cartCount}
+  </span>
+)}
           </Link>
           
           
