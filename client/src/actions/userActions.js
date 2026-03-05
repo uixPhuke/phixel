@@ -108,6 +108,29 @@ export const verifyOtp =
     }
   };
 
+  /* =========================
+   LOGOUT
+========================= */
+export const logout = () => async (dispatch) => {
+  try {
+
+    await axios.post(
+      `${API_KEY}/api/v1/user/auth/logout`,
+      {},
+      { withCredentials: true }
+    );
+
+    dispatch(verifyLoginFail());
+
+    localStorage.removeItem("token");
+
+    toast.success("Logged out successfully");
+
+  } catch {
+    toast.error("Logout failed");
+  }
+};
+
 /* =========================
    VERIFY AUTH (COOKIE)
 ========================= */
