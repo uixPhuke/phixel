@@ -16,6 +16,7 @@ const WishlistPage = () => {
   const { wishlistItems, loading } = useSelector((state) => state.wishlist);
    const { isLogin } = useSelector((state) => state.user);
    const [movedItems, setMovedItems] = useState([]);
+ 
 
   useEffect(() => {
     if (isLogin) {
@@ -46,7 +47,7 @@ const WishlistPage = () => {
       })
     );
   }
-  setMovedItems((prev) => [...prev, product._id]);
+  dispatch(removeFromWishlist(product._id));
 };
    
   // ==============================
@@ -158,19 +159,11 @@ const WishlistPage = () => {
                 </div>
 
                 {/* MOVE TO BAG */}
-               <button
+              <button
   onClick={() => handleAddToCart(product)}
-  disabled={movedItems.includes(product._id)}
-  className={`
-    mt-4 px-6 py-2 rounded-full text-sm transition
-    ${
-      movedItems.includes(product._id)
-        ? "bg-black text-white border-black"
-        : "border hover:border-black"
-    }
-  `}
+  className="mt-4 px-6 py-2 border rounded-full text-sm hover:border-black transition"
 >
-  {movedItems.includes(product._id) ? "Moved" : "Move to Bag"}
+  Move to Bag
 </button>
               </div>
             </div>
