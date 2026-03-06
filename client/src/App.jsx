@@ -12,6 +12,7 @@ import Wishlist from "./pages/Wishlist/Wishlist";
 import { Toaster } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { verify } from "./actions/userActions";
+import Profile from "./pages/Profile/Profile";
 
 const App = () => {
 
@@ -53,6 +54,7 @@ const App = () => {
               </>
             }
           />
+          <Route path='/profile' element={<Profile />} />
 
           {/* Auth */}
           <Route path="/register" element={<Register />} />
