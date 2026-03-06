@@ -80,7 +80,7 @@ const CartPage = () => {
               return (
                 <div
                   key={`${token ? product._id : item.productID}-${item.size}`}
-                  className="flex flex-col sm:flex-row gap-4 border p-4 sm:p-6"
+                  className="flex flex-col sm:flex-row gap-4 border rounded-2xl  p-4 sm:p-6"
                 >
                   {/* IMAGE */}
                   <img
@@ -223,7 +223,7 @@ const CartPage = () => {
         </div>
 
         {/* ================= RIGHT — ORDER SUMMARY ================= */}
-        <div className="border  p-6 sticky top-24 h-fit">
+        <div className="border rounded-2xl p-6 sticky top-24 h-fit">
           <h2 className="text-xl font-semibold mb-6">ORDER SUMMARY</h2>
 
           <div className="space-y-3 text-sm">
