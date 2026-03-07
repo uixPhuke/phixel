@@ -67,33 +67,6 @@ const OrderTimeline = ({ order }) => {
   );
 };
 
-const AddressCard = ({ address, isDefault }) => {
-  return (
-    <div className="border border-gray-200 rounded-xl p-5 bg-white hover:shadow-md transition">
-      {isDefault && (
-        <span className="text-xs px-2 py-1 bg-black text-white rounded">
-          Default
-        </span>
-      )}
-
-      <p className="mt-2 font-medium">{address.name}</p>
-
-      <p className="text-sm text-[var(--color-accent)]">{address.street}</p>
-
-      <p className="text-sm text-[var(--color-accent)]">
-        {address.city}, {address.state}
-      </p>
-
-      <p className="text-sm text-[var(--color-accent)]">{address.country}</p>
-
-      <div className="flex gap-4 mt-4 text-sm">
-        <button className="text-blue-600">Edit</button>
-
-        <button className="text-red-500">Remove</button>
-      </div>
-    </div>
-  );
-};
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -123,7 +96,7 @@ const orders = useSelector((state) => state.order?.orders) || [];
     dispatch(getUserOrders());
      dispatch(getWishlist());
      dispatch(getAddresses());
-     
+     console.log("Fetching addresses...",user)
   }, [dispatch]);
 
   useEffect(() => {
@@ -153,7 +126,7 @@ const orders = useSelector((state) => state.order?.orders) || [];
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--color-secondary)] py-8 px-4 pt-36">
+    <div className="min-h-screen bg-secondary py-8 px-4 pt-36">
       {loading ? (
         <div className="flex justify-center">
           <Loader />
@@ -165,7 +138,7 @@ const orders = useSelector((state) => state.order?.orders) || [];
           <div className="flex flex-col md:flex-row gap-8 text-sm">
             {/* SIDEBAR */}
 
-            <div className="w-full md:w-1/4">
+            <div className=" ">
               <div className="bg-white border border-gray-200 rounded-2xl p-6">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-12 h-12 flex items-center justify-center bg-black text-white rounded-full font-semibold">
