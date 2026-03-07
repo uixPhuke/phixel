@@ -27,12 +27,19 @@ export const UnAuthorized = () => {
                 {/* Message prompting to login */}
                 <p className="text-gray-800 mb-6">Please login to access this page.</p>
                 {/* Button to open the login modal */}
-                <div>
-                    <button onClick={handleOpenLoginModal} className="px-6 py-2 bg-primary text-secondary rounded hover:bg-accent">
-                        Login
-                    </button>
+                
+                    <div>
+  <Link to="/login">
+    <button
+      onClick={handleOpenLoginModal}
+      className="px-6 py-2 bg-primary text-secondary rounded hover:bg-accent"
+    >
+      Login
+    </button>
+  </Link>
+</div>
                 </div>
-            </div>
+            
         </>
     )
 }
