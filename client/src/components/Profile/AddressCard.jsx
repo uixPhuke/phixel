@@ -1,8 +1,7 @@
-import React from "react";
+import { deleteAddress, setDefaultAddress } from "../../actions/addressActions";
 import { useDispatch } from "react-redux";
-import { deleteAddress } from "../../actions/addressActions";
 
-const AddressCard = ({ address }) => {
+const AddressCard = ({ address, onEdit }) => {
 
   const dispatch = useDispatch();
 
@@ -12,8 +11,12 @@ const AddressCard = ({ address }) => {
     }
   };
 
+  const handleDefault = () => {
+    dispatch(setDefaultAddress(address._id));
+  };
+
   return (
-    <div className="border rounded-xl p-5 bg-white hover:shadow-md transition">
+    <div className="border rounded-xl p-5 bg-white hover:shadow-md">
 
       {address.isDefault && (
         <span className="text-xs bg-black text-white px-2 py-1 rounded">
@@ -38,9 +41,26 @@ const AddressCard = ({ address }) => {
       </p>
 
       <div className="flex gap-4 mt-4 text-sm">
-        <button className="text-blue-600">
-          Edit
-        </button>
+
+       <button
+  onClick={onEdit}
+  className="text-blue-600"
+>
+  Edit
+</button>
+{address.isDefault && (
+  <span className="inline-block mb-2 text-xs bg-black text-white px-2 py-1 rounded">
+    Default Address
+  </span>
+)}
+        {!address.isDefault && (
+          <button
+            onClick={handleDefault}
+            className="text-green-600"
+          >
+            Set Default
+          </button>
+        )}
 
         <button
           onClick={handleDelete}
@@ -48,6 +68,7 @@ const AddressCard = ({ address }) => {
         >
           Remove
         </button>
+
       </div>
 
     </div>

@@ -107,12 +107,7 @@ const Profile = () => {
 
 
 
-const handleAddressChange = (e) => {
-  setNewAddress({
-    ...newAddress,
-    [e.target.name]: e.target.value,
-  });
-};
+
 const addresses = useSelector((state) => state.address?.addresses) || [];
 console.log("Addresses from Redux:", addresses);
 const wishlist = useSelector((state) => state.wishlist?.wishlistItems) || [];
@@ -128,6 +123,7 @@ const orders = useSelector((state) => state.order?.orders) || [];
     dispatch(getUserOrders());
      dispatch(getWishlist());
      dispatch(getAddresses());
+     
   }, [dispatch]);
 
   useEffect(() => {
