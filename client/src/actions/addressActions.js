@@ -13,9 +13,10 @@ const API_URL = import.meta.env.VITE_API_KEY;
 
 // Helper function to get auth config
 const getAuthConfig = () => ({
-  headers: {
+headers: {
     Authorization: `Bearer ${localStorage.getItem('token')}`,
-  }
+   },
+  withCredentials: true// Include cookies for authentication
 });
 
 // Action to add a new address
