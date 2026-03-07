@@ -590,11 +590,12 @@ const firebaseAuth=async(req,res,next)=>{
 //Auth Verify
 const verifyAuth = async (req, res, next) => {
   try {
-    const user=req.user;
+     const user = await User.findById(req.user._id).select("-password");
     if (user) {
       return res.status(200).json({
         success: true,
-        isLogin: true
+        isLogin: true,
+        user
       });
     }
     if (!user) {
