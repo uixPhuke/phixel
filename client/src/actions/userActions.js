@@ -65,6 +65,7 @@ export const register =
         `${API}/api/v1/user/auth/register`,
         userData
       );
+      
 
       setUserId(data.userId);
       setOtpToggle(true);
@@ -221,7 +222,7 @@ export const getUser = () => async (dispatch) => {
       `${API}/api/v1/user/auth/verify`,
       config
     );
-
+console.log("Verify API response:", data);
     dispatch(getUserSuccess(data.user));
   } catch {
     dispatch(getUserFail());
