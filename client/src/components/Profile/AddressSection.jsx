@@ -4,6 +4,7 @@ import AddAddressModal from "./AddAddressModal";
 
 const AddressSection = ({ addresses }) => {
   const [showModal, setShowModal] = useState(false);
+  const [editingAddress, setEditingAddress] = useState(null);
 
   return (
     <div className="space-y-6">
@@ -22,10 +23,14 @@ const AddressSection = ({ addresses }) => {
       <div className="grid md:grid-cols-2 gap-6">
         {addresses?.length > 0 ? (
           addresses.map((address) => (
-            <AddressCard
-              key={address._id}
-              address={address}
-            />
+           <AddressCard
+    key={address._id}
+    address={address}
+    onEdit={() => {
+      setEditingAddress(address);
+      setShowModal(true);
+    }}
+  />
           ))
         ) : (
           <p className="text-gray-500">
@@ -35,8 +40,14 @@ const AddressSection = ({ addresses }) => {
       </div>
 
       {showModal && (
-        <AddAddressModal close={() => setShowModal(false)} />
-      )}
+  <AddAddressModal
+    close={() => {
+      setShowModal(false);
+      setEditingAddress(null);
+    }}
+    address={editingAddress}
+  />
+)}
 
     </div>
   );
