@@ -33,13 +33,32 @@ const OrderTimeline = ({ order }) => {
     <div className="relative pl-8 border-l border-gray-200 py-4">
       <div className="absolute -left-2 top-4 w-4 h-4 bg-black rounded-full"></div>
 
-      <p className="font-medium">Order #{order.id}</p>
+      <p className="font-medium">Order #{order._id.slice(-6)}</p>
 
       <p className="text-sm text-[var(--color-accent)]">
-        {new Date(order.date).toLocaleDateString()}
+        {new Date(order.placedAt).toLocaleDateString()}
       </p>
 
-      <p className="text-sm mt-1">${order.total}</p>
+      <p className="text-sm mt-1">₹{order.totalAmount}</p>
+
+      <p
+        className={`text-xs mt-1 capitalize ${
+          order.orderStatus === "delivered"
+            ? "text-green-600"
+            : order.orderStatus === "cancelled"
+            ? "text-red-600"
+            : "text-yellow-600"
+        }`}
+      >
+        {order.orderStatus}
+      </p>
+      {/* VIEW DETAILS LINK */}
+      <Link
+        to={`/order/${order._id}`}
+        className="text-blue-500 text-xs mt-2 inline-block hover:underline"
+      >
+        View Details
+      </Link>
     </div>
   );
 };
@@ -82,7 +101,7 @@ const Profile = () => {
     authLoading,
   } = useSelector((state) => state.user);
 
-  const orders = useSelector((state) => state.orders?.recentOrders) || [];
+const orders = useSelector((state) => state.order?.orders) || [];
 
   const [activeSection, setActiveSection] = useState("dashboard");
 
@@ -139,9 +158,7 @@ const Profile = () => {
         </div>
       ) : isLogin ? (
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-xl font-primary mb-8">
-            My Account
-          </h1>
+          <h1 className="text-xl font-primary mb-8">My Account</h1>
 
           <div className="flex flex-col md:flex-row gap-8 text-sm">
             {/* SIDEBAR */}
@@ -238,7 +255,9 @@ ${activeSection === item.id ? "bg-black text-white" : "hover:bg-gray-100"}`}
                       <FiTrendingUp size={22} />
 
                       <div>
-                        <p className="text-xl font-semibold">₹24K</p>
+                        <p className="text-xl font-semibold">
+  ₹{orders.reduce((acc, o) => acc + o.totalAmount, 0)}
+</p>
 
                         <p className="text-sm text-[var(--color-accent)]">
                           Spent
@@ -255,11 +274,9 @@ ${activeSection === item.id ? "bg-black text-white" : "hover:bg-gray-100"}`}
                     </h2>
 
                     {orders.length > 0 ? (
-                      orders
-                        .slice(0, 3)
-                        .map((order) => (
-                          <OrderTimeline key={order.id} order={order} />
-                        ))
+                      orders.slice(0, 3).map((order) => (
+  <OrderTimeline key={order._id} order={order} />
+))
                     ) : (
                       <p className="text-[var(--color-accent)]">
                         No recent orders
@@ -304,9 +321,9 @@ ${activeSection === item.id ? "bg-black text-white" : "hover:bg-gray-100"}`}
                   <h2 className="text-lg font-semibold mb-6">Order History</h2>
 
                   {orders.length > 0 ? (
-                    orders.map((order) => (
-                      <OrderTimeline key={order.id} order={order} />
-                    ))
+                   orders.map((order) => (
+  <OrderTimeline key={order._id} order={order} />
+))
                   ) : (
                     <p className="text-[var(--color-accent)]">No orders yet</p>
                   )}

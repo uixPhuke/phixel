@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 import {
   orderRequest,
   createOrderSuccess,
@@ -17,401 +17,493 @@ import {
   deleteOrderSuccess,
   processCancelledRefundSuccess,
   orderFail
-} from '../slices/orderSlice';
-import { toast } from 'react-hot-toast';
+} from "../slices/orderSlice";
 
-const API_URL = import.meta.env.VITE_API_KEY;
+import { toast } from "react-hot-toast";
 
-// Helper function to get auth config
-const getAuthConfig = () => ({
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem('token')}`,
-  }
-});
+const API = import.meta.env.VITE_API_KEY;
 
-// Action to create order (Razorpay integration)
+const config = {
+  withCredentials: true
+};
+
+
+// =========================
+// CREATE ORDER
+// =========================
+
 export const createOrder = (cartId, addressId, paymentData) => async (dispatch) => {
   try {
     dispatch(orderRequest());
 
     const { data } = await axios.post(
-      `${API_URL}/order/${cartId}/${addressId}`,
+      `${API}/api/v6/order/${cartId}/${addressId}`,
       paymentData,
-      getAuthConfig()
+      config
     );
 
     if (data.razorpayOrder) {
-      // Razorpay order created, return order data for payment
       dispatch(createOrderSuccess(data));
       return data.razorpayOrder;
     } else {
-      // Order created directly (COD or other methods)
       dispatch(confirmOrderSuccess(data.order));
-      toast.success('Order created successfully!');
+      toast.success("Order created successfully!");
       return data.order;
     }
+
   } catch (err) {
-    console.error('Create Order Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         err.response?.data?.message || 
-                         'Failed to create order. Please try again.';
-    
-    dispatch(orderFail(errorMessage));
-    toast.error(errorMessage);
-    throw errorMessage;
+
+    const message =
+      err.response?.data?.error ||
+      err.response?.data?.message ||
+      "Failed to create order.";
+
+    dispatch(orderFail(message));
+    toast.error(message);
+    throw message;
   }
 };
 
-// Action to confirm order after Razorpay payment
+
+// =========================
+// CONFIRM ORDER (RAZORPAY)
+// =========================
+
 export const confirmOrder = (cartId, addressId, razorpayData) => async (dispatch) => {
   try {
+
     dispatch(orderRequest());
 
     const { data } = await axios.post(
-      `${API_URL}/order/${cartId}/${addressId}`,
+      `${API}/api/v6/order/${cartId}/${addressId}`,
       {
         ...razorpayData,
-        paymentMethod: 'razorpay'
+        paymentMethod: "razorpay"
       },
-      getAuthConfig()
+      config
     );
 
     dispatch(confirmOrderSuccess(data.order));
-    toast.success('Order confirmed successfully!');
+
+    toast.success("Order confirmed successfully!");
+
     return data.order;
+
   } catch (err) {
-    console.error('Confirm Order Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to confirm order. Please try again.';
-    
-    dispatch(orderFail(errorMessage));
-    toast.error(errorMessage);
-    throw errorMessage;
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to confirm order.";
+
+    dispatch(orderFail(message));
+    toast.error(message);
+    throw message;
   }
 };
 
-// Action to get user orders
+
+// =========================
+// GET USER ORDERS
+// =========================
+
 export const getUserOrders = () => async (dispatch) => {
+
   try {
+
     dispatch(orderRequest());
 
     const { data } = await axios.get(
-      `${API_URL}/order/user`,
-      getAuthConfig()
+      `${API}/api/v6/order/user`,
+      config
     );
 
     dispatch(getUserOrdersSuccess(data.orders));
+
   } catch (err) {
-    console.error('Get User Orders Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to fetch orders. Please try again.';
-    
-    dispatch(orderFail(errorMessage));
-    
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to fetch orders.";
+
+    dispatch(orderFail(message));
+
     if (err.response?.status !== 404) {
-      toast.error(errorMessage);
+      toast.error(message);
     }
   }
 };
 
-// Action to get specific order by ID
+
+// =========================
+// GET ORDER BY ID
+// =========================
+
 export const getOrderById = (orderId) => async (dispatch) => {
+
   try {
+
     dispatch(orderRequest());
 
     const { data } = await axios.get(
-      `${API_URL}/order/user/${orderId}`,
-      getAuthConfig()
+      `${API}/api/v6/order/user/${orderId}`,
+      config
     );
 
     dispatch(getOrderByIdSuccess(data.orders[0]));
+
   } catch (err) {
-    console.error('Get Order By ID Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to fetch order details.';
-    
-    dispatch(orderFail(errorMessage));
-    
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to fetch order details.";
+
+    dispatch(orderFail(message));
+
     if (err.response?.status === 404) {
-      toast.error('Order not found');
+      toast.error("Order not found");
     }
   }
 };
 
-// Admin: Get all orders
+
+// =========================
+// ADMIN: GET ALL ORDERS
+// =========================
+
 export const getAllOrders = () => async (dispatch) => {
+
   try {
+
     dispatch(orderRequest());
 
     const { data } = await axios.get(
-      `${API_URL}/order/admin`,
-      getAuthConfig()
+      `${API}/api/v6/order/admin`,
+      config
     );
 
     dispatch(getAllOrdersSuccess(data.orders));
+
   } catch (err) {
-    console.error('Get All Orders Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to fetch orders.';
-    
-    dispatch(orderFail(errorMessage));
-    
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to fetch orders.";
+
+    dispatch(orderFail(message));
+
     if (err.response?.status === 401) {
-      toast.error('Unauthorized access');
+      toast.error("Unauthorized access");
     }
   }
 };
 
-// Admin: Get order by ID
+
+// =========================
+// ADMIN: GET ORDER BY ID
+// =========================
+
 export const getAdminOrderById = (orderId) => async (dispatch) => {
+
   try {
+
     dispatch(orderRequest());
 
     const { data } = await axios.get(
-      `${API_URL}/order/admin/${orderId}`,
-      getAuthConfig()
+      `${API}/api/v6/order/admin/${orderId}`,
+      config
     );
 
     dispatch(getAdminOrderByIdSuccess(data.order));
+
   } catch (err) {
-    console.error('Get Admin Order Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to fetch order details.';
-    
-    dispatch(orderFail(errorMessage));
-    
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to fetch order details.";
+
+    dispatch(orderFail(message));
+
     if (err.response?.status === 404) {
-      toast.error('Order not found');
+      toast.error("Order not found");
     }
   }
 };
 
-// Admin: Update order status
+
+// =========================
+// ADMIN: UPDATE ORDER STATUS
+// =========================
+
 export const updateOrderStatus = (orderId, statusData) => async (dispatch) => {
+
   try {
+
     dispatch(orderRequest());
 
     const { data } = await axios.put(
-      `${API_URL}/order/admin/status/${orderId}`,
+      `${API}/api/v6/order/admin/status/${orderId}`,
       statusData,
-      getAuthConfig()
+      config
     );
 
     dispatch(updateOrderStatusSuccess(data.order));
-    toast.success('Order status updated successfully!');
+
+    toast.success("Order status updated successfully!");
+
   } catch (err) {
-    console.error('Update Order Status Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to update order status.';
-    
-    dispatch(orderFail(errorMessage));
-    toast.error(errorMessage);
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to update order status.";
+
+    dispatch(orderFail(message));
+    toast.error(message);
   }
 };
 
-// Action to cancel order
+
+// =========================
+// CANCEL ORDER
+// =========================
+
 export const cancelOrder = (orderId) => async (dispatch) => {
+
   try {
+
     dispatch(orderRequest());
 
     const { data } = await axios.put(
-      `${API_URL}/order/cancel/${orderId}`,
+      `${API}/api/v6/order/cancel/${orderId}`,
       {},
-      getAuthConfig()
+      config
     );
 
     dispatch(cancelOrderSuccess(data.order));
-    toast.success('Order cancelled successfully!');
+
+    toast.success("Order cancelled successfully!");
+
   } catch (err) {
-    console.error('Cancel Order Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to cancel order.';
-    
-    dispatch(orderFail(errorMessage));
-    toast.error(errorMessage);
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to cancel order.";
+
+    dispatch(orderFail(message));
+    toast.error(message);
   }
 };
 
-// Action to request return
+
+// =========================
+// REQUEST RETURN
+// =========================
+
 export const requestReturn = (orderId, returnReason) => async (dispatch) => {
+
   try {
+
     dispatch(orderRequest());
 
     const { data } = await axios.put(
-      `${API_URL}/order/return/${orderId}`,
+      `${API}/api/v6/order/return/${orderId}`,
       { returnReason },
-      getAuthConfig()
+      config
     );
 
     dispatch(requestReturnSuccess(data.order));
-    toast.success('Return request submitted successfully!');
+
+    toast.success("Return request submitted successfully!");
+
   } catch (err) {
-    console.error('Request Return Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to submit return request.';
-    
-    dispatch(orderFail(errorMessage));
-    toast.error(errorMessage);
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to submit return request.";
+
+    dispatch(orderFail(message));
+    toast.error(message);
   }
 };
 
-// Admin: Update return status
-export const updateReturnStatus = (orderId, returnStatus) => async (dispatch) => {
-  try {
-    dispatch(orderRequest());
 
-    const { data } = await axios.put(
-      `${API_URL}/order/admin/return/${orderId}`,
-      { returnStatus },
-      getAuthConfig()
-    );
+// =========================
+// USER RETURN ORDERS
+// =========================
 
-    dispatch(updateReturnStatusSuccess(data.order));
-    toast.success(`Return request ${returnStatus} successfully!`);
-  } catch (err) {
-    console.error('Update Return Status Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to update return status.';
-    
-    dispatch(orderFail(errorMessage));
-    toast.error(errorMessage);
-  }
-};
-
-// Admin: Process refund
-export const processRefund = (orderId, refundStatus) => async (dispatch) => {
-  try {
-    dispatch(orderRequest());
-
-    const { data } = await axios.put(
-      `${API_URL}/order/admin/refund/${orderId}`,
-      { refundStatus },
-      getAuthConfig()
-    );
-
-    dispatch(processRefundSuccess(data.order));
-    toast.success(`Refund ${refundStatus} successfully!`);
-  } catch (err) {
-    console.error('Process Refund Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to process refund.';
-    
-    dispatch(orderFail(errorMessage));
-    toast.error(errorMessage);
-  }
-};
-
-// Action to get user return orders
 export const getUserReturnOrders = () => async (dispatch) => {
+
   try {
+
     dispatch(orderRequest());
 
     const { data } = await axios.get(
-      `${API_URL}/order/user/returns`,
-      getAuthConfig()
+      `${API}/api/v6/order/user/returns`,
+      config
     );
 
     dispatch(getUserReturnOrdersSuccess(data.returnOrders));
+
   } catch (err) {
-    console.error('Get User Return Orders Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to fetch return orders.';
-    
-    dispatch(orderFail(errorMessage));
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to fetch return orders.";
+
+    dispatch(orderFail(message));
   }
 };
 
-// Admin: Get all return orders
+
+// =========================
+// ADMIN: GET ALL RETURNS
+// =========================
+
 export const getAllReturnOrders = () => async (dispatch) => {
+
   try {
+
     dispatch(orderRequest());
 
     const { data } = await axios.get(
-      `${API_URL}/order/admin/returns/all`,
-      getAuthConfig()
+      `${API}/api/v6/order/admin/returns/all`,
+      config
     );
 
     dispatch(getAllReturnOrdersSuccess(data.returnOrders));
+
   } catch (err) {
-    console.error('Get All Return Orders Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to fetch return orders.';
-    
-    dispatch(orderFail(errorMessage));
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to fetch return orders.";
+
+    dispatch(orderFail(message));
   }
 };
 
-// Action to delete order
-export const deleteOrder = (orderId) => async (dispatch) => {
+
+// =========================
+// ADMIN: UPDATE RETURN STATUS
+// =========================
+
+export const updateReturnStatus = (orderId, returnStatus) => async (dispatch) => {
+
   try {
-    dispatch(orderRequest());
 
-    const { data } = await axios.delete(
-      `${API_URL}/order/${orderId}`,
-      getAuthConfig()
-    );
-
-    dispatch(deleteOrderSuccess(orderId));
-    toast.success('Order deleted successfully!');
-  } catch (err) {
-    console.error('Delete Order Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to delete order.';
-    
-    dispatch(orderFail(errorMessage));
-    toast.error(errorMessage);
-  }
-};
-
-// Admin: Process cancelled refund
-export const processCancelledRefund = (orderId, refundStatus) => async (dispatch) => {
-  try {
     dispatch(orderRequest());
 
     const { data } = await axios.put(
-      `${API_URL}/order/admin/refund/cancelled/${orderId}`,
-      { refundStatus },
-      getAuthConfig()
+      `${API}/api/v6/order/admin/return/${orderId}`,
+      { returnStatus },
+      config
     );
 
-    dispatch(processCancelledRefundSuccess(data.order));
-    toast.success(`Refund ${refundStatus} successfully!`);
+    dispatch(updateReturnStatusSuccess(data.order));
+
+    toast.success(`Return request ${returnStatus} successfully!`);
+
   } catch (err) {
-    console.error('Process Cancelled Refund Error:', err);
-    
-    const errorMessage = err.response?.data?.error || 
-                         'Failed to process refund.';
-    
-    dispatch(orderFail(errorMessage));
-    toast.error(errorMessage);
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to update return status.";
+
+    dispatch(orderFail(message));
+    toast.error(message);
   }
 };
 
-// Helper action to clear order state
-export const clearOrder = () => (dispatch) => {
-  dispatch(clearOrderState());
+
+// =========================
+// ADMIN: PROCESS REFUND
+// =========================
+
+export const processRefund = (orderId, refundStatus) => async (dispatch) => {
+
+  try {
+
+    dispatch(orderRequest());
+
+    const { data } = await axios.put(
+      `${API}/api/v6/order/admin/refund/${orderId}`,
+      { refundStatus },
+      config
+    );
+
+    dispatch(processRefundSuccess(data.order));
+
+    toast.success(`Refund ${refundStatus} successfully!`);
+
+  } catch (err) {
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to process refund.";
+
+    dispatch(orderFail(message));
+    toast.error(message);
+  }
 };
 
-// Helper action to clear orders list
-export const clearOrders = () => (dispatch) => {
-  dispatch(clearOrdersState());
+
+// =========================
+// ADMIN: PROCESS CANCELLED REFUND
+// =========================
+
+export const processCancelledRefund = (orderId, refundStatus) => async (dispatch) => {
+
+  try {
+
+    dispatch(orderRequest());
+
+    const { data } = await axios.put(
+      `${API}/api/v6/order/admin/refund/cancelled/${orderId}`,
+      { refundStatus },
+      config
+    );
+
+    dispatch(processCancelledRefundSuccess(data.order));
+
+    toast.success(`Refund ${refundStatus} successfully!`);
+
+  } catch (err) {
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to process refund.";
+
+    dispatch(orderFail(message));
+    toast.error(message);
+  }
 };
 
-// Helper action to clear admin orders
-export const clearAdminOrders = () => (dispatch) => {
-  dispatch(clearAdminOrdersState());
+
+// =========================
+// DELETE ORDER
+// =========================
+
+export const deleteOrder = (orderId) => async (dispatch) => {
+
+  try {
+
+    dispatch(orderRequest());
+
+    await axios.delete(
+      `${API}/api/v6/order/${orderId}`,
+      config
+    );
+
+    dispatch(deleteOrderSuccess(orderId));
+
+    toast.success("Order deleted successfully!");
+
+  } catch (err) {
+
+    const message =
+      err.response?.data?.error ||
+      "Failed to delete order.";
+
+    dispatch(orderFail(message));
+    toast.error(message);
+  }
 };
