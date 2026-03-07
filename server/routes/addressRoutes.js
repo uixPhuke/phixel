@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { createAddress, getAddresses, updateAddress, deleteAddress } = require('../controllers/addressCtrl');
+const { createAddress, getAddresses, updateAddress, deleteAddress,setDefaultAddress } = require('../controllers/addressCtrl');
 const { isAuthenticated } = require('../middlewares/auth');
 // Route to add a new address
 router.post('/add', isAuthenticated, createAddress);
@@ -11,5 +11,8 @@ router.get('/', isAuthenticated, getAddresses);
 router.put('/:id', isAuthenticated, updateAddress);
 // Route to delete an address by ID
 router.delete('/:id', isAuthenticated, deleteAddress);
+//Route to set default address
+router.put('/default/:id', isAuthenticated, setDefaultAddress);
+
 // Export the router
 module.exports = router;
