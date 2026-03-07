@@ -8,6 +8,7 @@ import { getUserOrders } from "../../actions/orderActions";
 import { Loader } from "../../components/Global/Loader";
 import { UnAuthorized } from "../../components/Global/UnAuthorized";
 import { getWishlist } from "../../actions/wishlistActions";
+import { addAddress,getAddresses } from "../../actions/addressActions";
 
 
 import {
@@ -103,7 +104,25 @@ const Profile = () => {
     loading,
     authLoading,
   } = useSelector((state) => state.user);
+  const [showAddressForm, setShowAddressForm] = useState(false);
 
+const [newAddress, setNewAddress] = useState({
+  name: "",
+  mobileNo: "",
+  address: "",
+  city: "",
+  state: "",
+  pinCode: "",
+  country: "",
+  landmark: "",
+});
+
+const handleAddressChange = (e) => {
+  setNewAddress({
+    ...newAddress,
+    [e.target.name]: e.target.value,
+  });
+};
 const addresses = useSelector((state) => state.address?.addresses) || [];
 const wishlist = useSelector((state) => state.wishlist?.wishlistItems) || [];
 
@@ -117,6 +136,7 @@ const orders = useSelector((state) => state.order?.orders) || [];
     dispatch(getUser());
     dispatch(getUserOrders());
      dispatch(getWishlist());
+     dispatch(getAddresses());
   }, [dispatch]);
 
   useEffect(() => {
@@ -250,7 +270,7 @@ ${activeSection === item.id ? "bg-black text-white" : "hover:bg-gray-100"}`}
                       <FiHeart size={22} />
 
                       <div>
-                        <p className="text-xl font-semibold">12</p>
+                        <p className="text-xl font-semibold">{wishlist.length}</p>
 
                         <p className="text-sm text-[var(--color-accent)]">
                           Wishlist
@@ -340,16 +360,22 @@ ${activeSection === item.id ? "bg-black text-white" : "hover:bg-gray-100"}`}
               {/* ADDRESSES */}
 
               {activeSection === "addresses" && (
-                <div className="grid md:grid-cols-2 gap-6">
-                  {sampleAddresses.map((address) => (
-                    <AddressCard
-                      key={address.id}
-                      address={address}
-                      isDefault={address.isDefault}
-                    />
-                  ))}
-                </div>
-              )}
+  <div className="grid md:grid-cols-2 gap-6">
+    {addresses.length > 0 ? (
+      addresses.map((address) => (
+        <AddressCard
+          key={address._id}
+          address={address}
+          isDefault={address.isDefault}
+        />
+      ))
+    ) : (
+      <p className="text-[var(--color-accent)]">
+        No addresses added yet
+      </p>
+    )}
+  </div>
+)}
 
               {/* PAYMENTS */}
 
