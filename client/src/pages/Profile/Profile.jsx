@@ -7,6 +7,8 @@ import { getUserOrders } from "../../actions/orderActions";
 
 import { Loader } from "../../components/Global/Loader";
 import { UnAuthorized } from "../../components/Global/UnAuthorized";
+import { getWishlist } from "../../actions/wishlistActions";
+
 
 import {
   FiHome,
@@ -18,6 +20,7 @@ import {
   FiShoppingCart,
   FiTrendingUp,
 } from "react-icons/fi";
+
 
 const getInitials = (firstName, lastName) => {
   if (!firstName || !lastName) return "";
@@ -101,6 +104,9 @@ const Profile = () => {
     authLoading,
   } = useSelector((state) => state.user);
 
+const addresses = useSelector((state) => state.address?.addresses) || [];
+const wishlist = useSelector((state) => state.wishlist?.wishlistItems) || [];
+
 const orders = useSelector((state) => state.order?.orders) || [];
 
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -110,6 +116,7 @@ const orders = useSelector((state) => state.order?.orders) || [];
   useEffect(() => {
     dispatch(getUser());
     dispatch(getUserOrders());
+     dispatch(getWishlist());
   }, [dispatch]);
 
   useEffect(() => {
@@ -363,21 +370,60 @@ ${activeSection === item.id ? "bg-black text-white" : "hover:bg-gray-100"}`}
               {/* WISHLIST */}
 
               {activeSection === "wishlist" && (
-                <div className="text-center py-12">
-                  <FiHeart size={28} className="mx-auto mb-4" />
+  <div className="grid md:grid-cols-3 gap-6">
 
-                  <p className="text-[var(--color-accent)] mb-4">
-                    Your wishlist is empty
-                  </p>
+    {wishlist.length > 0 ? (
+      wishlist.map((item) => (
 
-                  <Link
-                    to="/products"
-                    className="bg-black text-white px-6 py-2 rounded-lg"
-                  >
-                    Browse Products
-                  </Link>
-                </div>
-              )}
+        <div
+          key={item._id}
+          className="border rounded-xl p-4 bg-white"
+        >
+          <img
+            src={item.images[0]?.url}
+            alt={item.title}
+            className="w-full h-40 object-cover rounded"
+          />
+
+          <h3 className="mt-3 font-semibold">
+            {item.title}
+          </h3>
+
+          <p className="text-sm text-gray-500">
+            ₹{item.sellingPrice}
+          </p>
+
+          <Link
+            to={`/products/${item._id}`}
+            className="text-blue-500 text-sm"
+          >
+            View Product
+          </Link>
+
+        </div>
+
+      ))
+    ) : (
+
+      <div className="text-center col-span-3 py-12">
+        <FiHeart size={28} className="mx-auto mb-4" />
+
+        <p className="text-[var(--color-accent)] mb-4">
+      Your wishlist is empty
+    </p>
+
+    <Link
+      to="/products"
+      className="bg-black text-white px-6 py-2 rounded-lg"
+    >
+      Browse Products
+    </Link>
+      </div>
+
+    )}
+
+  </div>
+)}
             </div>
           </div>
         </div>
