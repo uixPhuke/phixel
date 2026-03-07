@@ -9,7 +9,7 @@ import { Loader } from "../../components/Global/Loader";
 import { UnAuthorized } from "../../components/Global/UnAuthorized";
 import { getWishlist } from "../../actions/wishlistActions";
 import { addAddress,getAddresses } from "../../actions/addressActions";
-
+import AddressSection from "../../components/Profile/AddressSection";
 
 import {
   FiHome,
@@ -104,18 +104,8 @@ const Profile = () => {
     loading,
     authLoading,
   } = useSelector((state) => state.user);
-  const [showAddressForm, setShowAddressForm] = useState(false);
 
-const [newAddress, setNewAddress] = useState({
-  name: "",
-  mobileNo: "",
-  address: "",
-  city: "",
-  state: "",
-  pinCode: "",
-  country: "",
-  landmark: "",
-});
+
 
 const handleAddressChange = (e) => {
   setNewAddress({
@@ -124,6 +114,7 @@ const handleAddressChange = (e) => {
   });
 };
 const addresses = useSelector((state) => state.address?.addresses) || [];
+console.log("Addresses from Redux:", addresses);
 const wishlist = useSelector((state) => state.wishlist?.wishlistItems) || [];
 
 const orders = useSelector((state) => state.order?.orders) || [];
@@ -153,19 +144,7 @@ const orders = useSelector((state) => state.order?.orders) || [];
     );
   }
 
-  const sampleAddresses = [
-    {
-      id: 1,
-      name: `${firstUpper(user.firstName)} ${firstUpper(user.lastName)}`,
-      street: "123 Main Street",
-      city: "New York",
-      state: "NY",
-      zipCode: "10001",
-      country: "United States",
-      phone: user.phoneNo || "+1 (555) 123-4567",
-      isDefault: true,
-    },
-  ];
+  
 
   const samplePaymentMethods = [
     {
@@ -360,21 +339,8 @@ ${activeSection === item.id ? "bg-black text-white" : "hover:bg-gray-100"}`}
               {/* ADDRESSES */}
 
               {activeSection === "addresses" && (
-  <div className="grid md:grid-cols-2 gap-6">
-    {addresses.length > 0 ? (
-      addresses.map((address) => (
-        <AddressCard
-          key={address._id}
-          address={address}
-          isDefault={address.isDefault}
-        />
-      ))
-    ) : (
-      <p className="text-[var(--color-accent)]">
-        No addresses added yet
-      </p>
-    )}
-  </div>
+   <AddressSection addresses={addresses} />
+   
 )}
 
               {/* PAYMENTS */}

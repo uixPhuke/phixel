@@ -7,17 +7,23 @@ const AddressCard = ({ address }) => {
   const dispatch = useDispatch();
 
   const handleDelete = () => {
-    dispatch(deleteAddress(address._id));
+    if (window.confirm("Delete this address?")) {
+      dispatch(deleteAddress(address._id));
+    }
   };
 
   return (
     <div className="border rounded-xl p-5 bg-white hover:shadow-md transition">
 
-      <p className="font-semibold">{address.name}</p>
+      {address.isDefault && (
+        <span className="text-xs bg-black text-white px-2 py-1 rounded">
+          Default
+        </span>
+      )}
 
-      <p className="text-sm text-gray-500">
-        {address.address}
-      </p>
+      <p className="font-semibold mt-2">{address.name}</p>
+
+      <p className="text-sm text-gray-500">{address.address}</p>
 
       <p className="text-sm text-gray-500">
         {address.city}, {address.state}
