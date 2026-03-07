@@ -131,28 +131,29 @@ export const deleteAddress = (addressId) => async (dispatch) => {
 // Action to set default address (if you implement this later)
 export const setDefaultAddress = (addressId) => async (dispatch) => {
   try {
+
     dispatch(addressRequest());
 
-    // This would call your setDefaultAddress endpoint when implemented
-    // const { data } = await axios.patch(
-    //   `${API_URL}/address/${addressId}/default`,
-    //   {},
-    //   getAuthConfig()
-    // );
+    await axios.put(
+      `${API_URL}/api/v2/address/default/${addressId}`,
+      {},
+      getAuthConfig()
+    );
 
-    // For now, we'll update the local state
-    // dispatch(updateAddressSuccess(data.address));
-    toast.success('Default address set successfully!');
-    
-    // Refresh addresses to get updated default status
     dispatch(getAddresses());
+
+    toast.success("Default address set successfully");
+
   } catch (err) {
-    console.error('Set Default Address Error:', err);
-    
-    const errorMessage = err.response?.data?.message || 
-                         'Failed to set default address. Please try again.';
-    
+
+    console.error("Set Default Address Error:", err);
+
+    const errorMessage =
+      err.response?.data?.message ||
+      "Failed to set default address.";
+
     dispatch(addressFail(errorMessage));
     toast.error(errorMessage);
+
   }
 };
