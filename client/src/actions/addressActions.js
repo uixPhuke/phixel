@@ -13,9 +13,9 @@ const API_URL = import.meta.env.VITE_API_KEY;
 
 // Helper function to get auth config
 const getAuthConfig = () => ({
-headers: {
-    Authorization: `Bearer ${localStorage.getItem('token')}`,
-   },
+// headers: {
+//     Authorization: `Bearer ${localStorage.getItem('token')}`,
+//    },
   withCredentials: true// Include cookies for authentication
 });
 
@@ -61,8 +61,10 @@ export const getAddresses = () => async (dispatch) => {
     const { data } = await axios.get(
       `${API_URL}/api/v2/address`,
       getAuthConfig()
+
     );
 
+    console.log("Address API response:", data);
     dispatch(getAddressesSuccess(data.addresses));
   } catch (err) {
     console.error('Get Addresses Error:', err);
