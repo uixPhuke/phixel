@@ -15,15 +15,19 @@ import {
   editUserRequest,
   editUserSuccess,
   editUserFail,
-  setShowLoginModalTrue,
   getUsersRequest,
   getUsersSuccess,
   getUsersFail,
 } from "../slices/userSlice";
+
 import { toast } from "react-hot-toast";
 import { signInSignUpWithFacebook, signInSignUpWithGoogle } from "../firebase";
 
-const API_KEY = import.meta.env.VITE_API_KEY;
+const API = import.meta.env.VITE_API_KEY;
+
+const config = {
+  withCredentials: true,
+};
 
 /* =========================
    LOGIN
@@ -32,67 +36,80 @@ export const login = (userData, callback) => async (dispatch) => {
   try {
     dispatch(loginRequest());
 
-    await axios.post(
-      `${API_KEY}/api/v1/user/auth/login`,
-      userData,
-      { withCredentials: true }
-    );
+    await axios.post(`${API}/api/v1/user/auth/login`, userData, config);
 
     dispatch(loginSuccess());
     dispatch(verify());
 
     toast.success("Login successful");
 
-    if (typeof callback === "function") {
-      callback(true);
-    }
+    callback?.(true);
   } catch (err) {
-    const message =
-      err.response?.data?.message || "Login failed";
-    dispatch(loginFail(message));
+    const message = err.response?.data?.message || "Login failed";
 
-    if (typeof callback === "function") {
-      callback(false, message);
-    }
+    dispatch(loginFail(message));
+    callback?.(false, message);
   }
 };
 
 /* =========================
    REGISTER
 ========================= */
+
 export const register =
   (userData, setOtpToggle, setUserId) => async (dispatch) => {
     try {
       dispatch(registerRequest());
 
       const { data } = await axios.post(
-        `${API_KEY}/api/v1/user/auth/register`,
+        `${API}/api/v1/user/auth/register`,
         userData
       );
 
       setUserId(data.userId);
       setOtpToggle(true);
 
-      toast.success("OTP sent to your email");
+      toast.success("OTP sent to email");
     } catch (err) {
-      const message =
-        err.response?.data?.message ||
-        "Registration failed";
+      const message = err.response?.data?.message || "Registration failed";
+
       dispatch(registerFail(message));
       toast.error(message);
     }
   };
 
+
+  /* =========================
+   RESEND OTP
+========================= */
+
+export const resendOtp = (username, password) => async () => {
+  try {
+    await axios.post(
+      `${API}/api/v1/user/auth/resend-otp`,
+      { username, password }
+    );
+
+    toast.success("OTP has been resent successfully");
+
+  } catch (err) {
+
+    const message =
+      err.response?.data?.message ||
+      "Failed to resend OTP";
+
+    toast.error(message);
+  }
+};
+
 /* =========================
    VERIFY OTP
 ========================= */
+
 export const verifyOtp =
   (userId, otp, setSuccessToggle) => async (dispatch) => {
     try {
-      await axios.post(
-        `${API_KEY}/api/v1/user/auth/verify-otp`,
-        { userId, otp }
-      );
+      await axios.post(`${API}/api/v1/user/auth/verify-otp`, { userId, otp });
 
       dispatch(registerSuccess());
       dispatch(verify());
@@ -100,47 +117,40 @@ export const verifyOtp =
       toast.success("Account verified successfully");
       setSuccessToggle(true);
     } catch (err) {
-      const message =
-        err.response?.data?.message ||
-        "OTP verification failed";
+      const message = err.response?.data?.message || "OTP verification failed";
+
       dispatch(loginFail(message));
       toast.error(message);
     }
   };
 
-  /* =========================
+/* =========================
    LOGOUT
 ========================= */
+
 export const logout = () => async (dispatch) => {
   try {
-
-    await axios.post(
-      `${API_KEY}/api/v1/user/auth/logout`,
-      {},
-      { withCredentials: true }
-    );
+    await axios.post(`${API}/api/v1/user/auth/logout`, {}, config);
 
     dispatch(verifyLoginFail());
 
-    localStorage.removeItem("token");
-
     toast.success("Logged out successfully");
-
   } catch {
     toast.error("Logout failed");
   }
 };
 
 /* =========================
-   VERIFY AUTH (COOKIE)
+   VERIFY AUTH
 ========================= */
+
 export const verify = () => async (dispatch) => {
   try {
     dispatch(verifyLoginRequest());
 
     const { data } = await axios.get(
-      `${API_KEY}/api/v1/user/auth/verify`,
-      { withCredentials: true }
+      `${API}/api/v1/user/auth/verify`,
+      config
     );
 
     dispatch(verifyLoginSuccess(data));
@@ -152,14 +162,15 @@ export const verify = () => async (dispatch) => {
 /* =========================
    GOOGLE AUTH
 ========================= */
+
 export const googleAuth = (callback) => async (dispatch) => {
   try {
     const token = await signInSignUpWithGoogle();
 
     await axios.post(
-      `${API_KEY}/api/v1/user/auth/firebase`,
+      `${API}/api/v1/user/auth/firebase`,
       { token },
-      { withCredentials: true }
+      config
     );
 
     dispatch(loginSuccess());
@@ -174,35 +185,17 @@ export const googleAuth = (callback) => async (dispatch) => {
 };
 
 /* =========================
-   RESEND OTP
-========================= */
-export const resendOtp = (username, password) => async (dispatch) => {
-  try {
-    await axios.post(
-      `${API_KEY}/api/v1/user/auth/resend-otp`,
-      { username, password }
-    );
-
-    toast.success("OTP has been resent successfully");
-  } catch (err) {
-    const message =
-      err.response?.data?.message ||
-      "Failed to resend OTP";
-    toast.error(message);
-  }
-};
-
-/* =========================
    FACEBOOK AUTH
 ========================= */
+
 export const facebookAuth = (callback) => async (dispatch) => {
   try {
     const token = await signInSignUpWithFacebook();
 
     await axios.post(
-      `${API_KEY}/api/v1/user/auth/firebase`,
+      `${API}/api/v1/user/auth/firebase`,
       { token },
-      { withCredentials: true }
+      config
     );
 
     dispatch(loginSuccess());
@@ -219,13 +212,14 @@ export const facebookAuth = (callback) => async (dispatch) => {
 /* =========================
    GET USER
 ========================= */
+
 export const getUser = () => async (dispatch) => {
   try {
     dispatch(getUserRequest());
 
     const { data } = await axios.get(
-      `${API_KEY}/api/v1/user/user`,
-      { withCredentials: true }
+      `${API}/api/v1/user/auth/verify`,
+      config
     );
 
     dispatch(getUserSuccess(data.user));
@@ -235,15 +229,16 @@ export const getUser = () => async (dispatch) => {
 };
 
 /* =========================
-   GET ALL USERS (ADMIN)
+   GET ALL USERS
 ========================= */
+
 export const getAllUsers = () => async (dispatch) => {
   try {
     dispatch(getUsersRequest());
 
     const { data } = await axios.get(
-      `${API_KEY}/api/v1/user/users`,
-      { withCredentials: true }
+      `${API}/api/v1/user/users`,
+      config
     );
 
     dispatch(getUsersSuccess(data.users));
@@ -255,15 +250,16 @@ export const getAllUsers = () => async (dispatch) => {
 /* =========================
    EDIT PROFILE
 ========================= */
+
 export const editProfile =
   (updatedUserData) => async (dispatch) => {
     try {
       dispatch(editUserRequest());
 
       await axios.put(
-        `${API_KEY}/api/v1/user/user/update`,
+        `${API}/api/v1/user/update`,
         updatedUserData,
-        { withCredentials: true }
+        config
       );
 
       dispatch(editUserSuccess());
@@ -272,8 +268,8 @@ export const editProfile =
       toast.success("Profile updated successfully");
     } catch (err) {
       const message =
-        err.response?.data?.message ||
-        "Profile update failed";
+        err.response?.data?.message || "Profile update failed";
+
       dispatch(editUserFail(message));
       toast.error(message);
     }
