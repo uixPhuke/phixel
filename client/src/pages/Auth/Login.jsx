@@ -33,7 +33,7 @@ export const Login = ({ setToggleAuth, handleOnClose }) => {
       if (user?.isAdmin) {
         navigate("/admin/dashboard");
       } else {
-        navigate("/products");
+        navigate("/");
       }
     } else {
       setErrorMessage(error || "Invalid email/username or password");
