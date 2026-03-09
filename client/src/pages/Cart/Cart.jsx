@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+
 import { useDispatch, useSelector } from "react-redux";
 import {
   getCart,
@@ -12,6 +13,13 @@ import {
 import { formatPrice } from "../../utils/productHelpers";
 import { IoTrashBinOutline } from "react-icons/io5";
 import { FaPlus, FaMinus, FaRegHeart } from "react-icons/fa";
+import {
+  applyCoupon,
+  removeCoupon,
+  getAllCoupons,
+  removeAppliedCoupon
+} from "../../actions/couponActions";
+import { addToCart } from "../../actions/cartActions";
 
 const CartPage = () => {
   const dispatch = useDispatch();
@@ -21,22 +29,53 @@ const CartPage = () => {
   );
 
   const token = localStorage.getItem("token");
+  const { appliedCoupon, coupons } = useSelector((state) => state.coupon);
+  const [couponCode, setCouponCode] = useState("");
+  const [showCoupons, setShowCoupons] = useState(false);
+  const { isLogin } = useSelector((state) => state.user);
+  console.log("LOGIN STATE:", isLogin);
+  const handleApplyCoupon = () => {
+    if (!couponCode.trim()) return;
+
+    dispatch(applyCoupon(couponCode));
+  };
+
+  const handleRemoveCoupon = () => {
+    dispatch(removeCoupon());
+    setCouponCode("");
+  };
 
   // ============================
   // AUTO LOAD + AUTO SYNC
   // ============================
   useEffect(() => {
-    if (token && guestCartItems.length > 0) {
-      dispatch(syncGuestCart(guestCartItems));
-    } else if (token) {
+    console.log("CartPage useEffect triggered");
+
+    if (isLogin) {
+      console.log("User logged in");
+
+      const localGuestCart =
+        guestCartItems.length > 0
+          ? guestCartItems
+          : JSON.parse(localStorage.getItem("guestCart")) || [];
+
+      console.log("LOCAL GUEST CART:", localGuestCart);
+
+      if (localGuestCart.length > 0) {
+        console.log("SYNCING GUEST CART");
+        dispatch(syncGuestCart(localGuestCart));
+      }
+
       dispatch(getCart());
     }
-  }, [dispatch, token]);
+
+    dispatch(getAllCoupons());
+  }, [dispatch, isLogin]);
 
   // ============================
   // Decide cart source
   // ============================
-  const itemsToShow = token ? cartItems : guestCartItems;
+  const itemsToShow = isLogin ? cartItems : guestCartItems;
 
   // ============================
   // UI SAFE TOTALS
@@ -50,7 +89,16 @@ const CartPage = () => {
     (sum, item) => sum + item.priceSnapshot * item.quantity,
     0,
   );
+let discountAmount = 0;
 
+if (appliedCoupon) {
+  if (appliedCoupon.discountType === "percentage") {
+    discountAmount =
+      (subtotalToShow * appliedCoupon.discountPercentage) / 100;
+  } else {
+    discountAmount = appliedCoupon.discountValue;
+  }
+}
   return (
     <div className="max-w-[1280px] mx-auto px-4 py-8 sm:py-10">
       <div className="grid lg:grid-cols-[65%_35%] gap-10 items-start">
@@ -67,7 +115,7 @@ const CartPage = () => {
             Items in your bag are not reserved — check out now.
           </p>
 
-          {loading && <p>Loading...</p>}
+          {/*loading && <p>Loading...</p>*/}
 
           {itemsToShow.length === 0 && (
             <p className="text-gray-500">Your cart is empty.</p>
@@ -79,7 +127,7 @@ const CartPage = () => {
 
               return (
                 <div
-                  key={`${token ? product._id : item.productID}-${item.size}`}
+                  key={`${isLogin ? product._id : item.productID}-${item.size}`}
                   className="flex flex-col sm:flex-row gap-4 border rounded-2xl  p-4 sm:p-6"
                 >
                   {/* IMAGE */}
@@ -109,9 +157,13 @@ const CartPage = () => {
                           className="w-6 h-6 flex items-center justify-center text-gray-700"
                           onClick={() =>
                             item.quantity === 1
-                              ? token
+                              ? isLogin
                                 ? dispatch(
-                                    removeFromCart(product._id, item.size),
+                                    addToCart({
+                                      productID: product._id,
+                                      size: item.size,
+                                      quantity: 0,
+                                    }),
                                   )
                                 : dispatch(
                                     removeFromGuestCart({
@@ -119,13 +171,13 @@ const CartPage = () => {
                                       size: item.size,
                                     }),
                                   )
-                              : token
+                              : isLogin
                                 ? dispatch(
-                                    updateCartQuantity(
-                                      product._id,
-                                      item.size,
-                                      item.quantity - 1,
-                                    ),
+                                    addToCart({
+                                      productID: product._id,
+                                      size: item.size,
+                                      quantity: item.quantity - 1,
+                                    }),
                                   )
                                 : dispatch(
                                     updateGuestQuantity({
@@ -152,13 +204,13 @@ const CartPage = () => {
                         <button
                           className="w-6 h-6 flex items-center justify-center text-gray-900"
                           onClick={() =>
-                            token
+                            isLogin
                               ? dispatch(
-                                  updateCartQuantity(
-                                    product._id,
-                                    item.size,
-                                    item.quantity + 1,
-                                  ),
+                                  addToCart({
+                                    productID: product._id,
+                                    size: item.size,
+                                    quantity: item.quantity + 1,
+                                  }),
                                 )
                               : dispatch(
                                   updateGuestQuantity({
@@ -218,7 +270,6 @@ const CartPage = () => {
                 </div>
               );
             })}
-            
           </div>
         </div>
 
@@ -237,29 +288,93 @@ const CartPage = () => {
               <span className="text-green-600">Free</span>
             </div>
 
+            {appliedCoupon && (
+              <div className="flex justify-between text-green-600">
+                <span>Coupon ({appliedCoupon.code})</span>
+               <span>- {formatPrice(discountAmount)}</span>
+              </div>
+            )}
+
             <div className="border-t pt-4 flex justify-between font-semibold">
               <span>Total</span>
-              <span>{formatPrice(subtotalToShow)}</span>
+              <span>
+                {appliedCoupon
+                  ? formatPrice(subtotalToShow - discountAmount)
+                  : formatPrice(subtotalToShow)}
+              </span>
             </div>
 
             <p className="text-xs text-gray-500">Inclusive of all taxes</p>
           </div>
 
+          {/* COUPON DROPDOWN */}
+          <div className="mt-6 border-t pt-6">
+            <button
+              onClick={() => setShowCoupons(!showCoupons)}
+              className="w-full flex justify-between items-center text-sm font-medium"
+            >
+              <span>Apply Coupon</span>
+              <span>{showCoupons ? "▲" : "▼"}</span>
+            </button>
+
+            {showCoupons && (
+              <div className="mt-4 space-y-3">
+                {/* MANUAL COUPON INPUT */}
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Enter coupon code"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    className="border px-3 py-2 rounded-lg w-full"
+                  />
+
+                  <button
+                    onClick={handleApplyCoupon}
+                    className="bg-black text-white px-4 py-2 rounded-lg"
+                  >
+                    Apply
+                  </button>
+                </div>
+
+                {/* AVAILABLE COUPONS */}
+
+                {coupons.map((coupon) => (
+                  <div
+                    key={coupon._id}
+                    className="flex justify-between items-center border rounded-lg p-3 bg-gray-50"
+                  >
+                    <div>
+                      <p className="font-semibold text-sm">{coupon.code}</p>
+
+                      <p className="text-xs text-gray-500">
+                        {coupon.discountType === "percentage"
+                          ? `${coupon.discountPercentage}% OFF`
+                          : `₹${coupon.discountValue} OFF`}
+                      </p>
+                    </div>
+
+                    <button
+  onClick={() =>
+    appliedCoupon?.code === coupon.code
+      ? dispatch(removeAppliedCoupon())
+      : dispatch(applyCoupon(coupon.code))
+  }
+  className="text-xs bg-black text-white px-3 py-1 rounded"
+>
+  {appliedCoupon?.code === coupon.code ? "Remove" : "Apply"}
+</button>
+                  </div>
+                ))}
+
+              </div>
+            )}
+          </div>
+
           <button className="w-full bg-black text-white text-sm py-4 mt-6 rounded-full hover:bg-gray-900">
             Checkout
           </button>
-
-          <div className="mt-6">
-            <p className="text-xs text-gray-500 mb-2">
-              ACCEPTED PAYMENT METHODS
-            </p>
-            <div className="flex gap-2 text-sm">
-              <span>VISA</span>
-              <span>Mastercard</span>
-              <span>RuPay</span>
-              <span>UPI</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
