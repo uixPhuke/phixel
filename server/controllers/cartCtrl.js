@@ -45,11 +45,18 @@ const addToDbCart = async (req, res) => {
     );
 
     if (itemIndex > -1) {
-      cart.products[itemIndex].quantity = Math.min(
-        cart.products[itemIndex].quantity + quantity,
-        product.stock
-      );
-    } else {
+
+  // Update quantity directly
+  const newQty = Math.min(quantity, product.stock);
+
+  if (newQty <= 0) {
+    // remove item if quantity becomes 0
+    cart.products.splice(itemIndex, 1);
+  } else {
+    cart.products[itemIndex].quantity = newQty;
+  }
+
+} else {
       cart.products.push({
         product: productID,
         quantity,
@@ -82,16 +89,26 @@ const addToDbCart = async (req, res) => {
 // ========================
 
 const syncGuestCart = async (req, res) => {
+
+  console.log("SYNC CART BODY:", req.body);
+
   const { guestCart } = req.body;
 
   try {
+
     let cart =
       (await Cart.findOne({ user: req.user._id })) ||
       new Cart({ user: req.user._id, products: [], totalPrice: 0 });
 
+    if (!cart.products) cart.products = [];
+
     for (const guestItem of guestCart) {
+
+      if (!guestItem.productID) continue;
+
       const product = await Product.findById(guestItem.productID);
-      if (!product || product.stock < 1) continue;
+
+      if (!product) continue;
 
       const existingItem = cart.products.find(
         (item) =>
@@ -99,19 +116,23 @@ const syncGuestCart = async (req, res) => {
           item.size === guestItem.size
       );
 
+      const quantity = Math.min(guestItem.quantity, product.stock);
+
       if (existingItem) {
-        existingItem.quantity = Math.min(
-          existingItem.quantity + guestItem.quantity,
-          product.stock
-        );
+
+        existingItem.quantity += quantity;
+
       } else {
+
         cart.products.push({
           product: guestItem.productID,
-          quantity: Math.min(guestItem.quantity, product.stock),
+          quantity,
           size: guestItem.size,
           priceSnapshot: product.sellingPrice
         });
+
       }
+
     }
 
     cart.totalPrice = cart.products.reduce(
@@ -126,12 +147,20 @@ const syncGuestCart = async (req, res) => {
       "title sellingPrice images stock"
     );
 
-    res.json(populatedCart.products);
-  } catch (error) {
-    res.status(500).json({ message: "Sync failed", error });
-  }
-};
+    res.status(200).json(populatedCart.products);
 
+  } catch (error) {
+
+    console.error("SYNC ERROR:", error);
+
+    res.status(500).json({
+      message: "Sync failed",
+      error
+    });
+
+  }
+
+};
 // ========================
 //  Common Cart Actions
 // ========================

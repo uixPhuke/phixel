@@ -41,7 +41,7 @@ const cartSlice = createSlice({
     error: null,
 
     cartItems: [], // DB cart
-    guestCartItems: [],
+   
 
     itemCount: 0,
     totalQuantity: 0,

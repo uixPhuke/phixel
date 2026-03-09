@@ -22,7 +22,11 @@ import {
 
 import { toast } from "react-hot-toast";
 import { signInSignUpWithFacebook, signInSignUpWithGoogle } from "../firebase";
-
+import {
+  getCart,
+  
+ 
+} from "./cartActions";
 const API = import.meta.env.VITE_API_KEY;
 
 const config = {
@@ -40,7 +44,8 @@ export const login = (userData, callback) => async (dispatch) => {
 
     dispatch(loginSuccess());
     dispatch(verify());
-
+    
+dispatch(getCart()); 
     toast.success("Login successful");
 
     callback?.(true);
