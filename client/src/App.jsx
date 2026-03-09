@@ -13,6 +13,8 @@ import { Toaster } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { verify } from "./actions/userActions";
 import Profile from "./pages/Profile/Profile";
+import Checkout from "./pages/Checkout/Checkout";
+import Payment from "./pages/Checkout/Payment";
 
 const App = () => {
 
@@ -21,6 +23,7 @@ const App = () => {
   useEffect(() => {
     dispatch(verify());
     dispatch(getWishlist());
+    
   }, [dispatch]);
 
   return (
@@ -69,6 +72,10 @@ const App = () => {
 
           {/* Wishlist */}
           <Route path="/wishlist" element={<Wishlist />} />
+
+          {/* Checkout */}
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout/payment" element={<Payment />} />
 
           {/* 404 */}
           <Route path="*" element={<h1>Page Not Found</h1>} />
