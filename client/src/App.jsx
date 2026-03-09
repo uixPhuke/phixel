@@ -12,6 +12,7 @@ import Wishlist from "./pages/Wishlist/Wishlist";
 import { Toaster } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { verify } from "./actions/userActions";
+import { getCart } from "./actions/cartActions";  
 import Profile from "./pages/Profile/Profile";
 import Checkout from "./pages/Checkout/Checkout";
 import Payment from "./pages/Checkout/Payment";
@@ -23,6 +24,7 @@ const App = () => {
   useEffect(() => {
     dispatch(verify());
     dispatch(getWishlist());
+      dispatch(getCart());
     
   }, [dispatch]);
 
