@@ -10,24 +10,30 @@ import { IoCartOutline } from "react-icons/io5";
 import { getWishlist } from "../../actions/wishlistActions";
 import { logout } from "../../actions/userActions";
 
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true); // Track visibility of the header
   const [lastScrollY, setLastScrollY] = useState(0); // Track the last scroll position
-  const { cartItems, guestCartItems, totalQuantity } = useSelector(
-  (state) => state.cart
-);
+//   const { cartItems, guestCartItems, totalQuantity } = useSelector(
+//   (state) => state.cart
+// );
 const { isLogin } = useSelector((state) => state.user);
 
 const handleLogout = () => {
   dispatch(logout());
   localStorage.removeItem("token");
 };
+const { totalQuantity, guestCartItems, cartItems } = useSelector(
+  (state) => state.cart
+);
 
-const cartCount = cartItems.length > 0
-  ? totalQuantity
+
+const cartCount = isLogin
+  ? cartItems.reduce((sum, item) => sum + item.quantity, 0)
   : guestCartItems.reduce((sum, item) => sum + item.quantity, 0);
+
 //wishlist load on navbar load
 const dispatch = useDispatch();
 
