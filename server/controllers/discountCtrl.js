@@ -54,6 +54,18 @@ const createDiscount = async (req, res) => {
   }
 };
 
+//get all discounts
+const getAllDiscounts = async (req, res) => {
+  try {
+    const discounts = await Discount.find();
+    res.json({ discounts });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching discounts', error });
+  }
+};
+
+// Apply a discount to the user's cart
+
 const applyDiscount = async (req, res) => {
   const { code } = req.body;
 
@@ -83,11 +95,26 @@ const applyDiscount = async (req, res) => {
     if (discount.usedBy.includes(req.user._id)) {
       return res.status(400).json({ message: 'Discount code already used by this user' });
     }
+const cart = await Cart.findOne({ user: req.user._id });
 
-    const cart = await Cart.findOne({ user: req.user._id });
-    if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ message: 'No cart found to apply discount' });
-    }
+if (!cart) {
+  return res.status(404).json({
+    message: "Cart not found"
+  });
+}
+
+
+if (!cart || !cart.products.length) {
+  return res.status(400).json({
+    message: "Cart is empty"
+  });
+}
+
+if (discount.usedBy?.includes(req.user._id)) {
+  return res.status(400).json({
+    message: "Discount code already used by this user"
+  });
+}
 
     // Calculate discount amount
     let discountAmount = 0;
@@ -114,9 +141,9 @@ const applyDiscount = async (req, res) => {
     await cart.save();
 
     // Update discount usage
-    discount.usedBy.push(req.user._id);
-    discount.usedCount += 1;
-    await discount.save();
+    // discount.usedBy.push(req.user._id);
+    // discount.usedCount += 1;
+    // await discount.save();
 
     res.json({
       message: 'Discount applied successfully',
@@ -168,43 +195,57 @@ const removeDiscount = async (req, res) => {
   }
 };
 
-//discouct check
 const checkDiscount = async (req, res) => {
   try {
     const { code } = req.body;
 
-    if (!code || typeof code !== 'string') {
-      return res.status(400).json({ message: 'Invalid discount code' });
+    if (!code || typeof code !== "string") {
+      return res.status(400).json({ message: "Invalid discount code" });
     }
 
-    const discount = await Discount.findOne({ code: code.toUpperCase() });
+    const discount = await Discount.findOne({
+      code: code.toUpperCase(),
+    });
 
     if (!discount) {
-      return res.status(404).json({ message: 'Discount not found' });
+      return res.status(404).json({ message: "Discount not found" });
+    }
+
+    if (!discount.isActive) {
+      return res.status(400).json({ message: "Coupon is disabled" });
     }
 
     const now = new Date();
+
     if (
       (discount.startDate && now < discount.startDate) ||
       (discount.endDate && now > discount.endDate)
     ) {
-      return res.status(400).json({ message: 'Discount is not valid at this time' });
+      return res
+        .status(400)
+        .json({ message: "Discount is not valid at this time" });
     }
 
     res.json({
-      message: 'Discount is valid',
-      discount,
+      message: "Discount is valid",
+      discount: {
+        code: discount.code,
+        discountType: discount.discountType,
+        discountPercentage: discount.discountPercentage,
+        discountValue: discount.discountValue,
+      },
     });
-  } catch (error) {
-    console.error('Error checking discount:', error);
-    res.status(500).json({ message: 'Error checking discount', error });
-  }
-};  
 
+  } catch (error) {
+    console.error("Error checking discount:", error);
+    res.status(500).json({ message: "Error checking discount" });
+  }
+};
 // Export the functions
 module.exports = {
   createDiscount,
   applyDiscount,
   removeDiscount,
   checkDiscount,
+  getAllDiscounts
 };
