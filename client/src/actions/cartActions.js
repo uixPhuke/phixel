@@ -18,38 +18,40 @@ const API_URL = import.meta.env.VITE_API_KEY;
    GET CART (AUTO SYNC ON LOGIN)
 ================================ */
 export const getCart = () => async (dispatch, getState) => {
+  console.log("GET CART TRIGGERED");
   try {
     dispatch(cartRequest());
+    
 
     const token = localStorage.getItem("token");
-    if (!token) return;
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
+const config = {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+  withCredentials: true,
+};
 
-    // 1️⃣ Get DB cart
-    const { data } = await axios.get(`${API_URL}/api/v4/cart`, config);
-
-    // 2️⃣ Check guest cart
     const { guestCartItems } = getState().cart;
 
-    if (guestCartItems.length > 0) {
-      // 3️⃣ Sync guest cart
-      const syncRes = await axios.post(
-        `${API_URL}/api/v4/cart/sync`,
-        { guestCart: guestCartItems },
-        config
-      );
+// fallback to localStorage
+const localGuestCart =
+  guestCartItems.length > 0
+    ? guestCartItems
+    : JSON.parse(localStorage.getItem("guestCart")) || [];
 
-      dispatch(syncCartSuccess(syncRes.data));
-      dispatch(clearGuestCart());
-      toast.success("Cart synced successfully!");
-    } else {
-      dispatch(getCartSuccess(data));
-    }
+console.log("LOCAL GUEST CART:", localGuestCart);
+
+// ONLY SYNC IF USER IS LOGGED IN
+if (token && localGuestCart.length > 0) {
+  dispatch(syncGuestCart(localGuestCart));
+  return;
+}
+
+// now fetch cart
+const { data } = await axios.get(`${API_URL}/api/v4/cart`, config);
+
+dispatch(getCartSuccess(data));
   } catch (err) {
     dispatch(
       cartFail(err.response?.data?.message || "Failed to fetch cart")
@@ -69,13 +71,13 @@ export const addToCart = (productData) => async (dispatch) => {
     dispatch(cartRequest());
 
     const token = localStorage.getItem("token");
-    if (!token) return;
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
+const config = {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+  withCredentials: true,
+};
 
     const { data } = await axios.post(
       `${API_URL}/api/v4/cart`,
@@ -104,15 +106,17 @@ export const addToCart = (productData) => async (dispatch) => {
 export const syncGuestCart = (guestCartItems) => async (dispatch) => {
   try {
     dispatch(cartRequest());
+    console.log("SYNCING CART:", guestCartItems);
 
     const token = localStorage.getItem("token");
-    if (!token) return;
+   
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
+const config = {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+  withCredentials: true,
+};
 
     const { data } = await axios.post(
       `${API_URL}/api/v4/cart/sync`,
@@ -122,8 +126,9 @@ export const syncGuestCart = (guestCartItems) => async (dispatch) => {
 
     dispatch(syncCartSuccess(data));   // ✅ DB cart updated
     dispatch(clearGuestCart());        // ✅ CLEAR GUEST CART
-    localStorage.removeItem("guestCart"); // ✅ SAFETY
-
+    
+    //localStorage.removeItem("guestCart"); // ✅ SAFETY
+ dispatch(getCart());
   } catch (err) {
     dispatch(cartFail("Failed to sync cart"));
   }
@@ -138,13 +143,13 @@ export const removeFromCart = (productID, size) => async (dispatch) => {
     dispatch(cartRequest());
 
     const token = localStorage.getItem("token");
-    if (!token) return;
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
+const config = {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+  withCredentials: true,
+};
 
     const { data } = await axios.delete(
       `${API_URL}/api/v4/cart?productID=${productID}&size=${size}`,
@@ -167,15 +172,14 @@ export const clearCart = () => async (dispatch) => {
   try {
     dispatch(cartRequest());
 
-    const token = localStorage.getItem("token");
-    if (!token) return;
+ const token = localStorage.getItem("token");
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
+const config = {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+  withCredentials: true,
+};
     await axios.delete(`${API_URL}/api/v4/cart`, config);
 
     dispatch(clearCartSuccess());
