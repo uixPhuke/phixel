@@ -17,49 +17,19 @@ const API_URL = import.meta.env.VITE_API_KEY;
 /* ================================
    GET CART (AUTO SYNC ON LOGIN)
 ================================ */
-export const getCart = () => async (dispatch, getState) => {
-  console.log("GET CART TRIGGERED");
+export const getCart = () => async (dispatch) => {
   try {
     dispatch(cartRequest());
-    
 
-    const token = localStorage.getItem("token");
+    const { data } = await axios.get(`${API_URL}/api/v4/cart`, {
+      withCredentials: true,
+    });
 
-const config = {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-  withCredentials: true,
-};
-
-    const { guestCartItems } = getState().cart;
-
-// fallback to localStorage
-const localGuestCart =
-  guestCartItems.length > 0
-    ? guestCartItems
-    : JSON.parse(localStorage.getItem("guestCart")) || [];
-
-console.log("LOCAL GUEST CART:", localGuestCart);
-
-// ONLY SYNC IF USER IS LOGGED IN
-if (token && localGuestCart.length > 0) {
-  dispatch(syncGuestCart(localGuestCart));
-  return;
-}
-
-// now fetch cart
-const { data } = await axios.get(`${API_URL}/api/v4/cart`, config);
-
-dispatch(getCartSuccess(data));
+    dispatch(getCartSuccess(data));
   } catch (err) {
     dispatch(
       cartFail(err.response?.data?.message || "Failed to fetch cart")
     );
-
-    if (err.response?.status === 401) {
-      dispatch(setShowLoginModalTrue());
-    }
   }
 };
 
@@ -128,7 +98,7 @@ const config = {
     dispatch(clearGuestCart());        // ✅ CLEAR GUEST CART
     
     //localStorage.removeItem("guestCart"); // ✅ SAFETY
- dispatch(getCart());
+ //dispatch(getCart());
   } catch (err) {
     dispatch(cartFail("Failed to sync cart"));
   }
