@@ -18,8 +18,11 @@ import {
   applyCoupon,
   removeCoupon,
   getAllCoupons,
-  removeAppliedCoupon
+  removeAppliedCoupon,
+  checkCoupon,
+ 
 } from "../../actions/couponActions";
+import { checkCouponSuccess } from "../../slices/couponSlice";
 import { addToCart } from "../../actions/cartActions";
 
 const CartPage = () => {
@@ -50,11 +53,14 @@ const CartPage = () => {
   console.log("LOGIN STATE:", isLogin);
  const handleApplyCoupon = () => {
 
- 
-
   if (!couponCode.trim()) return;
 
-  dispatch(applyCoupon(couponCode));
+  if (isLogin) {
+    dispatch(applyCoupon(couponCode));
+  } else {
+    dispatch(checkCoupon(couponCode));
+  }
+
 };
 
   const handleRemoveCoupon = () => {
@@ -71,6 +77,11 @@ useEffect(() => {
 
   if (isLogin) {
     dispatch(getCart());
+  }
+  const savedCoupon = localStorage.getItem("appliedCoupon");
+
+  if (savedCoupon) {
+    dispatch(checkCouponSuccess(JSON.parse(savedCoupon)));
   }
 
 }, [dispatch, isLogin]);
@@ -358,11 +369,15 @@ if (appliedCoupon) {
                     </div>
 
                     <button
-  onClick={() =>
-    appliedCoupon?.code === coupon.code
-      ? dispatch(removeAppliedCoupon())
-      : dispatch(applyCoupon(coupon.code))
-  }
+ 
+   onClick={() =>
+  appliedCoupon?.code === coupon.code
+    ? dispatch(removeAppliedCoupon())
+    : isLogin
+      ? dispatch(applyCoupon(coupon.code))
+      : dispatch(checkCoupon(coupon.code))
+}
+  
   className="text-xs bg-black text-white px-3 py-1 rounded"
 >
   {appliedCoupon?.code === coupon.code ? "Remove" : "Apply"}

@@ -2,11 +2,25 @@ import { deleteAddress, setDefaultAddress } from "../../actions/addressActions";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { FiEdit, FiTrash2, FiMoreVertical } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
-const AddressCard = ({ address, onEdit }) => {
+const AddressCard = ({ address, onEdit, checkoutMode,totalPrice }) => {
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+   
+
+  const handleDeliverHere = () => {
+
+    navigate("/checkout/payment", {
+      state: {
+        selectedAddress: address,
+        totalPrice: totalPrice
+      }
+    });
+
+  };
 
   const handleDelete = () => {
     if (window.confirm("Delete this address?")) {
@@ -24,7 +38,7 @@ const AddressCard = ({ address, onEdit }) => {
 
       {/* Default label */}
       {address.isDefault && (
-  <span className="absolute bottom-3 right-3 text-xs bg-black text-white px-2 py-1 rounded">
+  <span className="absolute bottom-3 right-3 text-xs  bg-accent text-primary px-2 py-1 rounded-md">
     Default
   </span>
 )}
@@ -85,6 +99,15 @@ const AddressCard = ({ address, onEdit }) => {
         >
           <FiTrash2 size={18} />
         </button>
+      {checkoutMode && (
+    <button
+       onClick={handleDeliverHere}
+      className="bg-black text-white px-4 py-2 rounded-full text-xs"
+    >
+      Deliver here
+    </button>
+  )}
+
 
       </div>
 

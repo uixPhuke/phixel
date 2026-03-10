@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import AddressCard from "./AddressCard";
 import AddAddressModal from "./AddAddressModal";
 
-const AddressSection = ({ addresses }) => {
+const AddressSection = ({ addresses, checkoutMode = false }) => {
   const [showModal, setShowModal] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
 
@@ -24,13 +24,14 @@ const AddressSection = ({ addresses }) => {
         {addresses?.length > 0 ? (
           addresses.map((address) => (
            <AddressCard
-    key={address._id}
-    address={address}
-    onEdit={() => {
-      setEditingAddress(address);
-      setShowModal(true);
-    }}
-  />
+  key={address._id}
+  address={address}
+  checkoutMode={checkoutMode}
+  onEdit={() => {
+    setEditingAddress(address);
+    setShowModal(true);
+  }}
+/>
           ))
         ) : (
           <p className="text-gray-500">
