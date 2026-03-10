@@ -7,7 +7,7 @@ import { CgSpinnerTwoAlt } from "react-icons/cg";
 import { useDispatch, useSelector } from "react-redux";
 import { login, googleAuth, facebookAuth, } from "../../actions/userActions";
 import { setShowLoginModalFalse } from "../../slices/userSlice"
-
+import { syncGuestCart, getCart } from "../../actions/cartActions";
 export const Login = ({ setToggleAuth, handleOnClose }) => {
   const [loginData, setLoginData] = useState({
     emailOrUsername: "",
@@ -33,6 +33,14 @@ export const Login = ({ setToggleAuth, handleOnClose }) => {
       if (user?.isAdmin) {
         navigate("/admin/dashboard");
       } else {
+       const guestCart =
+  JSON.parse(localStorage.getItem("guestCart")) || [];
+
+if (guestCart.length > 0) {
+  dispatch(syncGuestCart(guestCart));
+} else {
+  dispatch(getCart());
+}
         navigate("/");
       }
     } else {
