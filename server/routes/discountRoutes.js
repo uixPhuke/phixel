@@ -1,14 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const { createDiscount, applyDiscount,removeDiscount,checkDiscount} = require('../controllers/discountCtrl');
+const { createDiscount, applyDiscount,removeDiscount,checkDiscount,getAllDiscounts} = require('../controllers/discountCtrl');
 const { isAuthenticated,isAdmin } = require('../middlewares/auth');
 // Route to create a new discount
-router.post('/discount', isAuthenticated,isAdmin, createDiscount);
+router.post('/create', isAuthenticated,isAdmin, createDiscount);
+// Route to get all discounts
+router.get('/', getAllDiscounts);
 // Route to apply a discount to the user's cart
-router.post('/discount/apply', isAuthenticated, applyDiscount);
+router.post('/apply', isAuthenticated, applyDiscount);
 // Route to remove a discount from the user's cart
-router.post('/discount/remove', isAuthenticated,isAdmin, removeDiscount);
+router.post('/remove', isAuthenticated,removeDiscount);
 // Route to check if a discount is valid
-router.post('/discount/check', isAuthenticated, checkDiscount);
+router.post('/check', checkDiscount);
 // Export the router
 module.exports = router;
