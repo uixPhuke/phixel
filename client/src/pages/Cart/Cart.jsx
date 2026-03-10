@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   getCart,
   removeFromCart,
@@ -23,6 +24,19 @@ import { addToCart } from "../../actions/cartActions";
 
 const CartPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const handleCheckout = () => {
+
+  const totalPrice = subtotalToShow - discountAmount;
+
+  navigate("/checkout", {
+    state: {
+      totalPrice,
+      couponCode: appliedCoupon?.code || null
+    }
+  });
+
+};
 
   const { cartItems, guestCartItems, loading } = useSelector(
     (state) => state.cart,
@@ -48,30 +62,14 @@ const CartPage = () => {
   // ============================
   // AUTO LOAD + AUTO SYNC
   // ============================
-  useEffect(() => {
-    console.log("CartPage useEffect triggered");
+useEffect(() => {
 
-    if (isLogin) {
-      console.log("User logged in");
+  if (!isLogin) return;
 
-      const localGuestCart =
-        guestCartItems.length > 0
-          ? guestCartItems
-          : JSON.parse(localStorage.getItem("guestCart")) || [];
+  dispatch(getCart());
+  dispatch(getAllCoupons());
 
-      console.log("LOCAL GUEST CART:", localGuestCart);
-
-      if (localGuestCart.length > 0) {
-        console.log("SYNCING GUEST CART");
-        dispatch(syncGuestCart(localGuestCart));
-      }
-
-      dispatch(getCart());
-    }
-
-    dispatch(getAllCoupons());
-  }, [dispatch, isLogin]);
-
+}, [dispatch, isLogin]);
   // ============================
   // Decide cart source
   // ============================
@@ -372,9 +370,12 @@ if (appliedCoupon) {
             )}
           </div>
 
-          <button className="w-full bg-black text-white text-sm py-4 mt-6 rounded-full hover:bg-gray-900">
-            Checkout
-          </button>
+          <button
+  onClick={handleCheckout}
+  className="w-full bg-black text-white text-sm py-4 mt-6 rounded-full hover:bg-gray-900"
+>
+  Checkout
+</button>
         </div>
       </div>
     </div>
