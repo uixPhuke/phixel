@@ -24,7 +24,7 @@ const App = () => {
   useEffect(() => {
     dispatch(verify());
     dispatch(getWishlist());
-      dispatch(getCart());
+      // dispatch(getCart());
     
   }, [dispatch]);
 
