@@ -48,11 +48,14 @@ const CartPage = () => {
   const [showCoupons, setShowCoupons] = useState(false);
   const { isLogin } = useSelector((state) => state.user);
   console.log("LOGIN STATE:", isLogin);
-  const handleApplyCoupon = () => {
-    if (!couponCode.trim()) return;
+ const handleApplyCoupon = () => {
 
-    dispatch(applyCoupon(couponCode));
-  };
+ 
+
+  if (!couponCode.trim()) return;
+
+  dispatch(applyCoupon(couponCode));
+};
 
   const handleRemoveCoupon = () => {
     dispatch(removeCoupon());
@@ -64,10 +67,11 @@ const CartPage = () => {
   // ============================
 useEffect(() => {
 
-  if (!isLogin) return;
+  dispatch(getAllCoupons()); // always load coupons
 
-  dispatch(getCart());
-  dispatch(getAllCoupons());
+  if (isLogin) {
+    dispatch(getCart());
+  }
 
 }, [dispatch, isLogin]);
   // ============================
