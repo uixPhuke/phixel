@@ -27,6 +27,7 @@ import {
   
  
 } from "./cartActions";
+import { clearCartSuccess, clearGuestCart } from "../slices/cartSlice";
 const API = import.meta.env.VITE_API_KEY;
 
 const config = {
@@ -140,12 +141,15 @@ export const logout = () => async (dispatch) => {
 
     dispatch(verifyLoginFail());
 
+    // clear cart state
+    dispatch(clearCartSuccess());
+    dispatch(clearGuestCart());
+
     toast.success("Logged out successfully");
   } catch {
     toast.error("Logout failed");
   }
 };
-
 /* =========================
    VERIFY AUTH
 ========================= */
