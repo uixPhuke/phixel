@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { addToCart } from "../../actions/cartActions";
 import { addToGuestCart } from "../../slices/cartSlice";
 import { formatPrice, getProductStatus } from '../../utils/productHelpers';
+
 import { addToCartSuccess } from '../../slices/cartSlice';
 //import { addToWishlistSuccess } from '../../slices/wishlistSlice';
 
@@ -17,43 +18,45 @@ const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
-
+  const { cartItems } = useSelector((state) => state.cart);
+const { isLogin } = useSelector((state) => state.user);
 const wishlistItems = useSelector(state => state.wishlist.wishlistItems);
 const isWishlisted = wishlistItems.some(w => w._id === product._id);
 
   
-    const handleAddToCart = (e) => {
-    e.preventDefault();
-    console.log("Hit")
-    const token = localStorage.getItem("token");
+   const handleAddToCart = (e) => {
+  e.preventDefault();
 
-    if (!token) {
-      // =====================
-      // GUEST USER (LOCAL CART)
-      // =====================
-      dispatch(
-        addToGuestCart({
-          productID: product._id,
-          quantity,
-          size: selectedSize, //
-          priceSnapshot: product.sellingPrice,
-          product, // optional but useful for UI
-        }),
-        
-      );
-    } else {
-      // =====================
-      // LOGGED-IN USER (DB CART)
-      // =====================
-      dispatch(
-        addToCart({
-          productID: product._id,
-          quantity,
-          size: selectedSize, //
-        }),
-      );
-    }
-  };
+  const existingItem = cartItems.find(
+    (item) =>
+      (item.product?._id || item.productID) === product._id &&
+      item.size === selectedSize
+  );
+
+  const quantityToSend = existingItem
+    ? existingItem.quantity + 1
+    : 1;
+
+  if (!isLogin) {
+    dispatch(
+      addToGuestCart({
+        productID: product._id,
+        quantity: quantityToSend,
+        size: selectedSize,
+        priceSnapshot: product.sellingPrice,
+        product
+      })
+    );
+  } else {
+    dispatch(
+      addToCart({
+        productID: product._id,
+        quantity: quantityToSend,
+        size: selectedSize
+      })
+    );
+  }
+};
  
 
 const handleAddToWishlist = (e) => {
