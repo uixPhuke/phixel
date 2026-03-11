@@ -32,18 +32,23 @@ const Hero = () => {
       </Swiper>
 
       {/* Button - Desktop only (over image) */}
-      <div className="hidden lg:flex absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
-        <button className="bg-secondary text-primary px-6 py-3 rounded-full shadow-lg hover:shadow-2xl transition">
-          SHOP NOW
-        </button>
+      <div className="hidden lg:flex absolute bottom-16 right-20 z-10">
+        <Link to="/products">
+          <button className="bg-secondary text-primary px-10 py-4 text-md font-semibold rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition">
+            SHOP NOW
+          </button>
+        </Link>
       </div>
 
-      {/* Button - Mobile & Tablet (below image) */}
+      {/* Mobile Button */}
       <div className="lg:hidden flex justify-center mt-6">
-        <button className="bg-secondary text-primary px-6 py-3 rounded-full shadow-lg hover:shadow-2xl transition">
-          <Link to="/products">SHOP NOW</Link>
-        </button>
+        <Link to="/products">
+          <button className="bg-secondary text-primary px-8 py-3 text-base font-semibold rounded-full shadow-lg hover:shadow-xl transition">
+            SHOP NOW
+          </button>
+        </Link>
       </div>
+
     </div>
   );
 };
