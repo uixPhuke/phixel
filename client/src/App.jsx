@@ -16,6 +16,8 @@ import { getCart } from "./actions/cartActions";
 import Profile from "./pages/Profile/Profile";
 import Checkout from "./pages/Checkout/Checkout";
 import Payment from "./pages/Checkout/Payment";
+import Footer from "./components/Footer/Footer";
+import CategorySpotlight from "./pages/Home/CategorySpotlight";
 
 const App = () => {
 
@@ -55,7 +57,8 @@ const App = () => {
             element={
               <>
                 <Hero />
-                <About />
+                <CategorySpotlight/>
+              
               </>
             }
           />
@@ -83,7 +86,10 @@ const App = () => {
           <Route path="*" element={<h1>Page Not Found</h1>} />
 
         </Routes>
+         
       </div>
+       <About />
+        <Footer/>
     </BrowserRouter>
   );
 };
