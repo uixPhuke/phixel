@@ -15,7 +15,7 @@ const CouponCard = ({ coupon, onApply }) => {
       <div className="absolute -left-3 top-0 bottom-0 w-6 bg-white rounded-full"></div>
 
       {/* Right cut */}
-      <div className="absolute -right-3 top-0 bottom-0 w-6 bg-white rounded-full"></div>
+      <div className="absolute -right-3 top-0 bottom-0 w-6 bg-secondary rounded-full"></div>
 
       <div>
 
