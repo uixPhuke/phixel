@@ -24,14 +24,14 @@ connectDB()
 //pass the middleware
 app.use(
   cors({
-    origin: URL, // frontend URL
+    origin: "https://phixel.vercel.app", // frontend URL
     credentials: true,
   })
 );
 app.use(express.json())
 app.use(cookieParser());
 app.use(express.urlencoded({extended:true}))
-
+console.log("URL:", URL);
 
 //start server
 app.listen(PORT,()=>{
