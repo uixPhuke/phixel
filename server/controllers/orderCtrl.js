@@ -7,6 +7,7 @@ const Razorpay =require("../config/razorpay.js");
 const crypto =require("crypto");
 const Discount =require("../models/discountSchema.js");
 const Product =require("../models/productSchema.js");
+
 const {
     sendOrderCancellationEmail,
     sendOrderConfirmationEmail,
@@ -14,7 +15,7 @@ const {
     sendReturnRequestEmailToAdmin,
     sendReturnStatusEmailToUser,
     sendRefundStatusEmailToUser,
-} =require("../Services/orderEmailService.js");
+} =require("../services/orderEmailService.js");
 
 // Utility functions
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
