@@ -24,7 +24,7 @@ connectDB()
 //pass the middleware
 app.use(
   cors({
-    origin: "https://phixel.vercel.app", // frontend URL
+    origin: URL, // frontend URL
     credentials: true,
   })
 );
