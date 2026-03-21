@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../actions/cartActions";
 import { addToGuestCart } from "../../slices/cartSlice";
 
@@ -21,38 +21,43 @@ const ProductDetail = ({ product }) => {
   const toggleSection = (key) => {
     setOpenSection(openSection === key ? null : key);
   };
-  const handleAddToCart = (e) => {
-    e.preventDefault();
-    console.log("Hit")
-    const token = localStorage.getItem("token");
+  const { cartItems, guestCartItems, loading } = useSelector(
+    (state) => state.cart,
+  );
+   const { isLogin } = useSelector((state) => state.user);
+    const handleAddToCart = (e) => {
+  e.preventDefault();
 
-    if (!token) {
-      // =====================
-      // GUEST USER (LOCAL CART)
-      // =====================
-      dispatch(
-        addToGuestCart({
-          productID: product._id,
-          quantity,
-          size: selectedSize, //
-          priceSnapshot: product.sellingPrice,
-          product, // optional but useful for UI
-        }),
-        
-      );
-    } else {
-      // =====================
-      // LOGGED-IN USER (DB CART)
-      // =====================
-      dispatch(
-        addToCart({
-          productID: product._id,
-          quantity,
-          size: selectedSize, //
-        }),
-      );
-    }
-  };
+  const existingItem = cartItems.find(
+    (item) =>
+      (item.product?._id || item.productID) === product._id &&
+      item.size === selectedSize
+  );
+
+  const quantityToSend = existingItem
+    ? existingItem.quantity + 1
+    : 1;
+
+  if (!isLogin) {
+    dispatch(
+      addToGuestCart({
+        productID: product._id,
+        quantity: quantityToSend,
+        size: selectedSize,
+        priceSnapshot: product.sellingPrice,
+        product
+      })
+    );
+  } else {
+    dispatch(
+      addToCart({
+        productID: product._id,
+        quantity: quantityToSend,
+        size: selectedSize
+      })
+    );
+  }
+};
 
   const handleAddToWishlist = () => {
     toast.success("Product added to wishlist");
