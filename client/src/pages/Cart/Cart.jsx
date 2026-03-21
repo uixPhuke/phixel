@@ -51,7 +51,30 @@ const CartPage = () => {
   const [showCoupons, setShowCoupons] = useState(false);
   const { isLogin } = useSelector((state) => state.user);
   console.log("LOGIN STATE:", isLogin);
- const handleApplyCoupon = () => {
+//  const handleApplyCoupon = () => {
+
+//   if (!couponCode.trim()) return;
+
+//   if (isLogin) {
+//     dispatch(applyCoupon(couponCode));
+//   } else {
+//     dispatch(checkCoupon(couponCode));
+//   }
+
+// };
+
+
+// useEffect(() => {
+
+//   dispatch(getAllCoupons()); // always load coupons
+
+//   if (isLogin) {
+//     dispatch(getCart());
+//   }
+
+// }, [dispatch, isLogin]);
+
+const handleApplyCoupon = () => {
 
   if (!couponCode.trim()) return;
 
