@@ -48,6 +48,9 @@ const couponSlice = createSlice({
     checkCouponSuccess: (state, action) => {
       state.loading = false;
       state.coupon = action.payload;
+       state.appliedCoupon = action.payload;
+  localStorage.setItem("appliedCoupon", JSON.stringify(action.payload));
+
     },
 
     couponFail: (state, action) => {

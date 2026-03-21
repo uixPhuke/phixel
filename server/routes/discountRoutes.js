@@ -11,6 +11,6 @@ router.post('/apply', isAuthenticated, applyDiscount);
 // Route to remove a discount from the user's cart
 router.post('/remove', isAuthenticated,removeDiscount);
 // Route to check if a discount is valid
-router.post('/check', checkDiscount);
+router.post('/check',checkDiscount);
 // Export the router
 module.exports = router;
