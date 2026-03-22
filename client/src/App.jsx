@@ -18,10 +18,14 @@ import Checkout from "./pages/Checkout/Checkout";
 import Payment from "./pages/Checkout/Payment";
 import Footer from "./components/Footer/Footer";
 import CategorySpotlight from "./pages/Home/CategorySpotlight";
+import { setShowLoginModalFalse } from "./slices/userSlice";
+import { useSelector } from "react-redux";
+import LoginModal from "./pages/Auth/LoginModal";
 
 const App = () => {
 
   const dispatch = useDispatch();
+   const { showLoginModal } = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(verify());
@@ -32,7 +36,13 @@ const App = () => {
 
   return (
     <BrowserRouter>
+    
       <Navbar />
+<LoginModal
+        isOpen={showLoginModal}
+        onClose={() => dispatch(setShowLoginModalFalse())}
+      />
+
 <Toaster
   position="top-center"
   toastOptions={{
