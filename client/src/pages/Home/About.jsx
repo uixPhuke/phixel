@@ -5,8 +5,8 @@ const About = () => {
     <section className="bg-primary text-secondary py-20 px-6">
       <div className="max-w-5xl mx-auto text-center">
 
-        <h2 className="text-3xl md:text-4xl font-bold tracking-widest mb-8">
-          UiX STORE — PERFORMANCE, STYLE & INNOVATION
+        <h2 className="text-3xl md:text-4xl font-primary font-bold tracking-widest mb-8">
+          UiX STORE — UNLEASH YOUR NNER XPRESSION
         </h2>
 
         <div className="space-y-6 text-accent text-sm md:text-base leading-relaxed">
