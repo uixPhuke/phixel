@@ -24,12 +24,16 @@ import {
 } from "../../actions/couponActions";
 import { checkCouponSuccess } from "../../slices/couponSlice";
 import { addToCart } from "../../actions/cartActions";
+ import { setShowLoginModalTrue } from "../../slices/userSlice";
 
 const CartPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleCheckout = () => {
-
+  if (!isLogin) {
+    dispatch(setShowLoginModalTrue()); // open modal
+    return;
+  }
   const totalPrice = subtotalToShow - discountAmount;
 
   navigate("/checkout", {

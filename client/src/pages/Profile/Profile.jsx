@@ -10,6 +10,8 @@ import { UnAuthorized } from "../../components/Global/UnAuthorized";
 import { getWishlist } from "../../actions/wishlistActions";
 import { addAddress,getAddresses } from "../../actions/addressActions";
 import AddressSection from "../../components/Profile/AddressSection";
+import { IoIosLogOut } from "react-icons/io";
+import { logout } from "../../actions/userActions";
 
 import {
   FiHome,
@@ -77,6 +79,12 @@ const Profile = () => {
     loading,
     authLoading,
   } = useSelector((state) => state.user);
+
+const handleLogout = () => {
+  dispatch(logout());
+  localStorage.removeItem("token");
+};
+
 
 
 
@@ -190,6 +198,14 @@ ${activeSection === item.id ? "bg-black text-white" : "hover:bg-gray-100"}`}
                 <FiShoppingCart />
                 View Cart
               </Link>
+            <Link
+  to="/login"
+  onClick={handleLogout}
+  className="flex items-center justify-center gap-2 bg-black text-white py-3 rounded-xl mt-6 hover:opacity-80 transition"
+>
+  <IoIosLogOut />
+  Log Out
+</Link>
             </div>
 
             {/* MAIN */}
