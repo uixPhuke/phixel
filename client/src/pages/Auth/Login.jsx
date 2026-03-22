@@ -16,6 +16,8 @@ export const Login = ({ setToggleAuth, handleOnClose }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [focusedFields, setFocusedFields] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
+
+  const isModal = !!handleOnClose;
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -105,18 +107,34 @@ if (guestCart.length > 0) {
     });
     setErrorMessage("");
     
-    if (setToggleAuth) {
-      setToggleAuth("register");
-    } else {
-      navigate("/register");
-    }
+    // if (setToggleAuth) {
+    //   setToggleAuth("register");
+    // } else {
+    //   navigate("/register");
+    // }
+
+    if (handleOnClose) {
+  handleOnClose(); 
+}
+
+navigate("/register");
   };
 
   return (
-    <div className="min-h-screen pt-30 flex justify-center items-center pb-24 font-primary">
+   <div
+  className={`flex justify-center font-primary ${
+    isModal
+      ? "py-8 items-start"
+      : "min-h-screen pt-30 pb-24 items-center"
+  }`}
+>
       <form
         onSubmit={handleSubmit}
-        className="md:w-1/3 w-full md:mx-0 mx-6 md:mt-8 flex flex-col p-8 rounded-xl"
+        className={`w-full flex flex-col p-8 rounded-xl ${
+  isModal
+    ? "max-w-lg mx-auto"
+    : "md:w-1/3 w-full md:mx-0 mx-6 md:mt-8"
+}`}
       >
         <p className="text-center text-lg font-secondary mb-8">Login to Your Account</p>
 
