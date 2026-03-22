@@ -9,6 +9,7 @@ import { BsBorderStyle } from "react-icons/bs";
 import { IoCartOutline } from "react-icons/io5";
 import { getWishlist } from "../../actions/wishlistActions";
 import { logout } from "../../actions/userActions";
+import { setShowLoginModalTrue } from "../../slices/userSlice";
 
 
 const Navbar = () => {
@@ -117,10 +118,7 @@ useEffect(() => {
         <div className="flex flex-row items-center space-x-6">
           {/* Search Bar */}
           <SearchBar />
-          {/* User Profile */}
-          <Link to="/profile" className="hover:text-accent ">
-            <FaUserCircle size={24} className="text-sm transition-all duration-300" />
-          </Link>
+         
           {/* Wishlist */}
           <Link to="/wishlist" className="hover:text-accent ">
             <FaRegHeart size={24} className=" transition-all duration-300 text-sm" />
@@ -134,7 +132,22 @@ useEffect(() => {
   </span>
 )}
           </Link>
-          
+
+           {/* User Profile */}
+<div className="hidden lg:flex items-center">
+  {isLogin ? (
+    <Link to="/profile" className="hover:text-accent">
+      <FaUserCircle size={24} />
+    </Link>
+  ) : (
+    <button
+      onClick={() => dispatch(setShowLoginModalTrue())}
+      className="text-xs font-medium hover:text-accent border border-primary px-4 py-2 rounded-full transition-all duration-300"
+    >
+      Sign In
+    </button>
+  )}
+</div>      
           
           {/* Hamburger Menu for Small Screens*/}
           <div className="lg:hidden z-50">
