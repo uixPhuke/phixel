@@ -6,36 +6,36 @@ import {
   FaLinkedin,
   FaReddit,
 } from "react-icons/fa";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Footer = () => {
-
+  const navigate = useNavigate();
   const login = () => {
-    
-     Navigate("/login");
-  }
-
+    navigate("/login");
+  };
+  const { isLogin } = useSelector((state) => state.user);
   return (
     <footer className="bg-primary text-secondary px-4 py-8 ">
       <div className="container mx-auto">
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-
           {/* Signup Section */}
-          <div className="col-span-2 bg-accent text-primary text-center p-4 md:p-8 rounded-lg flex items-center justify-center">
-            <div>
-              <h2 className="text-md font-bold mb-2">
-                JOIN UiX AND GET 15% OFF
-              </h2>
+          {!isLogin && (
+            <div className="col-span-2 bg-accent text-primary text-center p-4 md:p-8 rounded-lg flex items-center justify-center">
+              <div>
+                <h2 className="text-md font-bold mb-2">
+                  JOIN UiX AND GET 15% OFF
+                </h2>
 
-              <button
-                onClick={login}
-                className="bg-primary text-secondary py-2 px-4 rounded-md hover:bg-gray-800 transition-colors"
-              >
-                SIGN UP FOR FREE
-              </button>
+                <button
+                  onClick={login}
+                  className="bg-primary text-secondary py-2 px-4 rounded-md hover:bg-gray-800 transition-colors"
+                >
+                  SIGN UP FOR FREE
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Footer Links */}
           <div>
@@ -101,7 +101,6 @@ const Footer = () => {
             </h3>
 
             <div className="flex justify-center lg:justify-start space-x-4">
-
               <FaInstagram
                 size={30}
                 className="text-secondary hover:text-accent transition-colors"
@@ -126,16 +125,13 @@ const Footer = () => {
                 size={30}
                 className="text-secondary hover:text-accent transition-colors"
               />
-
             </div>
           </div>
-
         </div>
 
         {/* Footer Bottom */}
         <div className="border-t border-accent mt-8 pt-4 text-center">
-
-          <ul className="flex justify-center space-x-4 text-sm text-accent">
+          <ul className="flex justify-center space-x-4 text-xs text-accent">
             <li>
               <a href="#">Privacy Policy</a>
             </li>
@@ -149,12 +145,10 @@ const Footer = () => {
             </li>
           </ul>
 
-          <p className="text-accent text-sm mt-4">
+          <p className="text-accent text-xs mt-4">
             ©2026 UiX India Marketing Pvt. Ltd
           </p>
-
         </div>
-
       </div>
     </footer>
   );
