@@ -43,7 +43,7 @@ if (guestCart.length > 0) {
 } else {
   dispatch(getCart());
 }
-        navigate("/");
+        //navigate("/");
       }
     } else {
       setErrorMessage(error || "Invalid email/username or password");
