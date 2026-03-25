@@ -19,7 +19,7 @@ const About = () => {
           </p>
 
           <p>
-            Whether exploring the city, working late nights, or
+            Whether exploring the city or village, working late nights, or
             expressing creativity, UiX products are designed for
             comfort, durability, and effortless style. Every piece
             blends contemporary aesthetics with functional design.
