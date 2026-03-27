@@ -217,7 +217,14 @@ export const Register = ({ setToggleAuth, handleOnClose }) => {
   setUserId       // correct
 ));
   };
-
+//  dispatch(register(
+//       formData, 
+//       () => setOtpToggle(true), 
+//       setOtpToggle, 
+//       setUserId, 
+//       setToken, 
+//       setErrorMessage
+//     ));
   const handleVerifyOtp = (e) => {
     e.preventDefault();
     dispatch(verifyOtp(userId, otp, () => {
