@@ -212,18 +212,15 @@ export const Register = ({ setToggleAuth, handleOnClose }) => {
     delete formData.countryCode;
 
     dispatch(register(
-      formData, 
-      () => setOtpToggle(true), 
-      setOtpToggle, 
-      setUserId, 
-      setToken, 
-      setErrorMessage
-    ));
+  formData, 
+  setOtpToggle,   // correct
+  setUserId       // correct
+));
   };
 
   const handleVerifyOtp = (e) => {
     e.preventDefault();
-    dispatch(verifyOtp(userId, otp, token, () => {
+    dispatch(verifyOtp(userId, otp, () => {
       if (handleOnClose) {
         handleOnClose();
       } else {

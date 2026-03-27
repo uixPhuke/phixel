@@ -116,10 +116,8 @@ export const resendOtp = (username, password) => async () => {
 export const verifyOtp =
   (userId, otp, setSuccessToggle) => async (dispatch) => {
     try {
-      await axios.post(`${API}/api/v1/user/auth/verify-otp`, { userId, otp });
-
-      dispatch(registerSuccess());
-      dispatch(verify());
+      await axios.post(`${API}/api/v1/user/auth/verify-otp`, { userId, otp },config);
+      await dispatch(verify());
 
       toast.success("Account verified successfully");
       setSuccessToggle(true);

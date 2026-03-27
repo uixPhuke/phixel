@@ -129,12 +129,12 @@ const registerUser = async (req, res) => {
     }
 
    
-    const token = createToken(newUser._id, newUser.email, res);
+    //const token = createToken(newUser._id, newUser.email, res);
     res.status(201).json({
       success: true,
       message: "User registered successfully, Please verify your email using you email",
       user: newUser,
-      token,
+      //token,
       userId: newUser._id
     });
   } catch (error) {
@@ -150,6 +150,7 @@ const registerUser = async (req, res) => {
 const verifyUserOtp = async (req, res) => {
   const { userId, otp } = req.body;
   //validate input
+  console.log("VERIFY OTP:", { userId, otp });
   if (!userId || !otp) {
     return res.status(400).json({
       success: false,
@@ -185,14 +186,17 @@ const verifyUserOtp = async (req, res) => {
   user.otp = null; // Clear OTP after verification
   user.otpExpiration = null; // Clear OTP expiration after verification
   await user.save();
+  const token = createToken(user._id, user.email, res);
   res.status(200).json({
     success: true,
     message: "User Email verified successfully",
     user,
+    token
     
   });
    console.log("Current time:", new Date());
 console.log("OTP Expiry:", user.otpExpiration);
+
 }
 
 //resend otp if user miss the verification email
