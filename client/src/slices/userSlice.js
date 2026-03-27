@@ -54,6 +54,7 @@ const userSlice=createSlice({
         verifyLoginSuccess: (state, action) => {
             state.isLogin = action.payload.isLogin;
             state.authLoading = false;
+            state.user = action.payload.user;
         },
         verifyLoginFail: (state, action) => {
             state.isLogin = false;
