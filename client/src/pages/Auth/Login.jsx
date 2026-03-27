@@ -1,85 +1,105 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
 import { CgSpinnerTwoAlt } from "react-icons/cg";
 import { useDispatch, useSelector } from "react-redux";
-import { login, googleAuth, facebookAuth, } from "../../actions/userActions";
-import { setShowLoginModalFalse } from "../../slices/userSlice"
+import { login, googleAuth, facebookAuth } from "../../actions/userActions";
+import { setShowLoginModalFalse } from "../../slices/userSlice";
 import { syncGuestCart, getCart } from "../../actions/cartActions";
 export const Login = ({ setToggleAuth, handleOnClose }) => {
   const [loginData, setLoginData] = useState({
     emailOrUsername: "",
-    password: ""
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [focusedFields, setFocusedFields] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
 
   const isModal = !!handleOnClose;
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { authLoading, user } = useSelector((state) => state.user);
+  const { authLoading, user,isLogin } = useSelector((state) => state.user);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setErrorMessage("");
-    
-    dispatch(
-  login(loginData, (success, error) => {
-    if (success) {
-      if (handleOnClose) handleOnClose();
+const handleSubmit = (e) => {
+  e.preventDefault();
+  setErrorMessage("");
 
-      if (user?.isAdmin) {
-        navigate("/admin/dashboard");
-      } else {
-       const guestCart =
-  JSON.parse(localStorage.getItem("guestCart")) || [];
-
-if (guestCart.length > 0) {
-  dispatch(syncGuestCart(guestCart));
-} else {
-  dispatch(getCart());
-}
-        //navigate("/");
-      }
-    } else {
-      setErrorMessage(error || "Invalid email/username or password");
-    }
-  })
-);
-  };
-
-  const handleContinueWithGoogle = () => {
-    dispatch(googleAuth((success) => {
+  dispatch(
+    login(loginData, (success, error) => {
       if (success) {
         if (handleOnClose) {
-          handleOnClose();
+          handleOnClose(); // modal → just close
         }
-        if (user?.isAdmin) {
-          navigate("/admin/dashboard");
+
+        const guestCart =
+          JSON.parse(localStorage.getItem("guestCart")) || [];
+
+        if (guestCart.length > 0) {
+          dispatch(syncGuestCart(guestCart));
         } else {
-          navigate("/profile");
+          dispatch(getCart());
         }
+      } else {
+        setErrorMessage(error || "Invalid email/username or password");
       }
-    }));
+    })
+  );
+};
+
+useEffect(() => {
+  if (!isLogin) return; 
+  if (user && user.isAdmin !== undefined) {
+    console.log("FINAL USER:", user);
+
+    //if (handleOnClose) return; // don't navigate if modal
+    if (handleOnClose) {
+    handleOnClose(); // close modal first
+  }
+
+    if (user.isAdmin) {
+      navigate("/admin/dashboard"); //  admin
+    } else {
+      navigate("/profile"); //  normal user
+    }
+  }
+}, [user]);
+
+  const handleContinueWithGoogle = () => {
+    dispatch(
+      googleAuth((success) => {
+        if (success) {
+          if (handleOnClose) {
+            handleOnClose();
+          }
+          if (user?.isAdmin) {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/profile");
+          }
+        }
+      }),
+    );
   };
 
   const handleContinueWithFacebook = () => {
-    dispatch(facebookAuth((success) => {
-      if (success) {
-        if (handleOnClose) {
-          handleOnClose();
+    dispatch(
+      facebookAuth((success) => {
+        if (success) {
+          if (handleOnClose) {
+            handleOnClose();
+          }
+          if (user?.isAdmin) {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/profile");
+          }
         }
-        if (user?.isAdmin) {
-          navigate("/admin/dashboard");
-        } else {
-          navigate("/profile");
-        }
-      }
-    }));
+      }),
+    );
   };
 
   const handleFocus = (field) => {
@@ -103,10 +123,10 @@ if (guestCart.length > 0) {
     e.preventDefault();
     setLoginData({
       emailOrUsername: "",
-      password: ""
+      password: "",
     });
     setErrorMessage("");
-    
+
     // if (setToggleAuth) {
     //   setToggleAuth("register");
     // } else {
@@ -114,29 +134,27 @@ if (guestCart.length > 0) {
     // }
 
     if (handleOnClose) {
-  handleOnClose(); 
-}
+      handleOnClose();
+    }
 
-navigate("/register");
+    navigate("/register");
   };
 
   return (
-   <div
-  className={`flex justify-center font-primary ${
-    isModal
-      ? "py-8 items-start"
-      : "min-h-screen pt-30 pb-24 items-center"
-  }`}
->
+    <div
+      className={`flex justify-center font-primary ${
+        isModal ? "py-8 items-start" : "min-h-screen pt-30 pb-24 items-center"
+      }`}
+    >
       <form
         onSubmit={handleSubmit}
         className={`w-full flex flex-col p-8 rounded-xl ${
-  isModal
-    ? "max-w-lg mx-auto"
-    : "md:w-1/3 w-full md:mx-0 mx-6 md:mt-8"
-}`}
+          isModal ? "max-w-lg mx-auto" : "md:w-1/3 w-full md:mx-0 mx-6 md:mt-8"
+        }`}
       >
-        <p className="text-center text-lg font-secondary mb-8">Login to Your Account</p>
+        <p className="text-center text-lg font-secondary mb-8">
+          Login to Your Account
+        </p>
 
         {/* Error Message */}
         {errorMessage && (
@@ -151,7 +169,9 @@ navigate("/register");
             type="text"
             required
             value={loginData.emailOrUsername}
-            onChange={(e) => setLoginData({...loginData, emailOrUsername: e.target.value})}
+            onChange={(e) =>
+              setLoginData({ ...loginData, emailOrUsername: e.target.value })
+            }
             onFocus={() => handleFocus("emailOrUsername")}
             onBlur={(e) => handleBlur("emailOrUsername", e.target.value)}
             className="border text-sm rounded-lg py-3 px-4 w-full border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent peer"
@@ -173,7 +193,9 @@ navigate("/register");
             type={showPassword ? "text" : "password"}
             required
             value={loginData.password}
-            onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+            onChange={(e) =>
+              setLoginData({ ...loginData, password: e.target.value })
+            }
             onFocus={() => handleFocus("password")}
             onBlur={(e) => handleBlur("password", e.target.value)}
             className="border text-sm rounded-lg py-3 px-4 w-full border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent peer pr-10"
@@ -192,7 +214,11 @@ navigate("/register");
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary"
           >
-            {showPassword ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
+            {showPassword ? (
+              <FaEyeSlash className="h-5 w-5" />
+            ) : (
+              <FaEye className="h-5 w-5" />
+            )}
           </button>
         </div>
 
