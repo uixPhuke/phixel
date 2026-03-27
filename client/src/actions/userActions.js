@@ -94,7 +94,7 @@ export const resendOtp = (username, password) => async () => {
   try {
     await axios.post(
       `${API}/api/v1/user/auth/resend-otp`,
-      { username, password }
+      { emailOrUsername: username, password }
     );
 
     toast.success("OTP has been resent successfully");
