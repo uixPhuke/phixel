@@ -22,6 +22,9 @@ import { setShowLoginModalFalse } from "./slices/userSlice";
 import { useSelector } from "react-redux";
 import LoginModal from "./pages/Auth/LoginModal";
 
+import AdminRoute from "./components/Global/AdminRoute";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+
 const App = () => {
 
   const dispatch = useDispatch();
@@ -60,6 +63,16 @@ const App = () => {
 />
       <div className="pt-[60px] space-y-24">
         <Routes>
+
+          {/* Admin Dashboard */}
+          <Route
+  path="/admin/dashboard"
+  element={
+    <AdminRoute>
+      <AdminDashboard />
+    </AdminRoute>
+  }
+/>
 
           {/* Home */}
           <Route
