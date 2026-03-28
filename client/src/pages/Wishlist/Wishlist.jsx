@@ -17,6 +17,7 @@ const WishlistPage = () => {
   const { wishlistItems, loading } = useSelector((state) => state.wishlist);
    //const { isLogin } = useSelector((state) => state.user);
   const { isLogin, authLoading } = useSelector((state) => state.user);
+  const { cartItems } = useSelector((state) => state.cart);
  
 
  useEffect(() => {
@@ -113,59 +114,97 @@ if (!isLogin) {
         ============================== */
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-20">
-          {wishlistItems.map((product) => (
-            <div key={product._id} className="relative group">
+         {wishlistItems.map((product) => {
+  const selectedSize = product.sizes?.[0];
 
-              {/* REMOVE BUTTON */}
-              <button
-                onClick={() => dispatch(removeFromWishlist(product._id))}
-                className="absolute top-0 right-0 z-10 w-9 h-9 flex items-center justify-center"
-              >
-                <IoClose className="text-black" size={18} />
-              </button>
+  const handleAddToCart = () => {
+    const existingItem = cartItems.find(
+      (item) =>
+        (item.product?._id || item.productID) === product._id &&
+        item.size === selectedSize
+    );
 
-              {/* IMAGE */}
-              <div className="w-full aspect-[4/3] flex items-center justify-center bg-white">
-                <img
-                  src={product.images?.[0]?.url}
-                  alt={product.title}
-                  className="max-h-[220px] object-contain"
-                />
-              </div>
+    const quantityToSend = existingItem
+      ? existingItem.quantity + 1
+      : 1;
 
-              {/* PRODUCT INFO */}
-              <div className="mt-6 space-y-1">
-                <p className="text-sm font-medium">{product.title}</p>
+    if (!isLogin) {
+      dispatch(
+        addToGuestCart({
+          productID: product._id,
+          quantity: quantityToSend,
+          size: selectedSize,
+          priceSnapshot: product.sellingPrice,
+          product
+        })
+      );
+    } else {
+      dispatch(
+        addToCart({
+          productID: product._id,
+          quantity: quantityToSend,
+          size: selectedSize
+        })
+      );
+    }
 
-                <p className="text-sm text-gray-600 leading-snug">
-                  {product.description?.length > 100
-                    ? product.description.substring(0, 100) + "..."
-                    : product.description}
-                </p>
+    // optional: remove from wishlist (true "move to bag")
+    dispatch(removeFromWishlist(product._id));
+  };
 
-                {/* PRICE */}
-                <div className="flex items-baseline gap-3">
-                  <span className="text-[clamp(1.5rem,2.4vw,1.9rem)] font-semibold text-gray-900 leading-none">
-                    {formatPrice(product.sellingPrice)}
-                  </span>
+  return (
+    <div key={product._id} className="relative group">
+      {/* REMOVE BUTTON */}
+      <button
+        onClick={() => dispatch(removeFromWishlist(product._id))}
+        className="absolute top-0 right-0 z-10 w-9 h-9 flex items-center justify-center"
+      >
+        <IoClose className="text-black" size={18} />
+      </button>
 
-                  {product.totalPrice > product.sellingPrice && (
-                    <span className="text-sm text-gray-400 line-through leading-none">
-                      {formatPrice(product.totalPrice)}
-                    </span>
-                  )}
-                </div>
+      {/* IMAGE */}
+      <div className="w-full aspect-[4/3] flex items-center justify-center bg-white">
+        <img
+          src={product.images?.[0]?.url}
+          alt={product.title}
+          className="max-h-[220px] object-contain"
+        />
+      </div>
 
-                {/* MOVE TO BAG */}
-              <button
-  onClick={() => handleAddToCart(product)}
-  className="mt-4 px-6 py-2 border rounded-full text-sm hover:border-black transition"
->
-  Move to Bag
-</button>
-              </div>
-            </div>
-          ))}
+      {/* PRODUCT INFO */}
+      <div className="mt-6 space-y-1">
+        <p className="text-sm font-medium">{product.title}</p>
+
+        <p className="text-sm text-gray-600 leading-snug">
+          {product.description?.length > 100
+            ? product.description.substring(0, 100) + "..."
+            : product.description}
+        </p>
+
+        {/* PRICE */}
+        <div className="flex items-baseline gap-3">
+          <span className="text-[clamp(1.5rem,2.4vw,1.9rem)] font-semibold text-gray-900 leading-none">
+            {formatPrice(product.sellingPrice)}
+          </span>
+
+          {product.totalPrice > product.sellingPrice && (
+            <span className="text-sm text-gray-400 line-through leading-none">
+              {formatPrice(product.totalPrice)}
+            </span>
+          )}
+        </div>
+
+        {/* MOVE TO BAG */}
+        <button
+          onClick={handleAddToCart}
+          className="mt-4 px-6 py-2 border rounded-full text-sm hover:border-black transition"
+        >
+          Move to Bag
+        </button>
+      </div>
+    </div>
+  );
+})}
         </div>
       )}
     </div>
