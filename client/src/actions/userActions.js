@@ -18,6 +18,7 @@ import {
   getUsersRequest,
   getUsersSuccess,
   getUsersFail,
+  logoutSuccess
 } from "../slices/userSlice";
 
 import { toast } from "react-hot-toast";
@@ -136,8 +137,8 @@ export const verifyOtp =
 export const logout = () => async (dispatch) => {
   try {
     await axios.post(`${API}/api/v1/user/auth/logout`, {}, config);
-
-    dispatch(verifyLoginFail());
+dispatch(logoutSuccess());
+    //dispatch(verifyLoginFail());
 
     // clear cart state
     dispatch(clearCartSuccess());
