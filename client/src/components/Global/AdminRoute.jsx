@@ -2,19 +2,29 @@ import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const AdminRoute = ({ children }) => {
-  const { isLogin, user } = useSelector((state) => state.user);
+  const { isLogin, user, loading } = useSelector(
+    (state) => state.user
+  );
 
-  // not logged in → go to login
+  // wait for verify() to finish
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+
+  // not logged in
   if (!isLogin) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
-  // logged in but not admin → block
+  // logged in but not admin
   if (!user?.isAdmin) {
-    return <Navigate to="/" />; // or /profile
+    return <Navigate to="/" replace />;
   }
 
-  // admin → allow access
   return children;
 };
 
