@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useProducts } from '../../hooks/useProducts';
 import AdminProductCard from '../../components/product/AdminProductCard';
 
-const AdminProductsPage = () => {
+const AdminProductsPage = ({onEdit}) => {
   const { productsAdmin, loading, error, fetchAdminProducts } = useProducts();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -89,7 +89,11 @@ const AdminProductsPage = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map(product => (
-            <AdminProductCard key={product._id} product={product} />
+            <AdminProductCard
+  key={product._id}
+  product={product}
+  onEdit={onEdit}
+/>
           ))}
         </div>
       )}

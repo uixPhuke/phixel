@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { 
-  getAllProducts, 
-  getProduct, 
+import {
+  getAllProducts,
+  getProduct,
   getProductsAdmin,
+  getProductAdmin,
   addProduct,
   updateProductAdmin,
-  deleteProductAdmin 
+  deleteProductAdmin
 } from '../actions/productActions';
 
 
@@ -35,24 +36,27 @@ const [searchParams] = useSearchParams();
   };
 
   const fetchProduct = (productID) => {
-    dispatch(getProduct(productID));
+    return dispatch(getProduct(productID));
   };
 
   // Admin actions
   const fetchAdminProducts = () => {
-    dispatch(getProductsAdmin());
+    return dispatch(getProductsAdmin());
   };
+const fetchProductAdmin = (productID) => {
+  return dispatch(getProductAdmin(productID));
+};
 
   const createProduct = (productData, formData, resetForm) => {
-    dispatch(addProduct(productData, formData, resetForm));
+    return dispatch(addProduct(productData, formData, resetForm));
   };
 
   const updateProduct = (productID, productData, formData) => {
-    dispatch(updateProductAdmin(productID, productData, formData));
+    return dispatch(updateProductAdmin(productID, productData, formData));
   };
 
   const deleteProduct = (productID) => {
-    dispatch(deleteProductAdmin(productID));
+    return dispatch(deleteProductAdmin(productID));
   };
 
   // Filter and sort handlers
@@ -85,6 +89,7 @@ const [searchParams] = useSearchParams();
     deleteProduct,
     updateFilters,
     updateSort,
+    fetchProductAdmin,
     
     // Helpers
     hasProducts: products.length > 0,
