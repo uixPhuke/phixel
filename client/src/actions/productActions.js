@@ -16,9 +16,11 @@ const API_URL = import.meta.env.VITE_API_KEY;
 
 // Helper function to get auth config
 const getAuthConfig = () => ({
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  }
+   withCredentials: true,
+  //headers: {
+   // Authorization: `Bearer ${localStorage.getItem("token")}`,
+    
+  //}
 });
 
 // Admin Route - Create Product
@@ -26,17 +28,12 @@ export const addProduct = (productData, formData, resetForm) => async (dispatch)
   try {
     dispatch(productRequest());
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        'Content-Type': 'multipart/form-data'
-      }
-    };
+   
 
     const { data } = await axios.post(
       `${API_URL}/api/v3/product/admin/product/create`,
       formData,
-      config
+      getAuthConfig()
     );
 
     dispatch(createProductSuccess());
@@ -133,12 +130,7 @@ export const updateProductAdmin = (productID, productData, formData) => async (d
   try {
     dispatch(productRequest());
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        'Content-Type': formData ? 'multipart/form-data' : 'application/json'
-      }
-    };
+   
 
     // Use formData if provided, otherwise use productData
     const requestData = formData || productData;
@@ -146,7 +138,7 @@ export const updateProductAdmin = (productID, productData, formData) => async (d
     const { data } = await axios.put(
       `${API_URL}/api/v3/product/admin/product/${productID}`,
       requestData,
-      config
+     getAuthConfig()
     );
 
     dispatch(updateProductAdminSuccess());
