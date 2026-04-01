@@ -165,22 +165,22 @@ const createProductAdmin = async (req, res, next) => {
     }
 
     //upload images to cloudinary
-    const imageUrls = [];
-    // Normalize to always handle as array
-    const imageArray = Array.isArray(images) ? images : [images];
+const imageArray = Array.isArray(images) ? images : [images];
 
-    for (const image of imageArray) {
-      const result = await cloudinary.uploader.upload(image.path, {
-        folder: "products",
-      });
-    
-      imageUrls.push({
-        public_id: result.public_id,
-        url: result.secure_url,
-      });
-    
-      fs.unlinkSync(image.path); // Clean up local file
-    }
+const imageUrls = await Promise.all(
+  imageArray.map(async (image) => {
+    const result = await cloudinary.uploader.upload(image.path, {
+      folder: "products",
+    });
+
+    fs.unlinkSync(image.path);
+
+    return {
+      public_id: result.public_id,
+      url: result.secure_url,
+    };
+  })
+);
     
     if (!imageUrls || imageUrls.length === 0) {
       return res
@@ -534,9 +534,14 @@ const deleteProductAdmin = async (req, res) => {
         }
     
         // Delete images from Cloudinary
-        for (const image of product.images) {
-        await cloudinary.uploader.destroy(image.public_id);
-        }
+        // for (const image of product.images) {
+        // await cloudinary.uploader.destroy(image.public_id);
+        // }
+        await Promise.all(
+  product.images.map((image) =>
+    cloudinary.uploader.destroy(image.public_id)
+  )
+);
     
         // Delete the product from the database
         await Product.findByIdAndDelete(productID);

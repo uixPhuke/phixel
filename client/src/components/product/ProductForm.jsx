@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  PRODUCT_CATEGORIES, 
-  PRODUCT_SIZES, 
-  FIT_TYPES, 
-  PATTERNS, 
-  SLEEVE_TYPES, 
-  COLLAR_TYPES, 
-  GENDER_TYPES 
+import {
+  PRODUCT_CATEGORIES,
+  PRODUCT_SIZES,
+  FIT_TYPES,
+  PATTERNS,
+  SLEEVE_TYPES,
+  COLLAR_TYPES,
+  GENDER_TYPES
 } from '../../constants/productConstants';
 import { validateProductForm } from '../../utils/productHelpers';
 
@@ -63,22 +63,25 @@ const ProductForm = ({ product, onSubmit, loading }) => {
         active: product.active || 'active',
         productCode: product.productCode || ''
       });
+
+      setImages(product.images || []);
     }
   }, [product]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
   };
 
   const handleSizeChange = (size) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       sizes: prev.sizes.includes(size)
-        ? prev.sizes.filter(s => s !== size)
+        ? prev.sizes.filter((s) => s !== size)
         : [...prev.sizes, size]
     }));
   };
@@ -89,17 +92,17 @@ const ProductForm = ({ product, onSubmit, loading }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     const formErrors = validateProductForm(formData);
+
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
       return;
     }
 
     const submitData = new FormData();
-    
-    // Append form data
-    Object.keys(formData).forEach(key => {
+
+    Object.keys(formData).forEach((key) => {
       if (key === 'sizes') {
         submitData.append(key, JSON.stringify(formData[key]));
       } else {
@@ -107,8 +110,7 @@ const ProductForm = ({ product, onSubmit, loading }) => {
       }
     });
 
-    // Append images
-    images.forEach(image => {
+    images.forEach((image) => {
       submitData.append('images', image);
     });
 
@@ -116,403 +118,333 @@ const ProductForm = ({ product, onSubmit, loading }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto">
-      {/* Basic Information */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Product Title *
-            </label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              className={`w-full p-2 border rounded-md ${
-                errors.title ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="Enter product title"
-            />
-            {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
-          </div>
+    <form onSubmit={handleSubmit} className="p-6 bg-gray-100 min-h-screen">
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-semibold">
+          {product ? 'Edit Product' : 'Add New Product'}
+        </h1>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Product Code *
-            </label>
-            <input
-              type="text"
-              name="productCode"
-              value={formData.productCode}
-              onChange={handleInputChange}
-              className={`w-full p-2 border rounded-md ${
-                errors.productCode ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="Enter product code"
-            />
-            {errors.productCode && <p className="text-red-500 text-sm mt-1">{errors.productCode}</p>}
-          </div>
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="border px-6 py-3 rounded-full"
+          >
+            Cancel
+          </button>
 
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description *
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              rows={4}
-              className={`w-full p-2 border rounded-md ${
-                errors.description ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="Enter product description"
-            />
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-green-300 px-6 py-3 rounded-full font-semibold"
+          >
+            {loading
+              ? 'Saving...'
+              : product
+              ? 'Update Product'
+              : 'Add Product'}
+          </button>
         </div>
       </div>
 
-      {/* Pricing */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold mb-4">Pricing</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Cost Price *
-            </label>
-            <input
-              type="number"
-              name="costPrice"
-              value={formData.costPrice}
-              onChange={handleInputChange}
-              step="0.01"
-              className={`w-full p-2 border rounded-md ${
-                errors.costPrice ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.costPrice && <p className="text-red-500 text-sm mt-1">{errors.costPrice}</p>}
+      <div className="grid grid-cols-3 gap-6">
+        {/* LEFT SIDE */}
+        <div className="col-span-2 space-y-6">
+          {/* GENERAL INFO */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm">
+            <h2 className="text-md font-semibold mb-6">
+              General Information
+            </h2>
+
+            <div className="space-y-5">
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                placeholder="Product Title"
+                className="w-full bg-gray-50 rounded-xl p-4"
+              />
+
+              <textarea
+                rows={6}
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                placeholder="Description"
+                className="w-full bg-gray-50 rounded-xl p-4 resize-none"
+              />
+
+              {/* SIZE + GENDER */}
+              <div className="grid grid-cols-2 gap-8">
+                <div>
+                  <p className="mb-3 font-medium">Size</p>
+
+                  <div className="flex gap-3 flex-wrap">
+                    {PRODUCT_SIZES.map((size) => (
+                      <button
+                        type="button"
+                        key={size}
+                        onClick={() => handleSizeChange(size)}
+                        className={`px-5 py-3 rounded-lg ${
+                          formData.sizes.includes(size)
+                            ? 'bg-green-300'
+                            : 'bg-gray-100'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="mb-3 font-medium">Gender</p>
+
+                  <div className="flex gap-4">
+                    {GENDER_TYPES.map((gender) => (
+                      <label key={gender} className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="gender"
+                          value={gender}
+                          checked={formData.gender === gender}
+                          onChange={handleInputChange}
+                        />
+                        {gender}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Selling Price *
-            </label>
-            <input
-              type="number"
-              name="sellingPrice"
-              value={formData.sellingPrice}
-              onChange={handleInputChange}
-              step="0.01"
-              className={`w-full p-2 border rounded-md ${
-                errors.sellingPrice ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.sellingPrice && <p className="text-red-500 text-sm mt-1">{errors.sellingPrice}</p>}
-          </div>
+          {/* PRICING */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm">
+            <h2 className="text-md font-semibold mb-6">
+              Pricing And Stock
+            </h2>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Total Price *
-            </label>
-            <input
-              type="number"
-              name="totalPrice"
-              value={formData.totalPrice}
-              onChange={handleInputChange}
-              step="0.01"
-              className={`w-full p-2 border rounded-md ${
-                errors.totalPrice ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.totalPrice && <p className="text-red-500 text-sm mt-1">{errors.totalPrice}</p>}
+            <div className="grid grid-cols-2 gap-5">
+              <input
+                type="number"
+                name="costPrice"
+                value={formData.costPrice}
+                onChange={handleInputChange}
+                placeholder="Cost Price"
+                className="bg-gray-50 rounded-xl p-4"
+              />
+
+              <input
+                type="number"
+                name="sellingPrice"
+                value={formData.sellingPrice}
+                onChange={handleInputChange}
+                placeholder="Selling Price"
+                className="bg-gray-50 rounded-xl p-4"
+              />
+
+              <input
+                type="number"
+                name="totalPrice"
+                value={formData.totalPrice}
+                onChange={handleInputChange}
+                placeholder="Total Price"
+                className="bg-gray-50 rounded-xl p-4"
+              />
+
+              <input
+                type="number"
+                name="stock"
+                value={formData.stock}
+                onChange={handleInputChange}
+                placeholder="Stock"
+                className="bg-gray-50 rounded-xl p-4"
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Product Details */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold mb-4">Product Details</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category *
-            </label>
+        {/* RIGHT SIDE */}
+        <div className="space-y-6">
+          {/* IMAGES */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm">
+            <h2 className="text-md font-semibold mb-5">Upload Images</h2>
+
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full bg-gray-50 rounded-xl p-4"
+            />
+
+            <div className="flex gap-3 mt-4 flex-wrap">
+              {images.map((img, index) => (
+                <img
+                  key={index}
+                  src={img.url || URL.createObjectURL(img)}
+                  alt=""
+                  className="w-20 h-20 rounded-xl object-cover"
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* CATEGORY */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm">
             <select
               name="category"
               value={formData.category}
               onChange={handleInputChange}
-              className={`w-full p-2 border rounded-md ${
-                errors.category ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className="w-full bg-gray-50 rounded-xl p-4"
             >
               <option value="">Select Category</option>
-              {PRODUCT_CATEGORIES.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-            {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Gender *
-            </label>
-            <select
-              name="gender"
-              value={formData.gender}
-              onChange={handleInputChange}
-              className={`w-full p-2 border rounded-md ${
-                errors.gender ? 'border-red-500' : 'border-gray-300'
-              }`}
-            >
-              <option value="">Select Gender</option>
-              {GENDER_TYPES.map(gender => (
-                <option key={gender} value={gender}>{gender}</option>
-              ))}
-            </select>
-            {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Fit Type *
-            </label>
-            <select
-              name="fitType"
-              value={formData.fitType}
-              onChange={handleInputChange}
-              className={`w-full p-2 border rounded-md ${
-                errors.fitType ? 'border-red-500' : 'border-gray-300'
-              }`}
-            >
-              <option value="">Select Fit Type</option>
-              {FIT_TYPES.map(fit => (
-                <option key={fit} value={fit}>{fit}</option>
-              ))}
-            </select>
-            {errors.fitType && <p className="text-red-500 text-sm mt-1">{errors.fitType}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Pattern *
-            </label>
-            <select
-              name="pattern"
-              value={formData.pattern}
-              onChange={handleInputChange}
-              className={`w-full p-2 border rounded-md ${
-                errors.pattern ? 'border-red-500' : 'border-gray-300'
-              }`}
-            >
-              <option value="">Select Pattern</option>
-              {PATTERNS.map(pattern => (
-                <option key={pattern} value={pattern}>{pattern}</option>
-              ))}
-            </select>
-            {errors.pattern && <p className="text-red-500 text-sm mt-1">{errors.pattern}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Sleeve Type
-            </label>
-            <select
-              name="sleeveType"
-              value={formData.sleeveType}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-md"
-            >
-              <option value="">Select Sleeve Type</option>
-              {SLEEVE_TYPES.map(sleeve => (
-                <option key={sleeve} value={sleeve}>{sleeve}</option>
+              {PRODUCT_CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
               ))}
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Collar Type
-            </label>
-            <select
-              name="collarType"
-              value={formData.collarType}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-md"
-            >
-              <option value="">Select Collar Type</option>
-              {COLLAR_TYPES.map(collar => (
-                <option key={collar} value={collar}>{collar}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Fabric Type *
-            </label>
+          {/* EXTRA DETAILS */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm space-y-4">
             <input
               type="text"
               name="fabricType"
               value={formData.fabricType}
               onChange={handleInputChange}
-              className={`w-full p-2 border rounded-md ${
-                errors.fabricType ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="e.g., Cotton, Polyester"
+              placeholder="Fabric Type"
+              className="w-full bg-gray-50 rounded-xl p-4"
             />
-            {errors.fabricType && <p className="text-red-500 text-sm mt-1">{errors.fabricType}</p>}
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Color *
-            </label>
+            <select
+              name="fitType"
+              value={formData.fitType}
+              onChange={handleInputChange}
+              className="w-full bg-gray-50 rounded-xl p-4"
+            >
+              <option value="">Fit Type</option>
+              {FIT_TYPES.map((fit) => (
+                <option key={fit} value={fit}>
+                  {fit}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="pattern"
+              value={formData.pattern}
+              onChange={handleInputChange}
+              className="w-full bg-gray-50 rounded-xl p-4"
+            >
+              <option value="">Pattern</option>
+              {PATTERNS.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="sleeveType"
+              value={formData.sleeveType}
+              onChange={handleInputChange}
+              className="w-full bg-gray-50 rounded-xl p-4"
+            >
+              <option value="">Sleeve Type</option>
+              {SLEEVE_TYPES.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="collarType"
+              value={formData.collarType}
+              onChange={handleInputChange}
+              className="w-full bg-gray-50 rounded-xl p-4"
+            >
+              <option value="">Collar Type</option>
+              {COLLAR_TYPES.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+
             <input
               type="text"
               name="color"
               value={formData.color}
               onChange={handleInputChange}
-              className={`w-full p-2 border rounded-md ${
-                errors.color ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="Enter color"
+              placeholder="Color"
+              className="w-full bg-gray-50 rounded-xl p-4"
             />
-            {errors.color && <p className="text-red-500 text-sm mt-1">{errors.color}</p>}
-          </div>
-        </div>
-      </div>
 
-      {/* Sizes */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold mb-4">Sizes *</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          {PRODUCT_SIZES.map(size => (
-            <label key={size} className="flex items-center">
-              <input
-                type="checkbox"
-                checked={formData.sizes.includes(size)}
-                onChange={() => handleSizeChange(size)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="ml-2 text-sm text-gray-700">{size}</span>
-            </label>
-          ))}
-        </div>
-        {errors.sizes && <p className="text-red-500 text-sm mt-2">{errors.sizes}</p>}
-      </div>
-
-      {/* Inventory & Status */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold mb-4">Inventory & Status</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Stock Quantity *
-            </label>
-            <input
-              type="number"
-              name="stock"
-              value={formData.stock}
-              onChange={handleInputChange}
-              className={`w-full p-2 border rounded-md ${
-                errors.stock ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.stock && <p className="text-red-500 text-sm mt-1">{errors.stock}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Country *
-            </label>
             <input
               type="text"
               name="country"
               value={formData.country}
               onChange={handleInputChange}
-              className={`w-full p-2 border rounded-md ${
-                errors.country ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="Enter country"
+              placeholder="Country"
+              className="w-full bg-gray-50 rounded-xl p-4"
             />
-            {errors.country && <p className="text-red-500 text-sm mt-1">{errors.country}</p>}
-          </div>
 
-          <div className="space-y-2">
-            <label className="flex items-center">
+            <input
+              type="text"
+              name="productCode"
+              value={formData.productCode}
+              onChange={handleInputChange}
+              placeholder="Product Code"
+              className="w-full bg-gray-50 rounded-xl p-4"
+            />
+
+            <select
+              name="active"
+              value={formData.active}
+              onChange={handleInputChange}
+              className="w-full bg-gray-50 rounded-xl p-4"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 name="availableState"
                 checked={formData.availableState}
                 onChange={handleInputChange}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="ml-2 text-sm text-gray-700">Available for Sale</span>
+              Available
             </label>
 
-            <label className="flex items-center">
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 name="madeToOrder"
                 checked={formData.madeToOrder}
                 onChange={handleInputChange}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="ml-2 text-sm text-gray-700">Made to Order</span>
+              Made To Order
             </label>
 
-            <label className="flex items-center">
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 name="popular"
                 checked={formData.popular}
                 onChange={handleInputChange}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="ml-2 text-sm text-gray-700">Mark as Popular</span>
+              Popular Product
             </label>
           </div>
         </div>
-      </div>
-
-      {/* Images */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold mb-4">Product Images</h3>
-        <input
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleImageChange}
-          className="w-full p-2 border border-gray-300 rounded-md"
-        />
-        <p className="text-sm text-gray-500 mt-2">
-          Select multiple images for the product
-        </p>
-      </div>
-
-      {/* Submit Button */}
-      <div className="flex justify-end space-x-4">
-        <button
-          type="button"
-          onClick={() => window.history.back()}
-          className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-        >
-          {loading ? 'Saving...' : (product ? 'Update Product' : 'Create Product')}
-        </button>
       </div>
     </form>
   );

@@ -47,10 +47,10 @@ const AdminDashboard = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside
+ <aside
   className={`bg-white transition-all duration-300 ${
     sidebarOpen ? "w-64" : "w-20"
-  } min-h-screen`}
+  } sticky top-0 h-screen m-2 rounded-2xl shadow-lg border border-gray-200`}
 >
   {/* Header */}
   <div className="h-16 px-4 flex items-center justify-between">
