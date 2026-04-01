@@ -1,74 +1,154 @@
-import React, { useState } from "react";
-import { FaPlus, FaEdit, FaEye } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import AddProduct from "../AddProduct";
-import ViewProduct from "../ViewProduct";
-import EditProduct from "../EditProduct";
+import ProductForm from "../../../components/product/ProductForm";
+import AdminProductCard from "../../../components/product/AdminProductCard";
+
+import {
+  addProduct,
+  updateProductAdmin,
+  getProductsAdmin,
+} from "../../../actions/productActions";
 
 const ProductsTab = () => {
-  const [activeTab, setActiveTab] = useState("add");
+  const dispatch = useDispatch();
 
-  const renderTab = () => {
-    switch (activeTab) {
-      case "add":
-        return <AddProduct />;
-      case "view":
-        return <ViewProduct />;
-      case "edit":
-        return <EditProduct />;
-      default:
-        return <AddProduct />;
+  const { productsAdmin, loading } =
+    useSelector((state) => state.product);
+    
+
+  const [mode, setMode] =
+    useState("list");
+
+  const [selectedProduct, setSelectedProduct] =
+    useState(null);
+
+  const [searchTerm, setSearchTerm] =
+    useState("");
+
+  const [category, setCategory] =
+    useState("");
+
+  useEffect(() => {
+    dispatch(getProductsAdmin());
+  }, [dispatch]);
+const filteredProducts = productsAdmin.filter((product) => {
+  const matchesSearch =
+    product.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.productCode?.toLowerCase().includes(searchTerm.toLowerCase());
+
+  const matchesCategory =
+    category === "" ||
+    product.category?.toLowerCase() === category.toLowerCase();
+
+  return matchesSearch && matchesCategory;
+});
+
+  const handleAdd = () => {
+    setSelectedProduct(null);
+    setMode("form");
+  };
+
+  const handleEdit = (product) => {
+    setSelectedProduct(product);
+    setMode("form");
+  };
+
+  const handleBackToList = () => {
+    setSelectedProduct(null);
+    setMode("list");
+    dispatch(getProductsAdmin());
+  };
+
+  const handleSubmit = async (
+    formData,
+    submitData
+  ) => {
+    if (selectedProduct) {
+      await dispatch(
+        updateProductAdmin(
+          selectedProduct._id,
+          formData,
+          submitData
+        )
+      );
+    } else {
+      await dispatch(
+        addProduct(
+          formData,
+          submitData
+        )
+      );
     }
+
+    handleBackToList();
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm space-y-6">
-      {/* Header */}
-      <h1 className="text-2xl font-bold">
+    <div className="bg-white p-6 rounded-2xl shadow-sm">
+      <h1 className="text-5xl font-bold mb-8">
         Product Management
       </h1>
 
-      {/* Horizontal Tabs */}
-      <div className="flex gap-4  pb-3">
-        <button
-          onClick={() => setActiveTab("add")}
-          className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-            activeTab === "add"
-              ? "bg-black text-white"
-              : "bg-gray-100"
-          }`}
-        >
-          <FaPlus />
-          Add Product
-        </button>
+      {mode === "list" ? (
+        <>
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex gap-4">
+              <input
+            type="text"
+            placeholder="Search products by name or code..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          />
 
-        <button
-          onClick={() => setActiveTab("view")}
-          className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-            activeTab === "view"
-              ? "bg-black text-white"
-              : "bg-gray-100"
-          }`}
-        >
-          <FaEye />
-          View Products
-        </button>
+              <select
+  value={category}
+  onChange={(e) => setCategory(e.target.value)}
+  className="border rounded-lg px-4 py-2"
+>
+  <option value="">All Categories</option>
 
-        <button
-          onClick={() => setActiveTab("edit")}
-          className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-            activeTab === "edit"
-              ? "bg-black text-white"
-              : "bg-gray-100"
-          }`}
-        >
-          <FaEdit />
-          Edit Product
-        </button>
-      </div>
+  {[...new Set(productsAdmin.map((p) => p.category))].map((cat) => (
+    <option key={cat} value={cat}>
+      {cat}
+    </option>
+  ))}
+</select>
+            </div>
 
-      {/* Dynamic Component */}
-      {renderTab()}
+            <button
+              onClick={handleAdd}
+              className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+            >
+              Add New Product
+            </button>
+          </div>
+
+          <div className="grid grid-cols-4 gap-6">
+            {filteredProducts.map(
+              (product) => (
+                <AdminProductCard
+                  key={product._id}
+                  product={product}
+                  onEdit={() =>
+                    handleEdit(
+                      product
+                    )
+                  }
+                />
+              )
+            )}
+          </div>
+        </>
+      ) : (
+        <ProductForm
+          product={selectedProduct}
+          onSubmit={handleSubmit}
+          onCancel={handleBackToList}
+          loading={loading}
+        />
+      )}
     </div>
   );
 };
