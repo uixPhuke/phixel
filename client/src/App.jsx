@@ -25,6 +25,9 @@ import LoginModal from "./pages/Auth/LoginModal";
 import AdminRoute from "./components/Global/AdminRoute";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 
+import AdminProductsPage from "./pages/Product/AdminProductsPage";
+import AdminProductFormPage from "./pages/Product/AdminProductFormPage";
+
 const App = () => {
 
   const dispatch = useDispatch();
@@ -65,11 +68,39 @@ const App = () => {
         <Routes>
 
           {/* Admin Dashboard */}
-          <Route
+          {/* Admin Dashboard */}
+<Route
   path="/admin/dashboard"
   element={
     <AdminRoute>
       <AdminDashboard />
+    </AdminRoute>
+  }
+/>
+
+<Route
+  path="/admin/products"
+  element={
+    <AdminRoute>
+      <AdminProductsPage />
+    </AdminRoute>
+  }
+/>
+
+<Route
+  path="/admin/products/create"
+  element={
+    <AdminRoute>
+      <AdminProductFormPage />
+    </AdminRoute>
+  }
+/>
+
+<Route
+  path="/admin/products/edit/:productID"
+  element={
+    <AdminRoute>
+      <AdminProductFormPage />
     </AdminRoute>
   }
 />
