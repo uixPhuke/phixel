@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const AdminRoute = ({ children }) => {
-  const { isLogin, user, authLoading } = useSelector(
+  const { isLogin, user, authLoading,authChecked, } = useSelector(
     (state) => state.user
   );
 
