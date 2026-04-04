@@ -43,19 +43,24 @@ export const login = (userData, callback) => async (dispatch) => {
     dispatch(loginRequest());
 
     await axios.post(
-      `${API}/api/v1/user/auth/login`,
-      userData,
-      config
-    );
+  `${API}/api/v1/user/auth/login`,
+  userData,
+  config
+);
 
-    dispatch(loginSuccess());
+const verifiedData = await dispatch(verify());
 
-    const verifiedData = await dispatch(verify());
-    await dispatch(getCart());
+if (!verifiedData?.user) {
+  throw new Error("User verification failed");
+}
 
-    toast.success("Login successful");
+dispatch(loginSuccess());
 
-    callback?.(true, verifiedData?.user);
+await dispatch(getCart());
+
+toast.success("Login successful");
+
+callback?.(true, verifiedData.user);
   } catch (err) {
     const message =
       err.response?.data?.message || "Login failed";
