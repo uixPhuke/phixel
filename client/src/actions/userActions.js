@@ -44,10 +44,10 @@ export const login = (userData, callback) => async (dispatch) => {
 
     await axios.post(`${API}/api/v1/user/auth/login`, userData, config);
 
-    dispatch(loginSuccess());
-    dispatch(verify());
-    
-dispatch(getCart()); 
+ dispatch(loginSuccess());
+
+await dispatch(verify());
+await dispatch(getCart());
     toast.success("Login successful");
 
     callback?.(true);
