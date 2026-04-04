@@ -7,13 +7,14 @@ const AdminRoute = ({ children }) => {
   );
 
   // wait for verify() to finish
-  if (authLoading) {
+if (!authChecked || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         Loading...
       </div>
     );
   }
+
 
   // not logged in
   if (!isLogin) {
