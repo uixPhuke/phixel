@@ -31,6 +31,8 @@ const handleSubmit = (e) => {
   dispatch(
     login(loginData, (success, verifiedUser, error) => {
       if (success) {
+        dispatch(setShowLoginModalFalse());
+
         if (handleOnClose) {
           handleOnClose();
         }
