@@ -664,12 +664,17 @@ const deleteUser = async (req, res) => {
 //logout user
 const logoutUser = async (req, res) => {
   try {
-    res.cookie("token", null, {
-      expires: new Date(Date.now()),
+    res.clearCookie("token", {
       httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite:
+        process.env.NODE_ENV === "production"
+          ? "none"
+          : "lax",
+      path: "/",
     });
-    res.status(200).json({
+
+    return res.status(200).json({
       success: true,
       message: "User logged out successfully",
     });
