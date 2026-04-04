@@ -29,10 +29,10 @@ const handleSubmit = (e) => {
   setErrorMessage("");
 
   dispatch(
-    login(loginData, (success, error) => {
+    login(loginData, (success, verifiedUser, error) => {
       if (success) {
         if (handleOnClose) {
-          handleOnClose(); // modal → just close
+          handleOnClose();
         }
 
         const guestCart =
@@ -43,30 +43,37 @@ const handleSubmit = (e) => {
         } else {
           dispatch(getCart());
         }
+
+        if (verifiedUser?.isAdmin) {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/profile");
+        }
       } else {
-        setErrorMessage(error || "Invalid email/username or password");
+        setErrorMessage(
+          error || "Invalid email/username or password"
+        );
       }
     })
   );
 };
+// useEffect(() => {
+//   if (!isLogin) return; 
+//   if (user && user.isAdmin !== undefined) {
+//     console.log("FINAL USER:", user);
 
-useEffect(() => {
-  if (!isLogin) return; 
-  if (user && user.isAdmin !== undefined) {
-    console.log("FINAL USER:", user);
+//     //if (handleOnClose) return; // don't navigate if modal
+//     if (handleOnClose) {
+//     handleOnClose(); // close modal first
+//   }
 
-    //if (handleOnClose) return; // don't navigate if modal
-    if (handleOnClose) {
-    handleOnClose(); // close modal first
-  }
-
-    if (user.isAdmin) {
-      navigate("/admin/dashboard"); //  admin
-    } else {
-      navigate("/profile"); //  normal user
-    }
-  }
-}, [user]);
+//     if (user.isAdmin) {
+//       navigate("/admin/dashboard"); //  admin
+//     } else {
+//       navigate("/profile"); //  normal user
+//     }
+//   }
+// }, [user]);
 
   const handleContinueWithGoogle = () => {
     dispatch(
