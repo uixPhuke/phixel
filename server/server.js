@@ -21,6 +21,8 @@ const URL=process.env.FRONTEND_URL
 //connect to database
 connectDB()
 
+
+app.set("trust proxy", 1);
 //pass the middleware
 app.use(
   cors({
