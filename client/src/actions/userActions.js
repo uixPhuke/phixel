@@ -42,20 +42,26 @@ export const login = (userData, callback) => async (dispatch) => {
   try {
     dispatch(loginRequest());
 
-    await axios.post(`${API}/api/v1/user/auth/login`, userData, config);
+    await axios.post(
+      `${API}/api/v1/user/auth/login`,
+      userData,
+      config
+    );
 
- dispatch(loginSuccess());
+    dispatch(loginSuccess());
 
-await dispatch(verify());
-await dispatch(getCart());
+    const verifiedData = await dispatch(verify());
+    await dispatch(getCart());
+
     toast.success("Login successful");
 
-    callback?.(true);
+    callback?.(true, verifiedData?.user);
   } catch (err) {
-    const message = err.response?.data?.message || "Login failed";
+    const message =
+      err.response?.data?.message || "Login failed";
 
     dispatch(loginFail(message));
-    callback?.(false, message);
+    callback?.(false, null, message);
   }
 };
 
@@ -163,8 +169,11 @@ export const verify = () => async (dispatch) => {
     );
 
     dispatch(verifyLoginSuccess(data));
+
+    return data; // IMPORTANT
   } catch {
     dispatch(verifyLoginFail());
+    return null;
   }
 };
 
