@@ -5,6 +5,7 @@ const userSlice=createSlice({
     initialState:{
         loading :false,
         authLoading:false,
+        authChecked: false,
         error:null,
         isLogin:false,
         showLoginModal:false,
@@ -71,11 +72,13 @@ logoutSuccess: (state) => {
         verifyLoginSuccess: (state, action) => {
             state.isLogin = action.payload.isLogin;
             state.authLoading = false;
+            state.authChecked = true;
             state.user = action.payload.user;
         },
         verifyLoginFail: (state, action) => {
             state.isLogin = false;
             state.authLoading = false;
+            state.authChecked = true;
             state.error = action.payload || 'Please login first to access this page';
         },
 
