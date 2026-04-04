@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import {
   FaTachometerAlt,
   FaShoppingCart,
@@ -26,6 +27,14 @@ const menuItems = [
 const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("Dashboard");
+
+useEffect(() => {
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: "auto",
+  });
+}, [activeTab]);
 
   const renderTab = () => {
     switch (activeTab) {
