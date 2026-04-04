@@ -1,59 +1,83 @@
-const nodemailer = require('nodemailer');
-require('dotenv').config();
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 let transporter;
 
 // Async function to initialize the transporter
 const initTransporter = async () => {
-    try {
-        transporter = nodemailer.createTransport({
-            service: "Gmail",
-            host: "smtp.gmail.com",
-            port: 587,
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
+  try {
+    // reuse existing transporter
+    if (transporter) return transporter;
 
-        await transporter.verify();
-        console.log("Email transporter verified and ready.");
-    } catch (error) {
-        console.error("Failed to configure email transporter:", error.message);
-        throw new Error("Failed to configure email transporter. Please check your credentials.");
-    }  
+    transporter = nodemailer.createTransport({
+      service: "Gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // important for port 587
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.verify();
+    console.log("Email transporter verified and ready.");
+
+    return transporter;
+  } catch (error) {
+    console.error(
+      "Failed to configure email transporter:",
+      error.message
+    );
+
+    transporter = null; // do not crash server
+    return null;
+  }
 };
 
-// Call the transporter initializer immediately
-initTransporter();
+const sendOtpEmail = async (
+  email,
+  otp,
+  type = "verification"
+) => {
+  // initialize transporter only when needed
+  const mailTransporter = await initTransporter();
 
-const sendOtpEmail = async (email, otp, type = "verification") => {
-    if (!email || !otp) {
-        throw new Error("Hi, Email and OTP are required to send an email.");
-    }
+  if (!mailTransporter) {
+    throw new Error(
+      "Email service unavailable. Please try again later."
+    );
+  }
 
-    let subject, message;
-    if (type === "verification") {
-        subject = "Your OTP for Account Verification";
-        message = `
+  if (!email || !otp) {
+    throw new Error(
+      "Hi, Email and OTP are required to send an email."
+    );
+  }
+
+  let subject, message;
+
+  if (type === "verification") {
+    subject = "Your OTP for Account Verification";
+    message = `
         <h2>Your OTP for Account Verification</h2>
         <p>Please use the OTP below to verify your account</p>
         `;
-    } else if (type === "forgot-password") {
-        subject = "Your OTP for Password Recovery";
-        message = `
+  } else if (type === "forgot-password") {
+    subject = "Your OTP for Password Recovery";
+    message = `
         <h2>Your OTP for Password Recovery</h2>
         <p>Please use the OTP below to reset your password</p>
         `;
-    } else {
-        throw new Error("Invalid email type specified.");
-    }
+  } else {
+    throw new Error("Invalid email type specified.");
+  }
 
-    const mailOptions = {
-        from: '"UiX" <uixphuke@gmail.com>',
-        to: email,
-        subject,
-        html: `
+  const mailOptions = {
+    from: '"UiX" <uixphuke@gmail.com>',
+    to: email,
+    subject,
+    html: `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -120,27 +144,49 @@ const sendOtpEmail = async (email, otp, type = "verification") => {
         </body>
         </html>
         `,
-    };
+  };
 
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        return info;
-    } catch (error) {
-        if (error.responseCode === 550) {
-            console.error("Authentication Error: Invalid email credentials.");
-        } else if (error.message.includes("ENOTFOUND")) {
-            console.error("Network Error: Unable to connect to the email server.");
-        } else if (error.message.includes("ETIMEDOUT")) {
-            console.error("Timeout Error: Email server is taking too long to respond.");
-        } else if (error.message.includes("ECONNREFUSED")) {
-            console.error("Connection Error: Email server refused the connection.");
-        } else {
-            console.error("Unexpected Error:", error.message);
-        }
-        throw new Error("Failed to send email. Please try again later.");
+  try {
+    const info = await mailTransporter.sendMail(
+      mailOptions
+    );
+    return info;
+  } catch (error) {
+    if (error.responseCode === 550) {
+      console.error(
+        "Authentication Error: Invalid email credentials."
+      );
+    } else if (
+      error.message.includes("ENOTFOUND")
+    ) {
+      console.error(
+        "Network Error: Unable to connect to the email server."
+      );
+    } else if (
+      error.message.includes("ETIMEDOUT")
+    ) {
+      console.error(
+        "Timeout Error: Email server is taking too long to respond."
+      );
+    } else if (
+      error.message.includes("ECONNREFUSED")
+    ) {
+      console.error(
+        "Connection Error: Email server refused the connection."
+      );
+    } else {
+      console.error(
+        "Unexpected Error:",
+        error.message
+      );
     }
+
+    throw new Error(
+      "Failed to send email. Please try again later."
+    );
+  }
 };
 
 module.exports = {
-    sendOtpEmail
+  sendOtpEmail,
 };
