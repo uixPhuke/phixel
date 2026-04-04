@@ -46,22 +46,7 @@ const userSlice=createSlice({
             state.authLoading = false;
             state.error = action.payload || 'Please login first to access this page';
         },
-        logoutSuccess: (state) => {
-    state.isLogin = false;
-    state.user = {
-        userID:"",
-        firstName:"",
-        lastName:"",
-        username:"",
-        email:"",
-        phone:"",
-        dob:"",
-        isAdmin:false,
-        isFirebaseAuth:false,
-        createdAt:"",
-        updatedAt:"",
-    };
-},
+
 logoutSuccess: (state) => {
     state.isLogin = false;
     state.user = {
