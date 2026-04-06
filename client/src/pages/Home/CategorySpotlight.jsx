@@ -45,14 +45,21 @@ const CategorySpotlight = () => {
       </div>
 
       {/* Category Grid */}
-     <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-y-12 gap-x-6 px-6">
+     <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-y-10 gap-x-4 px-4 sm:px-6">
   {categories.map((cat, index) => (
     <Link
       key={index}
       to={cat.link}
-      className="w-1/2 sm:w-1/4 md:w-1/6 lg:w-[12.5%] flex flex-col items-center group"
+      className="
+        w-1/3
+        sm:w-1/4
+        md:w-1/5
+        lg:w-1/6
+        xl:w-[12.5%]
+        flex flex-col items-center group
+      "
     >
-      <div className="w-32 h-32 flex items-center justify-center">
+      <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 flex items-center justify-center">
         <img
           src={cat.img}
           alt={cat.name}
@@ -60,7 +67,7 @@ const CategorySpotlight = () => {
         />
       </div>
 
-      <p className="text-xs text-primary mt-3 text-center">
+      <p className="text-xs sm:text-sm text-primary mt-3 text-center">
         {cat.name}
       </p>
     </Link>
