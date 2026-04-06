@@ -47,6 +47,7 @@ const App = () => {
 
   return (
     <>
+    <div className="min-h-screen flex flex-col">
       <Navbar />
 
       <LoginModal
@@ -55,7 +56,7 @@ const App = () => {
       />
 
       <Toaster
-        position="top-center"
+        position="bottom-center"
         toastOptions={{
           duration: 2500,
           style: {
@@ -70,7 +71,7 @@ const App = () => {
         }}
       />
 
-      <div className="pt-[60px] space-y-24">
+      <div className="min-h-screen pt-[60px] flex-1"> 
         <Routes>
           {/* Admin Routes */}
           <Route
@@ -151,6 +152,7 @@ const App = () => {
 
       <About />
       <Footer />
+      </div>
     </>
   );
 };
