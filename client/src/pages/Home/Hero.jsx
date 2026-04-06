@@ -5,9 +5,9 @@ import 'swiper/css';
 import 'swiper/css/effect-fade';
 import { Link } from 'react-router-dom';
 
-import img1 from '../../assets/img1.png';
-import img2 from '../../assets/img2.png';
-import img3 from '../../assets/img3.png';
+import img1 from '../../assets/img1.webp';
+import img2 from '../../assets/img2.webp';
+import img3 from '../../assets/img3.webp';
 
 const Hero = () => {
   return (
@@ -32,7 +32,7 @@ const Hero = () => {
       </Swiper>
 
       {/* Button - Desktop only (over image) */}
-      <div className="hidden lg:flex absolute bottom-16 right-20 z-10">
+      <div className="hidden lg:flex absolute bottom-30 right-20 z-10">
         <Link to="/products">
           <button className="bg-secondary text-primary px-10 py-4 text-md font-semibold rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition">
             SHOP NOW

@@ -142,7 +142,7 @@ useEffect(() => {
   ) : (
     <button
       onClick={() => dispatch(setShowLoginModalTrue())}
-      className="text-xs font-medium hover:text-accent border border-primary px-4 py-2 rounded-full transition-all duration-300"
+      className="text-xs font-medium hover:text-accent border border-accent px-4 py-2 rounded-full transition-all duration-300"
     >
       Sign In
     </button>
